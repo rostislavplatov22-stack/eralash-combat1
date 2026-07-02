@@ -75,3 +75,8 @@ https://eralash-combat1.vercel.app/api/anti-cheat?secret=ТВОЙ_ADMIN_API_SECR
 4. В Mini App нажми `🧬 Контент` и выбери бойца/арену.
 
 Смотри также `CONTENT_SYSTEM_UPDATE_RU.md`.
+
+
+## После Referral + Season update
+
+После загрузки архива обязательно выполни свежий `supabase_schema.sql` в Supabase SQL Editor и затем `notify pgrst, 'reload schema';`. Проверь `/api/referral` и `/api/season`.

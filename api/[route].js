@@ -15,6 +15,8 @@ import content from '../lib/handlers/content.js';
 import fighters from '../lib/handlers/fighters.js';
 import arenas from '../lib/handlers/arenas.js';
 import abilities from '../lib/handlers/abilities.js';
+import referral from '../lib/handlers/referral.js';
+import season from '../lib/handlers/season.js';
 
 // Single Vercel Serverless Function dispatcher.
 // This keeps the project inside the Hobby plan limit while preserving public URLs:
@@ -37,7 +39,9 @@ const routes = {
   content,
   fighters,
   arenas,
-  abilities
+  abilities,
+  referral,
+  season
 };
 
 export default async function handler(req, res) {

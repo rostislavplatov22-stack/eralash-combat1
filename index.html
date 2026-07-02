@@ -191,6 +191,8 @@
           <button id="contentBtn" class="secondary">🧬 Контент</button>
           <button id="promoBtn" class="secondary">🎟️ Promo</button>
           <button id="weeklyBtn" class="secondary">🥇 Weekly Top</button>
+          <button id="inviteBtn" class="secondary">🤝 Invite</button>
+          <button id="seasonBtn" class="secondary">🏆 Season</button>
           <button id="adminBtn" class="secondary">⚙️ Admin</button>
         </div>
         <div id="economyContent" class="economy-content">
@@ -200,6 +202,7 @@
             <span class="pill">Weekly leaderboard</span>
             <span class="pill">Telegram Stars ready</span>
             <span class="pill">Fighters & arenas DB</span>
+            <span class="pill">Referral & Season ready</span>
           </div>
         </div>
       </div>
@@ -215,6 +218,7 @@
       <div id="resultRewards" class="pill-list" style="justify-content:center;margin:12px 0"></div>
       <div class="btn-row">
         <button id="restartBtn">Реванш</button>
+        <button id="shareVictoryBtn" class="secondary">📤 Share</button>
         <button id="menuBtn" class="secondary">Меню</button>
       </div>
     </div>
@@ -265,7 +269,8 @@
     resultText: document.getElementById('resultText'),
     resultKicker: document.getElementById('resultKicker'),
     tgProfileBadge: document.getElementById('tgProfileBadge'),
-    resultRewards: document.getElementById('resultRewards')
+    resultRewards: document.getElementById('resultRewards'),
+    shareVictoryBtn: document.getElementById('shareVictoryBtn')
   };
 
   const DPR_MAX = 2;
@@ -675,6 +680,9 @@
         saveProfile();
         updateTelegramBadge();
       }
+      if (data?.season?.pointsAdded && ui.resultRewards) {
+        ui.resultRewards.insertAdjacentHTML('beforeend', `<span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">+${data.season.pointsAdded} season pts</span>`);
+      }
     } catch(_) {
       // Offline/browser preview must keep working even without backend.
     }
@@ -825,6 +833,7 @@
         <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Coins ${appProfile.coins}</span>
         <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Wins ${appProfile.wins}</span>
         <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Streak ${appProfile.streak}</span>
+        <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Season pts sync</span>
       `;
     }
     sendBattleResult(victory, rewards);
@@ -1486,6 +1495,8 @@
       contentBtn: document.getElementById('contentBtn'),
       promo: document.getElementById('promoBtn'),
       weekly: document.getElementById('weeklyBtn'),
+      invite: document.getElementById('inviteBtn'),
+      season: document.getElementById('seasonBtn'),
       admin: document.getElementById('adminBtn'),
       content: document.getElementById('economyContent')
     };
@@ -1642,6 +1653,145 @@
     } catch (error) {
       setEconomyContent('<div class="pill">Weekly leaderboard недоступен</div>');
     }
+  }
+
+  async function loadReferral(){
+    setEconomyContent('<div class="pill">Готовим invite-ссылку...</div>');
+    try {
+      const res = await fetch('/api/referral', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const refs = (data.referrals || []).slice(0, 6).map(r => `
+        <div class="shop-card">
+          <div><h4>${escapeUi(r.name || 'Fighter')}</h4><p>LVL ${r.level || 1} · +${r.rewardXp || 0} XP · +${r.rewardCoins || 0} coins</p></div>
+          <span class="pill">${r.rewarded ? 'Rewarded' : 'Pending'}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="shop-card">
+          <div>
+            <h4>🤝 Invite & Earn</h4>
+            <p>Пригласи друга: ты получишь +50 XP и +100 coins, друг получит +25 XP и +50 coins.</p>
+            <input id="inviteLinkInput" readonly value="${escapeUi(data.inviteLink || '')}" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(217,183,106,.3);background:rgba(0,0,0,.35);color:#fff;outline:none" />
+            <div class="price">Invited ${data.stats?.total || 0} · Rewarded ${data.stats?.rewarded || 0} · Earned ${data.stats?.coinsEarned || 0} coins</div>
+          </div>
+          <div class="shop-actions">
+            <button id="copyInviteBtn" class="mini-btn">Copy</button>
+            <button id="shareInviteBtn" class="mini-btn secondary">Share</button>
+          </div>
+        </div>
+        ${refs || '<div class="pill">Пока нет приглашённых игроков</div>'}
+      `);
+      document.getElementById('copyInviteBtn')?.addEventListener('click', async () => {
+        const value = document.getElementById('inviteLinkInput')?.value || '';
+        try { await navigator.clipboard.writeText(value); } catch(_) {}
+        setEconomyContent(`<div class="pill">✅ Invite-ссылка скопирована</div>`);
+      });
+      document.getElementById('shareInviteBtn')?.addEventListener('click', () => shareInvite(data.inviteLink));
+    } catch (error) {
+      setEconomyContent('<div class="pill">Referral API недоступен</div>');
+    }
+  }
+
+  async function loadSeason(){
+    setEconomyContent('<div class="pill">Загрузка сезонного турнира...</div>');
+    try {
+      const res = await fetch('/api/season?limit=10', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const rows = (data.leaderboard || []).map(p => `
+        <div class="shop-card">
+          <div><h4>#${p.rank || '?'} ${escapeUi(p.name || p.username || 'Fighter')}</h4><p>${p.points || 0} pts · ${p.wins || 0}W/${p.losses || 0}L · ${p.matches || 0} matches</p></div>
+          <span class="pill">LVL ${p.level || 1}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">${escapeUi(data.season?.title || 'Current Season')}</span>
+          <span class="pill">Win: 100+ pts</span>
+          <span class="pill">Clean win bonus</span>
+        </div>
+        ${rows || '<div class="pill">Пока нет очков сезона. Сыграй бой, чтобы попасть в рейтинг.</div>'}
+      `);
+    } catch (error) {
+      setEconomyContent('<div class="pill">Season API недоступен</div>');
+    }
+  }
+
+  function openShareUrl(url, text){
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url || location.href)}&text=${encodeURIComponent(text || 'EraLash Combat')}`;
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) window.Telegram.WebApp.openTelegramLink(shareUrl);
+      else window.open(shareUrl, '_blank');
+    } catch(_) {
+      window.open(shareUrl, '_blank');
+    }
+  }
+
+  async function shareInvite(inviteLink){
+    const link = inviteLink || location.href;
+    try {
+      await fetch('/api/referral', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({
+          action:'share',
+          shareType:'invite',
+          user: telegramContext.user || { id:'guest', first_name:'Guest' },
+          payload:{ link }
+        })
+      });
+    } catch(_) {}
+    openShareUrl(link, 'Заходи в EraLash Combat ⚔️ Получим бонусы за приглашение и ворвёмся в сезонный топ.');
+  }
+
+  async function shareVictory(){
+    const text = `Я выиграл бой в EraLash Combat ⚔️ ${appProfile.wins}W/${appProfile.losses}L · LVL ${appProfile.level}. Заходи на арену!`;
+    let link = location.origin || location.href;
+    try {
+      const res = await fetch('/api/referral', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (data.inviteLink) link = data.inviteLink;
+      await fetch('/api/referral', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({
+          action:'share',
+          shareType:'victory',
+          user: telegramContext.user || { id:'guest', first_name:'Guest' },
+          payload:{ wins:appProfile.wins, level:appProfile.level }
+        })
+      });
+    } catch(_) {}
+    openShareUrl(link, text);
+  }
+
+  async function registerReferralFromLaunch(){
+    const tgStart = window.Telegram?.WebApp?.initDataUnsafe?.start_param || '';
+    const params = new URLSearchParams(location.search);
+    const ref = tgStart || params.get('ref') || '';
+    if (!ref || ref === '1') return;
+    const key = `eralash_ref_registered_${ref}`;
+    if (localStorage.getItem(key)) return;
+    try {
+      const res = await fetch('/api/referral', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({
+          ref,
+          source:'miniapp-launch',
+          user: telegramContext.user || { id:'guest', first_name:'Guest' }
+        })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      if (data.registered) {
+        localStorage.setItem(key, '1');
+        setTimeout(() => setEconomyContent('<div class="pill">🎁 Referral bonus activated: +25 XP / +50 coins</div>'), 600);
+      }
+    } catch(_) {}
   }
 
 
@@ -1845,7 +1995,10 @@
     els.contentBtn?.addEventListener('click', () => { audio.ui(); loadContentPanel(); });
     els.promo?.addEventListener('click', () => { audio.ui(); promoForm(); });
     els.weekly?.addEventListener('click', () => { audio.ui(); loadWeekly(); });
+    els.invite?.addEventListener('click', () => { audio.ui(); loadReferral(); });
+    els.season?.addEventListener('click', () => { audio.ui(); loadSeason(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
+    ui.shareVictoryBtn?.addEventListener('click', () => { audio.ui(); shareVictory(); });
   }
 
 
@@ -1881,12 +2034,15 @@
     } catch(_) {}
     updateTelegramBadge();
     syncProfileFromBackend();
+    registerReferralFromLaunch();
     fetch('/api/content').then(r=>r.json()).then(data=>{ if(data.ok){ contentBundle={ fighters:data.fighters||DEFAULT_CONTENT.fighters, arenas:data.arenas||DEFAULT_CONTENT.arenas, abilities:data.abilities||[], balance:data.balance||DEFAULT_CONTENT.balance }; }}).catch(()=>{});
     const params = new URLSearchParams(location.search);
     setTimeout(() => {
       if (params.get('admin') === '1') loadAdmin();
       if (params.get('promo') === '1') promoForm();
       if (params.get('content') === '1') loadContentPanel();
+      if (params.get('invite') === '1' || params.get('ref') === '1') loadReferral();
+      if (params.get('season') === '1') loadSeason();
     }, 350);
   }
 

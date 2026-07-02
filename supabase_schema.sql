@@ -419,3 +419,67 @@ on conflict (id) do update set
   updated_at = now();
 
 notify pgrst, 'reload schema';
+
+
+-- Referral + Share + Tournament Season update.
+-- Safe to run multiple times in Supabase SQL Editor.
+
+create table if not exists public.seasons (
+  id text primary key,
+  title text not null,
+  starts_at timestamptz not null,
+  ends_at timestamptz not null,
+  active boolean not null default true,
+  rewards jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.season_points (
+  season_id text not null references public.seasons(id) on delete cascade,
+  user_id uuid not null references public.users(id) on delete cascade,
+  points integer not null default 0,
+  wins integer not null default 0,
+  losses integer not null default 0,
+  matches integer not null default 0,
+  xp_total integer not null default 0,
+  coins_total integer not null default 0,
+  last_result text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (season_id, user_id)
+);
+
+create table if not exists public.referrals (
+  id uuid primary key default gen_random_uuid(),
+  referrer_id uuid not null references public.users(id) on delete cascade,
+  referred_id uuid not null references public.users(id) on delete cascade,
+  source text not null default 'unknown',
+  reward_xp integer not null default 0,
+  reward_coins integer not null default 0,
+  rewarded boolean not null default false,
+  created_at timestamptz not null default now(),
+  unique (referred_id)
+);
+
+create table if not exists public.share_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete set null,
+  share_type text not null default 'generic',
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists seasons_active_idx on public.seasons (active, starts_at desc);
+create index if not exists season_points_rank_idx on public.season_points (season_id, points desc, wins desc, updated_at desc);
+create index if not exists referrals_referrer_idx on public.referrals (referrer_id, created_at desc);
+create index if not exists referrals_referred_idx on public.referrals (referred_id);
+create index if not exists share_events_user_idx on public.share_events (user_id, created_at desc);
+create index if not exists share_events_type_idx on public.share_events (share_type, created_at desc);
+
+alter table public.seasons enable row level security;
+alter table public.season_points enable row level security;
+alter table public.referrals enable row level security;
+alter table public.share_events enable row level security;
+
+notify pgrst, 'reload schema';

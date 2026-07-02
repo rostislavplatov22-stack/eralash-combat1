@@ -161,3 +161,8 @@ ADMIN_API_SECRET
 ## Content System
 
 Добавлены API `/api/content`, `/api/fighters`, `/api/arenas`, `/api/abilities`, таблицы `fighters`, `arenas`, `abilities`, `content_balance`, выбор бойца/арены в Mini App и admin-actions для live-баланса.
+
+
+## Referral + Season Update
+
+Добавлены referral, share victory, сезонный рейтинг и начисление season points после боя. Подробности: `REFERRAL_SEASON_UPDATE_RU.md`.
