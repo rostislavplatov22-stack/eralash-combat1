@@ -1,0 +1,52 @@
+import bot from '../lib/handlers/bot.js';
+import result from '../lib/handlers/result.js';
+import leaderboard from '../lib/handlers/leaderboard.js';
+import setWebhook from '../lib/handlers/set-webhook.js';
+import profile from '../lib/handlers/profile.js';
+import shop from '../lib/handlers/shop.js';
+import inventory from '../lib/handlers/inventory.js';
+import dailyReward from '../lib/handlers/daily-reward.js';
+import weeklyLeaderboard from '../lib/handlers/weekly-leaderboard.js';
+import starsInvoice from '../lib/handlers/stars-invoice.js';
+import admin from '../lib/handlers/admin.js';
+import promo from '../lib/handlers/promo.js';
+import antiCheat from '../lib/handlers/anti-cheat.js';
+
+// Single Vercel Serverless Function dispatcher.
+// This keeps the project inside the Hobby plan limit while preserving public URLs:
+// /api/bot, /api/shop, /api/admin, /api/promo, etc.
+
+const routes = {
+  bot,
+  result,
+  leaderboard,
+  'set-webhook': setWebhook,
+  profile,
+  shop,
+  inventory,
+  'daily-reward': dailyReward,
+  'weekly-leaderboard': weeklyLeaderboard,
+  'stars-invoice': starsInvoice,
+  admin,
+  promo,
+  'anti-cheat': antiCheat
+};
+
+export default async function handler(req, res) {
+  const url = new URL(req.url, `https://${req.headers.host || 'localhost'}`);
+  const match = url.pathname.match(/^\/api\/([^/?#]+)/);
+  const route = match ? decodeURIComponent(match[1]) : '';
+  const routeHandler = routes[route];
+
+  if (!routeHandler) {
+    res.status(404).json({
+      ok: false,
+      error: 'API route not found',
+      route,
+      available: Object.keys(routes)
+    });
+    return;
+  }
+
+  return routeHandler(req, res);
+}
