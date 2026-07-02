@@ -58,6 +58,39 @@ export function catalogItem(id) {
   return SHOP_CATALOG.find(item => item.id === id) || null;
 }
 
+function dbShopItemToClient(row = {}) {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description || '',
+    type: row.type || 'skin',
+    rarity: row.rarity || 'common',
+    priceCoins: toInt(row.price_coins),
+    priceStars: toInt(row.price_stars),
+    metadata: row.metadata || {},
+    active: row.active !== false
+  };
+}
+
+export async function getShopCatalog(activeOnly = true) {
+  if (!canUseDb()) return SHOP_CATALOG;
+  const filter = activeOnly ? 'active=eq.true&' : '';
+  const rows = await supabase(`shop_items?${filter}select=*&order=created_at.desc`, { method: 'GET' });
+  return (rows || []).map(dbShopItemToClient);
+}
+
+export async function catalogItemLive(id) {
+  const fallback = catalogItem(id);
+  if (!canUseDb()) return fallback;
+  const rows = await supabase(
+    `shop_items?id=eq.${encodeURIComponent(String(id))}&select=*&limit=1`,
+    { method: 'GET' }
+  );
+  const item = rows?.[0] ? dbShopItemToClient(rows[0]) : fallback;
+  return item && item.active !== false ? item : null;
+}
+
+
 export function storageMode() {
   return hasDatabase() ? 'supabase-postgres' : 'memory-preview';
 }
@@ -134,7 +167,6 @@ export async function syncShopItems() {
     price_coins: item.priceCoins,
     price_stars: item.priceStars,
     metadata: item.metadata,
-    active: true,
     updated_at: new Date().toISOString()
   }));
 
@@ -333,7 +365,7 @@ export async function claimDailyReward(user) {
 }
 
 export async function purchaseWithCoins(user, itemId) {
-  const item = catalogItem(itemId);
+  const item = await catalogItemLive(itemId);
   if (!item) throw new Error('Unknown shop item');
 
   if (!canUseDb()) {

@@ -2,6 +2,7 @@ import { appUrl, telegram, parseBody, WEBHOOK_SECRET } from './_telegram.js';
 import { leaderboard, getProfile, storageMode } from './_store.js';
 import { claimDailyReward, SHOP_CATALOG, weeklyLeaderboard, catalogItem, createStarsPayload, validateStarsCheckout, completeStarsPayment } from './_economy.js';
 import { ensureUser } from './_db.js';
+import { isAdminUser } from './_admin-tools.js';
 
 function mainMenu(url) {
   return {
@@ -16,7 +17,11 @@ function mainMenu(url) {
           { text: '🎁 Daily', callback_data: 'daily_reward' },
           { text: '🛒 Магазин', callback_data: 'shop' }
         ],
-        [{ text: '🥇 Weekly Top', callback_data: 'weekly_leaderboard' }]
+        [
+          { text: '🎟️ Promo', web_app: { url: `${url}?promo=1` } },
+          { text: '🥇 Weekly Top', callback_data: 'weekly_leaderboard' }
+        ],
+        [{ text: '⚙️ Admin', web_app: { url: `${url}?admin=1` } }]
       ]
     }
   };
@@ -187,7 +192,7 @@ export default async function handler(req, res) {
       } else if (text.startsWith('/help')) {
         await telegram('sendMessage', {
           chat_id: chatId,
-          text: 'Команды: /start, /play, /profile, /leaderboard, /daily, /shop. Управление в игре: A/D, W, J/K/L, I.',
+          text: 'Команды: /start, /play, /profile, /leaderboard, /daily, /shop, /admin. Управление в игре: A/D, W, J/K/L, I.',
           ...mainMenu(url)
         });
       } else if (text.startsWith('/profile')) {
@@ -201,6 +206,17 @@ export default async function handler(req, res) {
           parse_mode: 'HTML',
           ...shopKeyboard(url)
         });
+      } else if (text.startsWith('/admin')) {
+        if (isAdminUser(msg.from)) {
+          await telegram('sendMessage', {
+            chat_id: chatId,
+            text: '⚙️ <b>Admin Panel</b>\n\nОткрой Mini App кнопкой ниже. Доступ проверяется через ADMIN_TELEGRAM_IDS. API: /api/admin, /api/anti-cheat.',
+            parse_mode: 'HTML',
+            reply_markup: { inline_keyboard: [[{ text: '⚙️ Открыть Admin Panel', web_app: { url: `${url}?admin=1` } }], [{ text: '🏠 Главное меню', callback_data: 'home' }]] }
+          });
+        } else {
+          await telegram('sendMessage', { chat_id: chatId, text: '⛔ Admin access denied. Добавь свой Telegram ID в ADMIN_TELEGRAM_IDS.', ...mainMenu(url) });
+        }
       } else if (text.startsWith('/daily')) {
         const result = await claimDailyReward(msg.from || { id: chatId });
         await telegram('sendMessage', {

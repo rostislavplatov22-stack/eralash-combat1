@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const webhookUrl = `${base}/api/bot`;
     const payload = {
       url: webhookUrl,
-      allowed_updates: ['message', 'callback_query']
+      allowed_updates: ['message', 'callback_query', 'pre_checkout_query']
     };
     if (WEBHOOK_SECRET) payload.secret_token = WEBHOOK_SECRET;
 

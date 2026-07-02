@@ -1,5 +1,5 @@
 import { parseBody } from './_telegram.js';
-import { SHOP_CATALOG, syncShopItems, getRequestUser, purchaseWithCoins, getInventory, requireProfile, storageMode } from './_economy.js';
+import { syncShopItems, getShopCatalog, getRequestUser, purchaseWithCoins, getInventory, requireProfile, storageMode } from './_economy.js';
 
 export default async function handler(req, res) {
   try {
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       res.status(200).json({
         ok: true,
         storage: storageMode(),
-        catalog: SHOP_CATALOG,
+        catalog: await getShopCatalog(true),
         inventory
       });
       return;

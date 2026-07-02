@@ -86,6 +86,8 @@ export function toClientProfile(row) {
     bestStreak: toInt(row?.best_streak),
     dailyStreak: toInt(row?.daily_streak),
     lastDailyClaimAt: row?.last_daily_claim_at || '',
+    banned: Boolean(row?.banned),
+    banReason: row?.ban_reason || '',
     updatedAt: row?.updated_at || ''
   };
 }

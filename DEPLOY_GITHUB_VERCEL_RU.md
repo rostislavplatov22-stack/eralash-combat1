@@ -40,3 +40,28 @@
 1. Заменяешь файлы в GitHub.
 2. Нажимаешь `Commit changes`.
 3. Vercel сам создаёт новый deployment.
+
+
+## Дополнительно для Admin Panel
+
+В Vercel → Settings → Environment Variables добавь:
+
+```text
+ADMIN_TELEGRAM_IDS=твой_telegram_id
+ADMIN_API_SECRET=длинный_admin_secret
+```
+
+После добавления переменных сделай:
+
+```text
+Deployments → Redeploy
+```
+
+Проверка:
+
+```text
+https://eralash-combat1.vercel.app/api/admin?secret=ТВОЙ_ADMIN_API_SECRET
+https://eralash-combat1.vercel.app/api/anti-cheat?secret=ТВОЙ_ADMIN_API_SECRET
+```
+
+В Supabase обязательно выполни свежий `supabase_schema.sql`.

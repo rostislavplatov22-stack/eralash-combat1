@@ -164,7 +164,9 @@
         <div class="economy-actions">
           <button id="dailyBtn" class="secondary">🎁 Daily</button>
           <button id="shopBtn" class="secondary">🛒 Магазин</button>
+          <button id="promoBtn" class="secondary">🎟️ Promo</button>
           <button id="weeklyBtn" class="secondary">🥇 Weekly Top</button>
+          <button id="adminBtn" class="secondary">⚙️ Admin</button>
         </div>
         <div id="economyContent" class="economy-content">
           <div class="pill-list">
@@ -1291,7 +1293,9 @@
     return {
       daily: document.getElementById('dailyBtn'),
       shop: document.getElementById('shopBtn'),
+      promo: document.getElementById('promoBtn'),
       weekly: document.getElementById('weeklyBtn'),
+      admin: document.getElementById('adminBtn'),
       content: document.getElementById('economyContent')
     };
   }
@@ -1449,11 +1453,110 @@
     }
   }
 
+
+  function promoForm(){
+    setEconomyContent(`
+      <div class="shop-card">
+        <div>
+          <h4>🎟️ Promo Code</h4>
+          <p>Введи промокод, чтобы получить coins, XP или предмет.</p>
+          <input id="promoInput" placeholder="WELCOME100" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(217,183,106,.3);background:rgba(0,0,0,.35);color:#fff;outline:none;text-transform:uppercase" />
+        </div>
+        <div class="shop-actions">
+          <button id="promoRedeemBtn" class="mini-btn">Redeem</button>
+        </div>
+      </div>
+    `);
+    document.getElementById('promoRedeemBtn')?.addEventListener('click', redeemPromo);
+  }
+
+  async function redeemPromo(){
+    const code = document.getElementById('promoInput')?.value || '';
+    if (!code.trim()) {
+      setEconomyContent('<div class="pill">Введи промокод</div>');
+      return;
+    }
+    setEconomyContent('<div class="pill">Проверяем promo code...</div>');
+    try {
+      const res = await fetch('/api/promo', {
+        method: 'POST',
+        headers: economyHeaders(true),
+        body: JSON.stringify({
+          code,
+          user: telegramContext.user || { id: 'guest', first_name: 'Guest' }
+        })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      if (data.redeemed) {
+        setEconomyContent(`
+          <div class="pill-list">
+            <span class="pill">✅ ${escapeUi(data.promo?.title || 'Promo активирован')}</span>
+            <span class="pill">+${data.promo?.rewardXp || 0} XP</span>
+            <span class="pill">+${data.promo?.rewardCoins || 0} coins</span>
+            ${data.promo?.itemId ? `<span class="pill">Item: ${escapeUi(data.promo.itemId)}</span>` : ''}
+          </div>
+        `);
+      } else {
+        setEconomyContent(`<div class="pill">Promo не активирован: ${escapeUi(data.reason || data.error || 'unknown')}</div>`);
+      }
+    } catch (error) {
+      setEconomyContent('<div class="pill">Promo API недоступен</div>');
+    }
+  }
+
+  async function loadAdmin(){
+    setEconomyContent('<div class="pill">Загрузка admin dashboard...</div>');
+    try {
+      const res = await fetch('/api/admin', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) {
+        setEconomyContent(`
+          <div class="shop-card">
+            <div>
+              <h4>⚙️ Admin Panel</h4>
+              <p>${escapeUi(data.error || 'Нет доступа. Добавь ADMIN_TELEGRAM_IDS в Vercel и открывай игру из Telegram.')}</p>
+            </div>
+          </div>
+        `);
+        return;
+      }
+      const live = data.live || {};
+      const stats = data.stats || {};
+      const top = (data.leaderboard || []).slice(0, 5).map((p, i) =>
+        `<div class="shop-card"><div><h4>#${i + 1} ${escapeUi(p.name || p.username || 'Fighter')}</h4><p>${p.wins}W/${p.losses}L · ${p.coins} coins · LVL ${p.level}</p></div><span class="pill">TOP</span></div>`
+      ).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Players: ${stats.players || 0}</span>
+          <span class="pill">Battles 24h: ${live.battles24h || 0}</span>
+          <span class="pill">Shop active: ${live.activeShopItems || 0}</span>
+          <span class="pill">Purchases: ${live.purchasesTotal || 0}</span>
+          <span class="pill">Anti-cheat: ${live.antiCheatFlags || 0}</span>
+        </div>
+        ${top || '<div class="pill">Нет игроков в рейтинге</div>'}
+        <div class="shop-card">
+          <div><h4>Admin API</h4><p>POST /api/admin: grant, ban, unban, resetProgress, upsertShopItem, createPromo, togglePromo. GET /api/anti-cheat.</p></div>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+        </div>
+      `);
+    } catch (error) {
+      setEconomyContent('<div class="pill">Admin API недоступен</div>');
+    }
+  }
+
+
   function bindEconomyControls(){
     const els = economyEls();
     els.daily?.addEventListener('click', () => { audio.ui(); claimDaily(); });
     els.shop?.addEventListener('click', () => { audio.ui(); loadShop(); });
+    els.promo?.addEventListener('click', () => { audio.ui(); promoForm(); });
     els.weekly?.addEventListener('click', () => { audio.ui(); loadWeekly(); });
+    els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
   }
 
 
@@ -1486,6 +1589,11 @@
     } catch(_) {}
     updateTelegramBadge();
     syncProfileFromBackend();
+    const params = new URLSearchParams(location.search);
+    setTimeout(() => {
+      if (params.get('admin') === '1') loadAdmin();
+      if (params.get('promo') === '1') promoForm();
+    }, 350);
   }
 
   resize();

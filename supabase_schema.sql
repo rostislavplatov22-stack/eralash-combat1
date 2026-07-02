@@ -123,7 +123,6 @@ on conflict (id) do update set
   price_coins = excluded.price_coins,
   price_stars = excluded.price_stars,
   metadata = excluded.metadata,
-  active = excluded.active,
   updated_at = now();
 
 create or replace view public.weekly_leaderboard as
@@ -150,5 +149,87 @@ group by u.id, u.telegram_id, u.username, u.display_name, u.level, u.best_streak
 create unique index if not exists purchases_telegram_charge_unique_idx
   on public.purchases (telegram_charge_id)
   where telegram_charge_id is not null and telegram_charge_id <> '';
+
+
+
+
+-- Admin panel, promo codes and anti-cheat update.
+-- Safe to run multiple times in Supabase SQL Editor.
+
+alter table public.users
+  add column if not exists banned boolean not null default false,
+  add column if not exists ban_reason text not null default '',
+  add column if not exists admin_note text not null default '';
+
+create table if not exists public.promo_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  title text not null default '',
+  reward_xp integer not null default 0,
+  reward_coins integer not null default 0,
+  item_id text references public.shop_items(id) on delete set null,
+  max_uses integer not null default 100,
+  used_count integer not null default 0,
+  active boolean not null default true,
+  valid_until timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.promo_redemptions (
+  id uuid primary key default gen_random_uuid(),
+  promo_code_id uuid not null references public.promo_codes(id) on delete cascade,
+  user_id uuid not null references public.users(id) on delete cascade,
+  reward_xp integer not null default 0,
+  reward_coins integer not null default 0,
+  item_id text references public.shop_items(id) on delete set null,
+  created_at timestamptz not null default now(),
+  unique (promo_code_id, user_id)
+);
+
+create table if not exists public.admin_audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  admin_telegram_id text not null default '',
+  action text not null,
+  target_type text not null default '',
+  target_id text not null default '',
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.anti_cheat_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete set null,
+  telegram_id text not null default '',
+  severity text not null default 'low',
+  reason text not null,
+  payload jsonb not null default '{}'::jsonb,
+  resolved boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists users_banned_idx on public.users (banned, telegram_id);
+create index if not exists promo_codes_active_idx on public.promo_codes (active, code);
+create index if not exists promo_redemptions_user_idx on public.promo_redemptions (user_id, created_at desc);
+create index if not exists admin_audit_logs_created_idx on public.admin_audit_logs (created_at desc);
+create index if not exists anti_cheat_events_created_idx on public.anti_cheat_events (created_at desc, severity);
+
+alter table public.promo_codes enable row level security;
+alter table public.promo_redemptions enable row level security;
+alter table public.admin_audit_logs enable row level security;
+alter table public.anti_cheat_events enable row level security;
+
+insert into public.promo_codes (code, title, reward_xp, reward_coins, item_id, max_uses, active)
+values
+  ('WELCOME100', 'Welcome Fighter Pack', 100, 100, null, 1000, true),
+  ('DARKARENA', 'Dark Arena Launch Bonus', 50, 250, 'effect_crimson_sparks', 250, true)
+on conflict (code) do update set
+  title = excluded.title,
+  reward_xp = excluded.reward_xp,
+  reward_coins = excluded.reward_coins,
+  item_id = excluded.item_id,
+  max_uses = excluded.max_uses,
+  active = excluded.active,
+  updated_at = now();
 
 notify pgrst, 'reload schema';

@@ -119,3 +119,35 @@ SUPABASE_SETUP_RU.md
 - В боте команда `/shop` показывает кнопки прямой покупки за Stars.
 
 После обновления обязательно выполнить свежий `supabase_schema.sql` в Supabase SQL Editor.
+
+
+## Admin Panel + Promo + Anti-cheat
+
+Эта версия добавляет production-инструменты:
+
+- Admin dashboard;
+- Shop Manager API;
+- Players Manager API;
+- Promo Codes;
+- Anti-cheat result validation;
+- Admin audit logs;
+- Ban / unban;
+- Grant coins / XP;
+- Reset player progress.
+
+Новые API:
+
+```text
+/api/admin
+/api/promo
+/api/anti-cheat
+```
+
+Новые Vercel переменные:
+
+```text
+ADMIN_TELEGRAM_IDS
+ADMIN_API_SECRET
+```
+
+После деплоя выполни свежий `supabase_schema.sql` в Supabase SQL Editor.

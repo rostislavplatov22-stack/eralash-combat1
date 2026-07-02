@@ -1,5 +1,6 @@
 import { parseBody, validateInitData, extractUserFromInitData } from './_telegram.js';
 import { saveResult, storageMode } from './_store.js';
+import { validateBattleSubmission } from './_security.js';
 
 export default async function handler(req, res) {
   try {
@@ -20,12 +21,26 @@ export default async function handler(req, res) {
       serverReceivedAt: new Date().toISOString()
     };
 
-    const profile = await saveResult(record);
+    const security = await validateBattleSubmission(record);
+    if (!security.ok) {
+      res.status(security.status || 400).json({
+        ok: false,
+        verifiedTelegram: Boolean(isTelegram),
+        storage: storageMode(),
+        error: security.error,
+        flags: security.flags || [],
+        profile: security.profile || null
+      });
+      return;
+    }
+
+    const profile = await saveResult(security.record || record);
 
     res.status(200).json({
       ok: true,
       verifiedTelegram: Boolean(isTelegram),
       storage: storageMode(),
+      antiCheatFlags: security.flags || [],
       profile
     });
   } catch (error) {
