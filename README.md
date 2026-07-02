@@ -1,4 +1,9 @@
 # EraLash Combat — Dark Arena
+## Mobile Polish 1.8
+
+Исправлены прокрутка меню в Telegram на телефоне, скрыта системная MainButton, усилен визуал боя и добавлен компактный HUD для мобильного экрана.
+
+
 
 Premium browser / Telegram Mini App-ready fighting game.
 

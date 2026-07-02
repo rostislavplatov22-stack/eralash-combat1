@@ -22,13 +22,13 @@
       --line:rgba(217,183,106,.38);
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 0%,#1a1115 0%,#050506 48%,#000 100%);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);touch-action:none}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 0%,#1a1115 0%,#050506 48%,#000 100%);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);touch-action:manipulation}
     #app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:
       radial-gradient(circle at 20% 15%,rgba(201,40,50,.25),transparent 25%),
       radial-gradient(circle at 85% 25%,rgba(62,182,255,.18),transparent 25%),
       linear-gradient(180deg,#090a0d,#020203 70%);
     }
-    canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+    canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
     .hud{position:absolute;top:calc(12px + env(safe-area-inset-top));left:12px;right:12px;display:grid;grid-template-columns:1fr 78px 1fr;gap:10px;align-items:start;z-index:20;pointer-events:none}
     .fighter-card{background:linear-gradient(180deg,rgba(18,22,28,.82),rgba(4,5,7,.74));border:1px solid var(--line);box-shadow:0 14px 45px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.045);border-radius:18px;padding:10px 12px;overflow:hidden}
     .fighter-card.right{text-align:right}
@@ -49,13 +49,13 @@
     .center-callout{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);z-index:30;text-align:center;pointer-events:none;text-shadow:0 8px 30px rgba(0,0,0,.7)}
     .center-callout .big{font-size:clamp(36px,9vw,92px);font-weight:1000;letter-spacing:.1em;text-transform:uppercase;color:#fff;filter:drop-shadow(0 0 18px rgba(217,183,106,.35))}
     .center-callout .small{margin-top:8px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
-    .menu,.result{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:
+    .menu,.result{position:absolute;inset:0;z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:calc(18px + env(safe-area-inset-top)) 0 calc(34px + env(safe-area-inset-bottom));background:
       radial-gradient(circle at 50% 25%,rgba(217,183,106,.14),transparent 20%),
       radial-gradient(circle at 20% 20%,rgba(201,40,50,.2),transparent 25%),
       rgba(0,0,0,.45);
       backdrop-filter:blur(10px);
     }
-    .menu-panel{width:min(560px,calc(100% - 28px));padding:34px 26px;border-radius:30px;border:1px solid rgba(217,183,106,.42);background:linear-gradient(180deg,rgba(18,20,26,.86),rgba(5,6,8,.9));box-shadow:0 35px 100px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.045);text-align:center}
+    .menu-panel{width:min(560px,calc(100% - 28px));margin:auto 0;padding:34px 26px;border-radius:30px;border:1px solid rgba(217,183,106,.42);background:linear-gradient(180deg,rgba(18,20,26,.86),rgba(5,6,8,.9));box-shadow:0 35px 100px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.045);text-align:center}
     .kicker{color:var(--gold);letter-spacing:.24em;text-transform:uppercase;font-size:11px;font-weight:900;margin-bottom:10px}
     h1{font-size:clamp(42px,10vw,76px);line-height:.85;margin:0;text-transform:uppercase;letter-spacing:.08em;font-weight:1000}
     .subtitle{color:#b8bac1;line-height:1.55;margin:18px auto 24px;max-width:460px}
@@ -78,18 +78,42 @@
     .control-btn.active{transform:translateY(2px) scale(.96);background:linear-gradient(180deg,rgba(217,183,106,.3),rgba(255,255,255,.08));box-shadow:0 0 24px rgba(217,183,106,.23)}
     .debug{position:absolute;left:12px;bottom:100px;z-index:60;color:#fff;background:rgba(0,0,0,.45);font-size:11px;padding:7px 9px;border-radius:10px;display:none}
     @media (max-width:700px){
-      .hud{grid-template-columns:1fr 58px 1fr;gap:6px;top:calc(8px + env(safe-area-inset-top));left:8px;right:8px}
-      .fighter-card{border-radius:14px;padding:8px}
-      .name-row{font-size:10px}
+      .menu,.result{padding:calc(12px + env(safe-area-inset-top)) 0 calc(96px + env(safe-area-inset-bottom));align-items:flex-start}
+      .menu-panel{width:calc(100% - 22px);margin:0;padding:22px 16px;border-radius:24px}
+      h1{font-size:clamp(38px,14vw,58px);line-height:.86}
+      .subtitle{font-size:15px;line-height:1.48;margin:14px auto 18px}
+      .profile-badge{font-size:11px;line-height:1.35}
+      .hud{grid-template-columns:1fr 52px 1fr;gap:5px;top:calc(6px + env(safe-area-inset-top));left:7px;right:7px}
+      .fighter-card{border-radius:13px;padding:7px 8px}
+      .name-row{font-size:9px;letter-spacing:.13em}
+      .bar{height:12px;margin-top:6px}
+      .meter{height:6px}
       .badge{display:none}
-      .timer{height:58px;border-radius:17px}
-      .timer .num{font-size:22px}
+      .timer{height:52px;border-radius:16px}
+      .timer .num{font-size:20px}
       .timer .rounds{font-size:8px}
-      .controls{padding:0 10px}
-      .control-btn{width:50px;height:50px;border-radius:17px;font-size:12px}
-      .control-btn.big{width:58px;height:58px}
-      .tips{grid-template-columns:1fr}
-      .menu-panel{padding:26px 18px}
+      .controls{padding:0 8px;bottom:calc(8px + env(safe-area-inset-bottom))}
+      .pad,.actions{gap:7px}
+      .control-btn{width:48px;height:48px;border-radius:16px;font-size:12px}
+      .control-btn.big{width:54px;height:54px}
+      .tips{grid-template-columns:1fr;gap:8px}
+      .tip{padding:11px 12px}
+      .economy-actions button{font-size:11px;padding:10px 11px}
+      .economy-content{max-height:none;overflow:visible}
+    }
+    @media (max-height:650px){
+      .hud{top:calc(5px + env(safe-area-inset-top));grid-template-columns:1fr 50px 1fr;gap:5px}
+      .fighter-card{padding:6px 8px;border-radius:13px}
+      .name-row{font-size:9px;letter-spacing:.12em}
+      .bar{height:11px;margin-top:5px}
+      .meter{height:5px}
+      .timer{height:50px;border-radius:15px}
+      .timer .num{font-size:19px}
+      .timer .rounds{font-size:8px}
+      .controls{bottom:calc(6px + env(safe-area-inset-bottom));padding:0 8px}
+      .control-btn{width:46px;height:46px;border-radius:15px}
+      .control-btn.big{width:52px;height:52px}
+      .center-callout .big{font-size:clamp(34px,10vw,62px)}
     }
     @media (min-width:900px){
       .controls{opacity:.82}
@@ -455,8 +479,9 @@
     applyAbilityConfig();
     player = makeFighter('player');
     enemy = makeFighter('enemy');
-    player.x = w * .28;
-    enemy.x = w * .72;
+    const mobileArena = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    player.x = w * (mobileArena ? .34 : .28);
+    enemy.x = w * (mobileArena ? .66 : .72);
     player.y = enemy.y = groundY;
     player.dir = 1;
     enemy.dir = -1;
@@ -473,6 +498,10 @@
     updateHUD(true);
   }
 
+  function hideTelegramMainButton(){
+    try { window.Telegram?.WebApp?.MainButton?.hide(); } catch(_) {}
+  }
+
   function newMatch(){
     playerRounds = 0;
     enemyRounds = 0;
@@ -480,6 +509,8 @@
     gameState = 'fight';
     ui.menu.style.display = 'none';
     ui.result.style.display = 'none';
+    document.body.classList.add('is-fighting');
+    hideTelegramMainButton();
     resetRoundPositions();
   }
 
@@ -492,7 +523,7 @@
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    groundY = Math.floor(h * (1 - GROUND_MARGIN));
+    groundY = Math.floor(h * (window.matchMedia && window.matchMedia('(pointer:coarse)').matches ? 0.78 : (1 - GROUND_MARGIN)));
     if (player && enemy) {
       player.y = Math.min(player.y, groundY);
       enemy.y = Math.min(enemy.y, groundY);
@@ -779,6 +810,8 @@
 
   function endMatch(victory){
     gameState = 'result';
+    document.body.classList.remove('is-fighting');
+    hideTelegramMainButton();
     const rewards = grantRewards(victory);
     ui.result.style.display = 'flex';
     ui.resultTitle.textContent = victory ? 'VICTORY' : 'DEFEAT';
@@ -1114,122 +1147,188 @@
     const hurt = f.state === 'hitstun';
     const blocking = f.state === 'block';
     const attacking = f.state === 'attack';
-    const atkT = attacking && f.attack ? f.stateT / f.attack.total : 0;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const visualScale = coarse ? 1.12 : 1;
 
     ctx.save();
     ctx.translate(x,y);
-    ctx.scale(dir,1);
+    ctx.scale(dir * visualScale, visualScale);
 
-    ctx.globalAlpha = .22;
-    ctx.fillStyle = '#000';
+    ctx.save();
+    ctx.globalAlpha = .30;
+    const shadow = ctx.createRadialGradient(0,10,4,0,10,f.w*.9);
+    shadow.addColorStop(0,'rgba(0,0,0,.55)');
+    shadow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = shadow;
     ctx.beginPath();
-    ctx.ellipse(0,10,f.w*.75,15,0,0,Math.PI*2);
+    ctx.ellipse(0,10,f.w*.86,18,0,0,Math.PI*2);
     ctx.fill();
-    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    const coreA = hurt ? '#ff5865' : f.colorA;
+    const coreB = hurt ? '#ff9aa2' : f.colorB;
+    const accent = f.accent || '#d9b76a';
 
     if (blocking) {
       ctx.save();
-      ctx.globalAlpha=.75;
-      ctx.strokeStyle = f.id === 'player' ? 'rgba(62,182,255,.8)' : 'rgba(217,183,106,.72)';
-      ctx.lineWidth=4;
+      ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha=.78;
+      const shieldColor = f.id === 'player' ? 'rgba(62,182,255,.88)' : 'rgba(217,183,106,.78)';
+      ctx.strokeStyle = shieldColor;
+      ctx.lineWidth=5;
       ctx.beginPath();
-      ctx.ellipse(22,-92,44,86,-.12,0,Math.PI*2);
+      ctx.ellipse(24,-92,42,82,-.12,0,Math.PI*2);
       ctx.stroke();
-      ctx.globalAlpha=.18;
-      ctx.fillStyle=ctx.strokeStyle;
+      ctx.globalAlpha=.16;
+      ctx.fillStyle=shieldColor;
       ctx.fill();
       ctx.restore();
     }
 
     if (attacking && f.attack && f.attack.name === 'special') {
       ctx.save();
-      ctx.globalAlpha=.22 + Math.sin(performance.now()/60)*.08;
-      ctx.fillStyle = f.colorB;
+      ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha=.20 + Math.sin(performance.now()/55)*.08;
+      const aura = ctx.createRadialGradient(0,-92,10,0,-92,92);
+      aura.addColorStop(0, coreB + 'aa');
+      aura.addColorStop(.45, accent + '44');
+      aura.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = aura;
       ctx.beginPath();
-      ctx.arc(0,-92,72,0,Math.PI*2);
+      ctx.arc(0,-92,92,0,Math.PI*2);
       ctx.fill();
       ctx.restore();
     }
 
-    const bodyGrad = ctx.createLinearGradient(-f.w/2,-f.h, f.w/2,0);
-    bodyGrad.addColorStop(0, hurt ? '#ff5b63' : f.colorA);
-    bodyGrad.addColorStop(.55, '#050608');
-    bodyGrad.addColorStop(1, f.colorB);
-
-    ctx.fillStyle = bodyGrad;
-    roundRect(ctx,-f.w*.34,-f.h*.72,f.w*.68,f.h*.52,18,true,false);
-    ctx.fillStyle = '#07080b';
-    roundRect(ctx,-f.w*.28,-f.h*.98,f.w*.56,f.h*.34,22,true,false);
-
-    ctx.fillStyle = f.accent;
-    ctx.globalAlpha=.95;
-    roundRect(ctx,-f.w*.18,-f.h*.9,f.w*.36,9,7,true,false);
-    ctx.globalAlpha=1;
-
-    ctx.strokeStyle = 'rgba(255,255,255,.13)';
-    ctx.lineWidth=2;
-    roundRect(ctx,-f.w*.34,-f.h*.72,f.w*.68,f.h*.52,18,false,true);
-    roundRect(ctx,-f.w*.28,-f.h*.98,f.w*.56,f.h*.34,22,false,true);
-
-    const armY = -f.h*.60;
-    const legY = -f.h*.22;
-
-    ctx.lineCap='round';
-    ctx.lineWidth = 15;
-    ctx.strokeStyle = hurt ? '#ff7880' : f.colorB;
-
+    const armY = -f.h*.61;
+    const legY = -f.h*.26;
     let punch = 0;
+    let recoil = 0;
     if (attacking && f.attack) {
-      if (f.stateT < f.attack.startup) punch = -12 * (f.stateT / f.attack.startup);
-      else if (f.stateT < f.attack.startup + f.attack.active) punch = f.attack.range * .62;
-      else punch = lerp(f.attack.range*.32,0,(f.stateT - f.attack.startup - f.attack.active)/f.attack.recovery);
+      const t = f.stateT;
+      if (t < f.attack.startup) punch = -10 * (t / f.attack.startup);
+      else if (t < f.attack.startup + f.attack.active) punch = f.attack.range * .58;
+      else punch = lerp(f.attack.range*.28,0,(t - f.attack.startup - f.attack.active)/f.attack.recovery);
+      recoil = Math.min(12, Math.abs(punch) * .10);
     }
 
+    // Back cloak / cape silhouette
+    ctx.save();
+    ctx.globalAlpha=.84;
+    const cloak = ctx.createLinearGradient(-f.w*.45,-f.h*.76,f.w*.18,4);
+    cloak.addColorStop(0,'rgba(0,0,0,.86)');
+    cloak.addColorStop(.45, coreA);
+    cloak.addColorStop(1,'rgba(0,0,0,.72)');
+    ctx.fillStyle = cloak;
     ctx.beginPath();
-    ctx.moveTo(12,armY);
-    ctx.lineTo(55+punch,armY-10);
-    ctx.stroke();
-    ctx.strokeStyle = '#0b0d12';
+    ctx.moveTo(-f.w*.25,-f.h*.76);
+    ctx.quadraticCurveTo(-f.w*.68,-f.h*.48,-f.w*.55,-f.h*.06);
+    ctx.quadraticCurveTo(-f.w*.25,8,f.w*.08,-f.h*.05);
+    ctx.quadraticCurveTo(f.w*.05,-f.h*.48,-f.w*.25,-f.h*.76);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Legs: armored, not stick-like.
+    ctx.lineCap='round';
+    ctx.lineJoin='round';
+    ctx.lineWidth=20;
+    ctx.strokeStyle='rgba(8,10,14,.98)';
+    ctx.beginPath(); ctx.moveTo(-17,legY); ctx.lineTo(-28,0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(19,legY); ctx.lineTo(34,0); ctx.stroke();
+    ctx.lineWidth=11;
+    ctx.strokeStyle='rgba(255,255,255,.08)';
+    ctx.beginPath(); ctx.moveTo(-19,legY+10); ctx.lineTo(-28,-3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(21,legY+10); ctx.lineTo(34,-3); ctx.stroke();
+
+    // Torso armor.
+    const bodyGrad = ctx.createLinearGradient(-f.w/2,-f.h, f.w/2,0);
+    bodyGrad.addColorStop(0, coreA);
+    bodyGrad.addColorStop(.45, '#050608');
+    bodyGrad.addColorStop(1, coreB);
+    ctx.fillStyle = bodyGrad;
+    roundRect(ctx,-f.w*.38 + recoil,-f.h*.74,f.w*.76,f.h*.55,20,true,false);
+
+    // Chest plate.
+    ctx.fillStyle='rgba(255,255,255,.055)';
     ctx.beginPath();
-    ctx.moveTo(-15,armY+5);
-    ctx.lineTo(-42,armY+30);
+    ctx.moveTo(-f.w*.22,-f.h*.66);
+    ctx.lineTo(f.w*.22,-f.h*.66);
+    ctx.lineTo(f.w*.14,-f.h*.34);
+    ctx.lineTo(-f.w*.14,-f.h*.34);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,.16)';
+    ctx.lineWidth=2;
+    roundRect(ctx,-f.w*.38 + recoil,-f.h*.74,f.w*.76,f.h*.55,20,false,true);
+
+    // Shoulders.
+    ctx.fillStyle = coreB;
+    ctx.globalAlpha=.96;
+    roundRect(ctx,-f.w*.52,-f.h*.68,f.w*.34,18,11,true,false);
+    roundRect(ctx,f.w*.18,-f.h*.68,f.w*.34,18,11,true,false);
+    ctx.globalAlpha=1;
+
+    // Head / helmet.
+    const headGrad = ctx.createLinearGradient(-f.w*.30,-f.h*.99,f.w*.30,-f.h*.72);
+    headGrad.addColorStop(0,'#141820');
+    headGrad.addColorStop(.55,'#050608');
+    headGrad.addColorStop(1,coreB);
+    ctx.fillStyle = headGrad;
+    roundRect(ctx,-f.w*.30,-f.h*.99,f.w*.60,f.h*.34,22,true,false);
+    ctx.strokeStyle='rgba(255,255,255,.15)';
+    ctx.lineWidth=2;
+    roundRect(ctx,-f.w*.30,-f.h*.99,f.w*.60,f.h*.34,22,false,true);
+
+    // Visor.
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    ctx.fillStyle=accent;
+    ctx.shadowColor=accent;
+    ctx.shadowBlur=12;
+    roundRect(ctx,-f.w*.20,-f.h*.88,f.w*.40,8,6,true,false);
+    ctx.restore();
+
+    // Arms and fists.
+    ctx.lineCap='round';
+    ctx.lineJoin='round';
+    ctx.lineWidth = 18;
+    ctx.strokeStyle = coreB;
+    ctx.beginPath();
+    ctx.moveTo(13,armY);
+    ctx.quadraticCurveTo(36+punch*.35,armY-20,56+punch,armY-8);
     ctx.stroke();
 
-    ctx.strokeStyle = '#10131a';
-    ctx.lineWidth=17;
+    ctx.strokeStyle = '#0a0c11';
     ctx.beginPath();
-    ctx.moveTo(-18,legY);
-    ctx.lineTo(-30,0);
+    ctx.moveTo(-16,armY+4);
+    ctx.quadraticCurveTo(-40,armY+16,-48,armY+40);
     ctx.stroke();
+
+    ctx.fillStyle=accent;
+    ctx.globalAlpha=.96;
     ctx.beginPath();
-    ctx.moveTo(20,legY);
-    ctx.lineTo(34,0);
-    ctx.stroke();
+    ctx.ellipse(61+punch, armY-8, 13, 10, .1, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha=1;
 
     if (attacking && f.attack) {
-      const ab = attackBox(f);
-      if (ab) {
-        ctx.save();
-        ctx.scale(1/dir,1);
-        ctx.globalAlpha=.18;
-        ctx.fillStyle=f.colorB;
-        ctx.fillRect(ab.x, ab.y, ab.w, ab.h);
-        ctx.globalAlpha=.95;
-        ctx.strokeStyle=f.accent;
-        ctx.lineWidth=2;
-        ctx.strokeRect(ab.x, ab.y, ab.w, ab.h);
-        ctx.restore();
-
-        ctx.save();
-        ctx.globalCompositeOperation='lighter';
-        ctx.globalAlpha=.72;
-        ctx.strokeStyle=f.attack.name==='special'?'#fff0b7':f.colorB;
-        ctx.lineWidth=f.attack.name==='special'?8:5;
-        ctx.beginPath();
-        ctx.arc(56+punch,armY-10, f.attack.name==='special'?48:32, -.8, .85);
-        ctx.stroke();
-        ctx.restore();
-      }
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      const trailAlpha = f.attack.name === 'special' ? .78 : .55;
+      ctx.globalAlpha=trailAlpha;
+      ctx.strokeStyle=f.attack.name==='special'?'#fff0b7':coreB;
+      ctx.lineWidth=f.attack.name==='special'?11:7;
+      ctx.beginPath();
+      ctx.arc(58+punch,armY-8, f.attack.name==='special'?58:38, -.95, .72);
+      ctx.stroke();
+      ctx.globalAlpha=.20;
+      ctx.fillStyle=f.attack.name==='special' ? '#fff0b7' : coreB;
+      ctx.beginPath();
+      ctx.ellipse(72+punch,armY-8,f.attack.name==='special'?52:34,18,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
     }
 
     ctx.restore();
@@ -1365,7 +1464,7 @@
 
     ui.startBtn.addEventListener('click',()=>{audio.ui();audio.ensure();newMatch();});
     ui.restartBtn.addEventListener('click',()=>{audio.ui();newMatch();});
-    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';ui.menu.style.display='flex';gameState='menu';});
+    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';ui.menu.style.display='flex';gameState='menu';document.body.classList.remove('is-fighting');hideTelegramMainButton();});
     ui.muteBtn.addEventListener('click',()=>{
       muted = !muted;
       ui.muteBtn.textContent = 'Звук: ' + (muted ? 'OFF' : 'ON');
@@ -1761,6 +1860,7 @@
         tg.expand();
         tg.setHeaderColor('#050506');
         tg.setBackgroundColor('#050506');
+        if (tg.onEvent) tg.onEvent('viewportChanged', resize);
         if (tg.onEvent) {
           tg.onEvent('invoiceClosed', (eventData) => {
             const status = eventData?.status || eventData;
@@ -1773,7 +1873,9 @@
         if (tg.MainButton) {
           tg.MainButton.setText('ENTER ARENA');
           tg.MainButton.onClick(()=>{ audio.ui(); audio.ensure(); newMatch(); });
-          tg.MainButton.show();
+          // Внутриигровая кнопка Telegram перекрывала нижнюю часть экрана и блокировала прокрутку меню на iPhone.
+          // Оставляем собственные premium-кнопки внутри Mini App и скрываем системную MainButton.
+          tg.MainButton.hide();
         }
       }
     } catch(_) {}
