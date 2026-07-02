@@ -37,3 +37,34 @@ npm run build
 
 Игра уже вызывает `window.Telegram?.WebApp.ready()` и `expand()`, если запускается внутри Telegram WebView.
 Для production Telegram Mini App нужен HTTPS URL из Vercel и кнопка Web App в Telegram-боте.
+
+
+## Telegram Mini App integration
+
+В этой версии добавлены:
+
+- `/api/bot` — webhook для Telegram-бота;
+- `/api/result` — приём результата боя;
+- `/api/leaderboard` — demo leaderboard;
+- `/api/set-webhook` — быстрая установка webhook;
+- Telegram WebApp init в `index.html`;
+- отправка результата боя через `Telegram.WebApp.sendData()` и `fetch('/api/result')`;
+- `.env.example`;
+- подробная инструкция `TELEGRAM_BOT_SETUP_RU.md`.
+
+Для деплоя на Vercel:
+
+```text
+Framework Preset: Vite
+Build Command: npm run build
+Output Directory: dist
+```
+
+Переменные окружения:
+
+```text
+BOT_TOKEN
+PUBLIC_APP_URL
+TELEGRAM_WEBHOOK_SECRET
+SETUP_SECRET
+```

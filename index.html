@@ -8,6 +8,7 @@
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Premium browser fighting game with mobile controls, AI opponent, rounds, hit stop and cinematic combat feel." />
   <title>EraLash Combat — Dark Arena</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
       --bg:#050506;
@@ -193,7 +194,9 @@
     calloutSmall: document.getElementById('calloutSmall'),
     resultTitle: document.getElementById('resultTitle'),
     resultText: document.getElementById('resultText'),
-    resultKicker: document.getElementById('resultKicker')
+    resultKicker: document.getElementById('resultKicker'),
+    tgProfileBadge: document.getElementById('tgProfileBadge'),
+    resultRewards: document.getElementById('resultRewards')
   };
 
   const DPR_MAX = 2;
@@ -217,6 +220,8 @@
   let enemyRounds = 0;
   let roundIndex = 1;
   let flash = 0;
+  let telegramContext = { insideTelegram:false, user:null, initData:'' };
+  let appProfile = loadProfile();
 
   const input = {
     left:false,right:false,jump:false,block:false,
@@ -380,6 +385,106 @@
     showCallout._t = setTimeout(()=>{ ui.callout.style.display='none'; }, 1050);
   }
 
+  function loadProfile(){
+    try {
+      return JSON.parse(localStorage.getItem('eralashCombatProfile') || 'null') || {
+        level: 1, xp: 0, coins: 0, wins: 0, losses: 0, matches: 0, bestStreak: 0, streak: 0
+      };
+    } catch(_) {
+      return { level: 1, xp: 0, coins: 0, wins: 0, losses: 0, matches: 0, bestStreak: 0, streak: 0 };
+    }
+  }
+
+  function saveProfile(){
+    try { localStorage.setItem('eralashCombatProfile', JSON.stringify(appProfile)); } catch(_) {}
+  }
+
+  function profileName(){
+    const u = telegramContext.user;
+    if (!u) return 'Guest Fighter';
+    return [u.first_name, u.last_name].filter(Boolean).join(' ') || u.username || ('Player ' + u.id);
+  }
+
+  function updateTelegramBadge(){
+    if (!ui.tgProfileBadge) return;
+    const name = profileName();
+    const mode = telegramContext.insideTelegram ? 'Telegram Fighter' : 'Offline Arena Preview';
+    ui.tgProfileBadge.textContent = `${mode} · ${name} · LVL ${appProfile.level} · ${appProfile.coins} coins · ${appProfile.wins}W/${appProfile.losses}L`;
+  }
+
+  function grantRewards(victory){
+    const rewards = victory
+      ? { xp: 100, coins: 50, label: '+100 XP · +50 coins' }
+      : { xp: 25, coins: 10, label: '+25 XP · +10 coins' };
+
+    appProfile.matches += 1;
+    appProfile.xp += rewards.xp;
+    appProfile.coins += rewards.coins;
+    if (victory) {
+      appProfile.wins += 1;
+      appProfile.streak += 1;
+      appProfile.bestStreak = Math.max(appProfile.bestStreak, appProfile.streak);
+    } else {
+      appProfile.losses += 1;
+      appProfile.streak = 0;
+    }
+
+    while (appProfile.xp >= appProfile.level * 250) {
+      appProfile.xp -= appProfile.level * 250;
+      appProfile.level += 1;
+      appProfile.coins += 25;
+    }
+
+    saveProfile();
+    updateTelegramBadge();
+    return rewards;
+  }
+
+  async function sendBattleResult(victory, rewards){
+    const payload = {
+      game: 'eralash-combat',
+      result: victory ? 'win' : 'loss',
+      rewards,
+      score: {
+        playerRounds,
+        enemyRounds,
+        duration: Math.max(0, Math.round(ROUND_TIME - roundTime)),
+        level: appProfile.level,
+        xp: appProfile.xp,
+        coins: appProfile.coins,
+        wins: appProfile.wins,
+        losses: appProfile.losses,
+        bestStreak: appProfile.bestStreak
+      },
+      user: telegramContext.user ? {
+        id: telegramContext.user.id,
+        username: telegramContext.user.username,
+        first_name: telegramContext.user.first_name,
+        last_name: telegramContext.user.last_name
+      } : null,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      if (window.Telegram?.WebApp?.sendData && telegramContext.insideTelegram) {
+        window.Telegram.WebApp.sendData(JSON.stringify(payload));
+      }
+    } catch(_) {}
+
+    try {
+      await fetch('/api/result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Telegram-Init-Data': telegramContext.initData || ''
+        },
+        body: JSON.stringify(payload)
+      });
+    } catch(_) {
+      // Offline/browser preview must keep working even without backend.
+    }
+  }
+
   function startAttack(f, type){
     if (gameState !== 'fight') return;
     if (roundFreeze > 0) return;
@@ -510,12 +615,22 @@
 
   function endMatch(victory){
     gameState = 'result';
+    const rewards = grantRewards(victory);
     ui.result.style.display = 'flex';
     ui.resultTitle.textContent = victory ? 'VICTORY' : 'DEFEAT';
     ui.resultKicker.textContent = victory ? 'ARENA CLAIMED' : 'MATCH LOST';
     ui.resultText.textContent = victory
-      ? 'Матч завершён. База готова: можно подключать Telegram-профиль, leaderboard, награды и выбор персонажей.'
-      : 'AI забрал арену. Жми реванш: блокируй heavy, копи энергию и бей special после открытия дистанции.';
+      ? `Матч завершён: ${rewards.label}. Профиль обновлён и готов к Telegram leaderboard.`
+      : `AI забрал арену. Награда за участие: ${rewards.label}. Жми реванш и копи энергию для special.`;
+    if (ui.resultRewards) {
+      ui.resultRewards.innerHTML = `
+        <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">XP ${appProfile.xp}/${appProfile.level * 250}</span>
+        <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Coins ${appProfile.coins}</span>
+        <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Wins ${appProfile.wins}</span>
+        <span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">Streak ${appProfile.streak}</span>
+      `;
+    }
+    sendBattleResult(victory, rewards);
   }
 
   function spawnHitSpark(x,y,color,type){
@@ -1091,12 +1206,21 @@
     try {
       const tg = window.Telegram?.WebApp;
       if (tg) {
+        telegramContext.insideTelegram = true;
+        telegramContext.initData = tg.initData || '';
+        telegramContext.user = tg.initDataUnsafe?.user || null;
         tg.ready();
         tg.expand();
         tg.setHeaderColor('#050506');
         tg.setBackgroundColor('#050506');
+        if (tg.MainButton) {
+          tg.MainButton.setText('ENTER ARENA');
+          tg.MainButton.onClick(()=>{ audio.ui(); audio.ensure(); newMatch(); });
+          tg.MainButton.show();
+        }
       }
     } catch(_) {}
+    updateTelegramBadge();
   }
 
   resize();
