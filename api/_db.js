@@ -84,6 +84,8 @@ export function toClientProfile(row) {
     matches: toInt(row?.matches),
     streak: toInt(row?.current_streak),
     bestStreak: toInt(row?.best_streak),
+    dailyStreak: toInt(row?.daily_streak),
+    lastDailyClaimAt: row?.last_daily_claim_at || '',
     updatedAt: row?.updated_at || ''
   };
 }

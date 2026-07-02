@@ -94,6 +94,24 @@
     @media (min-width:900px){
       .controls{opacity:.82}
     }
+
+    .profile-badge{margin:14px 0 10px;padding:10px 12px;border:1px solid rgba(217,183,106,.28);border-radius:14px;background:rgba(255,255,255,.055);font-size:12px;color:#f5f0e6;letter-spacing:.04em;text-transform:uppercase}
+    .economy-panel{margin-top:16px;padding:14px;border:1px solid rgba(217,183,106,.28);border-radius:22px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(0,0,0,.22));box-shadow:0 18px 45px rgba(0,0,0,.28)}
+    .economy-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .economy-top b{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+    .economy-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .economy-actions button{padding:10px 12px;font-size:12px;border-radius:14px;min-width:auto}
+    .economy-content{max-height:210px;overflow:auto;padding-right:4px}
+    .shop-card{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}
+    .shop-card:first-child{border-top:0}
+    .shop-card h4{margin:0 0 3px;font-size:13px;color:#fff}
+    .shop-card p{margin:0;font-size:11px;line-height:1.35;color:var(--muted)}
+    .shop-card .price{font-size:11px;color:var(--gold);white-space:nowrap}
+    .shop-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+    .mini-btn{padding:8px 9px!important;border-radius:12px!important;font-size:11px!important}
+    .pill-list{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{padding:8px 10px;border:1px solid rgba(217,183,106,.25);border-radius:999px;background:rgba(255,255,255,.055);font-size:12px;color:#fff}
+
   </style>
 </head>
 <body>
@@ -127,6 +145,8 @@
       <div class="kicker">Premium Telegram Mini App / Browser Fighting Game</div>
       <h1>ERALASH<br/>COMBAT</h1>
       <p class="subtitle">Dark premium файтинг 1 на 1: мощные удары, блок, спецприём, AI-противник, hit stop, knockback, cinematic FX, раунды и удобные мобильные кнопки.</p>
+      <div id="tgProfileBadge" class="profile-badge">Offline Arena Preview · Guest Fighter · LVL 1 · 0 coins</div>
+
       <div class="btn-row">
         <button id="startBtn">Начать бой</button>
         <button id="muteBtn" class="secondary">Звук: ON</button>
@@ -136,6 +156,26 @@
         <div class="tip"><b>Мобильное</b><span>Слева движение и прыжок, справа удары, блок и спецприём.</span></div>
         <div class="tip"><b>Цель</b><span>Best of 3. Спецприём тратит энергию, блок снижает урон.</span></div>
       </div>
+      <div class="economy-panel">
+        <div class="economy-top">
+          <b>Premium Economy</b>
+          <span class="badge">Supabase Live</span>
+        </div>
+        <div class="economy-actions">
+          <button id="dailyBtn" class="secondary">🎁 Daily</button>
+          <button id="shopBtn" class="secondary">🛒 Магазин</button>
+          <button id="weeklyBtn" class="secondary">🥇 Weekly Top</button>
+        </div>
+        <div id="economyContent" class="economy-content">
+          <div class="pill-list">
+            <span class="pill">Daily rewards</span>
+            <span class="pill">Premium shop</span>
+            <span class="pill">Weekly leaderboard</span>
+            <span class="pill">Telegram Stars ready</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -144,6 +184,7 @@
       <div id="resultKicker" class="kicker">MATCH COMPLETE</div>
       <h1 id="resultTitle">VICTORY</h1>
       <p id="resultText" class="subtitle">Победа закреплена. Следующий шаг — GitHub + Vercel production deployment и Telegram Mini App интеграция.</p>
+      <div id="resultRewards" class="pill-list" style="justify-content:center;margin:12px 0"></div>
       <div class="btn-row">
         <button id="restartBtn">Реванш</button>
         <button id="menuBtn" class="secondary">Меню</button>
@@ -388,10 +429,10 @@
   function loadProfile(){
     try {
       return JSON.parse(localStorage.getItem('eralashCombatProfile') || 'null') || {
-        level: 1, xp: 0, coins: 0, wins: 0, losses: 0, matches: 0, bestStreak: 0, streak: 0
+        level: 1, xp: 0, coins: 0, wins: 0, losses: 0, matches: 0, bestStreak: 0, streak: 0, dailyStreak: 0
       };
     } catch(_) {
-      return { level: 1, xp: 0, coins: 0, wins: 0, losses: 0, matches: 0, bestStreak: 0, streak: 0 };
+      return { level: 1, xp: 0, coins: 0, wins: 0, losses: 0, matches: 0, bestStreak: 0, streak: 0, dailyStreak: 0 };
     }
   }
 
@@ -410,7 +451,9 @@
       losses: Number(profile.losses || 0),
       matches: Number(profile.matches || 0),
       bestStreak: Number(profile.bestStreak || 0),
-      streak: Number(profile.streak || 0)
+      streak: Number(profile.streak || 0),
+      dailyStreak: Number(profile.dailyStreak || 0),
+      lastDailyClaimAt: profile.lastDailyClaimAt || ''
     };
   }
 
@@ -1242,6 +1285,161 @@
     });
   }
 
+
+  function economyEls(){
+    return {
+      daily: document.getElementById('dailyBtn'),
+      shop: document.getElementById('shopBtn'),
+      weekly: document.getElementById('weeklyBtn'),
+      content: document.getElementById('economyContent')
+    };
+  }
+
+  function economyHeaders(json = false){
+    const headers = { 'X-Telegram-Init-Data': telegramContext.initData || '' };
+    if (json) headers['Content-Type'] = 'application/json';
+    return headers;
+  }
+
+  function setEconomyContent(html){
+    const el = economyEls().content;
+    if (el) el.innerHTML = html;
+  }
+
+  function escapeUi(value){
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+    }[ch]));
+  }
+
+  async function loadShop(){
+    setEconomyContent('<div class="pill">Загрузка магазина...</div>');
+    try {
+      const res = await fetch('/api/shop', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const owned = new Set((data.inventory || []).map(x => x.id || x.item_id));
+      const cards = (data.catalog || []).map(item => `
+        <div class="shop-card">
+          <div>
+            <h4>${escapeUi(item.title)} · ${escapeUi(item.rarity)}</h4>
+            <p>${escapeUi(item.description)}</p>
+            <div class="price">${item.priceCoins} coins · ${item.priceStars} Stars</div>
+          </div>
+          <div class="shop-actions">
+            ${owned.has(item.id) ? '<span class="pill">Owned</span>' : `
+              <button class="mini-btn buy-coins" data-item="${escapeUi(item.id)}">Coins</button>
+              <button class="mini-btn stars-buy secondary" data-item="${escapeUi(item.id)}">Stars</button>
+            `}
+          </div>
+        </div>
+      `).join('');
+      setEconomyContent(cards || '<div class="pill">Магазин пуст</div>');
+      document.querySelectorAll('.buy-coins').forEach(btn => btn.addEventListener('click', () => buyWithCoins(btn.dataset.item)));
+      document.querySelectorAll('.stars-buy').forEach(btn => btn.addEventListener('click', () => buyWithStars(btn.dataset.item)));
+    } catch (error) {
+      setEconomyContent('<div class="pill">Магазин недоступен. Проверь Supabase env и redeploy.</div>');
+    }
+  }
+
+  async function buyWithCoins(itemId){
+    setEconomyContent('<div class="pill">Покупка...</div>');
+    try {
+      const res = await fetch('/api/shop', {
+        method: 'POST',
+        headers: economyHeaders(true),
+        body: JSON.stringify({
+          itemId,
+          user: telegramContext.user || { id: 'guest', first_name: 'Guest' }
+        })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      setEconomyContent(data.ok
+        ? `<div class="pill">✅ Куплено: ${escapeUi(data.item?.title || itemId)}</div>`
+        : `<div class="pill">Недостаточно coins: нужно ${data.required || 0}, есть ${data.coins || 0}</div>`);
+    } catch (error) {
+      setEconomyContent('<div class="pill">Ошибка покупки</div>');
+    }
+  }
+
+  async function buyWithStars(itemId){
+    try {
+      const res = await fetch('/api/stars-invoice', {
+        method: 'POST',
+        headers: economyHeaders(true),
+        body: JSON.stringify({
+          itemId,
+          user: telegramContext.user || { id: 'guest', first_name: 'Guest' }
+        })
+      });
+      const data = await res.json();
+      if (!data.ok || !data.invoiceLink) {
+        setEconomyContent('<div class="pill">Stars доступны только внутри Telegram Mini App</div>');
+        return;
+      }
+      if (window.Telegram?.WebApp?.openInvoice) {
+        window.Telegram.WebApp.openInvoice(data.invoiceLink);
+      } else {
+        window.open(data.invoiceLink, '_blank');
+      }
+    } catch (error) {
+      setEconomyContent('<div class="pill">Не удалось создать Stars invoice</div>');
+    }
+  }
+
+  async function claimDaily(){
+    setEconomyContent('<div class="pill">Получаем daily reward...</div>');
+    try {
+      const res = await fetch('/api/daily-reward', {
+        method: 'POST',
+        headers: economyHeaders(true),
+        body: JSON.stringify({
+          user: telegramContext.user || { id: 'guest', first_name: 'Guest' }
+        })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      setEconomyContent(data.claimed
+        ? `<div class="pill-list"><span class="pill">+${data.reward.xp} XP</span><span class="pill">+${data.reward.coins} coins</span><span class="pill">Streak ${data.streak || 1}</span></div>`
+        : '<div class="pill">Daily reward уже получен сегодня</div>');
+    } catch (error) {
+      setEconomyContent('<div class="pill">Daily reward недоступен</div>');
+    }
+  }
+
+  async function loadWeekly(){
+    setEconomyContent('<div class="pill">Загрузка weekly leaderboard...</div>');
+    try {
+      const res = await fetch('/api/weekly-leaderboard?limit=10');
+      const data = await res.json();
+      const rows = (data.leaderboard || []).map((p, i) => `
+        <div class="shop-card">
+          <div><h4>#${i + 1} ${escapeUi(p.name || p.username || 'Fighter')}</h4><p>${p.wins}W · ${p.xpTotal || 0} XP · ${p.coins || 0} coins</p></div>
+          <span class="pill">LVL ${p.level || 1}</span>
+        </div>
+      `).join('');
+      setEconomyContent(rows || '<div class="pill">Пока нет weekly-боёв</div>');
+    } catch (error) {
+      setEconomyContent('<div class="pill">Weekly leaderboard недоступен</div>');
+    }
+  }
+
+  function bindEconomyControls(){
+    const els = economyEls();
+    els.daily?.addEventListener('click', () => { audio.ui(); claimDaily(); });
+    els.shop?.addEventListener('click', () => { audio.ui(); loadShop(); });
+    els.weekly?.addEventListener('click', () => { audio.ui(); loadWeekly(); });
+  }
+
+
   function initTelegram(){
     try {
       const tg = window.Telegram?.WebApp;
@@ -1266,6 +1464,7 @@
 
   resize();
   bindControls();
+  bindEconomyControls();
   initTelegram();
   window.addEventListener('resize', resize);
 

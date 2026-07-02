@@ -91,3 +91,17 @@ SUPABASE_SETUP_RU.md
 ```
 
 Настройка базы описана в `SUPABASE_SETUP_RU.md`.
+
+
+## Premium Economy Update
+
+Добавлены:
+
+- `/api/shop` — каталог и покупка за coins;
+- `/api/inventory` — инвентарь игрока;
+- `/api/daily-reward` — ежедневная награда;
+- `/api/weekly-leaderboard` — недельный рейтинг;
+- `/api/stars-invoice` — Telegram Stars invoice link;
+- `/api/admin` — безопасная админ-синхронизация каталога по `ADMIN_TELEGRAM_IDS`.
+
+Перед деплоем выполни SQL из `supabase_schema.sql` в Supabase.

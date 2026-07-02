@@ -1,5 +1,7 @@
 import { appUrl, telegram, parseBody, WEBHOOK_SECRET } from './_telegram.js';
 import { leaderboard, getProfile, storageMode } from './_store.js';
+import { claimDailyReward, SHOP_CATALOG, weeklyLeaderboard, addInventory, catalogItem } from './_economy.js';
+import { ensureUser } from './_db.js';
 
 function mainMenu(url) {
   return {
@@ -10,7 +12,11 @@ function mainMenu(url) {
           { text: '🏆 Рейтинг', callback_data: 'leaderboard' },
           { text: '👤 Профиль', callback_data: 'profile' }
         ],
-        [{ text: '🎁 Награды', callback_data: 'rewards' }]
+        [
+          { text: '🎁 Daily', callback_data: 'daily_reward' },
+          { text: '🛒 Магазин', callback_data: 'shop' }
+        ],
+        [{ text: '🥇 Weekly Top', callback_data: 'weekly_leaderboard' }]
       ]
     }
   };
@@ -42,6 +48,23 @@ function formatProfile(profile) {
     `Storage: ${storageMode()}`
   ].join('\n');
 }
+
+
+function formatShop() {
+  const lines = SHOP_CATALOG.map(item =>
+    `• <b>${escapeHtml(item.title)}</b> — ${item.priceCoins} coins / ${item.priceStars} Stars · ${escapeHtml(item.rarity)}`
+  );
+  return ['🛒 <b>Premium Shop</b>', '', ...lines, '', 'Покупки делаются внутри Mini App. Telegram Stars invoice endpoint уже готов.'].join('\n');
+}
+
+function formatWeekly(rows = []) {
+  if (!rows.length) return '🥇 <b>Weekly Top</b>\n\nПока нет боёв на этой неделе.';
+  const lines = rows.slice(0, 10).map((p, index) =>
+    `${index + 1}. <b>${escapeHtml(p.name || p.username || 'Fighter')}</b> — ${p.wins}W · ${p.xpTotal || 0} XP · ${p.coins || 0} coins`
+  );
+  return ['🥇 <b>Weekly Top</b>', '', ...lines].join('\n');
+}
+
 
 function escapeHtml(value = '') {
   return String(value)
@@ -107,23 +130,67 @@ export default async function handler(req, res) {
     const update = await parseBody(req);
     const url = appUrl(req);
 
+    if (update.pre_checkout_query) {
+      await telegram('answerPreCheckoutQuery', {
+        pre_checkout_query_id: update.pre_checkout_query.id,
+        ok: true
+      });
+      res.status(200).json({ ok: true, type: 'pre_checkout' });
+      return;
+    }
+
     if (update.message) {
       const msg = update.message;
       const chatId = msg.chat.id;
       const text = msg.text || '';
 
-      if (text.startsWith('/start') || text.startsWith('/play')) {
+      if (msg.successful_payment?.invoice_payload) {
+        try {
+          const payload = JSON.parse(msg.successful_payment.invoice_payload);
+          const item = catalogItem(payload.itemId);
+          const userRow = await ensureUser(msg.from || { id: chatId });
+          if (item && userRow?.id) await addInventory(userRow.id, item.id, 'telegram-stars');
+          await telegram('sendMessage', {
+            chat_id: chatId,
+            text: item ? `✅ Stars purchase complete: ${escapeHtml(item.title)} добавлен в inventory.` : '✅ Stars purchase complete.',
+            parse_mode: 'HTML',
+            ...mainMenu(url)
+          });
+        } catch (_) {
+          await telegram('sendMessage', {
+            chat_id: chatId,
+            text: '✅ Stars payment received. Inventory sync will be checked in Mini App.',
+            ...mainMenu(url)
+          });
+        }
+      } else if (text.startsWith('/start') || text.startsWith('/play')) {
         await sendHome(chatId, url);
       } else if (text.startsWith('/help')) {
         await telegram('sendMessage', {
           chat_id: chatId,
-          text: 'Команды: /start, /play, /profile, /leaderboard. Управление в игре: A/D, W, J/K/L, I.',
+          text: 'Команды: /start, /play, /profile, /leaderboard, /daily, /shop. Управление в игре: A/D, W, J/K/L, I.',
           ...mainMenu(url)
         });
       } else if (text.startsWith('/profile')) {
         await sendProfile(chatId, url, msg.from);
       } else if (text.startsWith('/leaderboard')) {
         await sendLeaderboard(chatId, url);
+      } else if (text.startsWith('/shop')) {
+        await telegram('sendMessage', {
+          chat_id: chatId,
+          text: formatShop(),
+          parse_mode: 'HTML',
+          ...mainMenu(url)
+        });
+      } else if (text.startsWith('/daily')) {
+        const result = await claimDailyReward(msg.from || { id: chatId });
+        await telegram('sendMessage', {
+          chat_id: chatId,
+          text: result.claimed
+            ? `🎁 Daily reward claimed: +${result.reward.xp} XP / +${result.reward.coins} coins. Streak: ${result.streak || 1}`
+            : '🎁 Daily reward уже получен сегодня. Возвращайся завтра.',
+          ...mainMenu(url)
+        });
       } else if (msg.web_app_data?.data) {
         await telegram('sendMessage', {
           chat_id: chatId,
@@ -154,6 +221,39 @@ export default async function handler(req, res) {
         await telegram('sendMessage', {
           chat_id: chatId,
           text: '🎁 Награды: победа +100 XP / +50 coins, поражение +25 XP / +10 coins. База данных сохраняет прогресс по Telegram ID.',
+          ...mainMenu(url)
+        });
+      }
+
+      if (cb.data === 'daily_reward') {
+        await answerCallback(cb, 'Daily');
+        const result = await claimDailyReward(cb.from);
+        await telegram('sendMessage', {
+          chat_id: chatId,
+          text: result.claimed
+            ? `🎁 Daily reward claimed: +${result.reward.xp} XP / +${result.reward.coins} coins. Streak: ${result.streak || 1}`
+            : '🎁 Daily reward уже получен сегодня. Возвращайся завтра.',
+          ...mainMenu(url)
+        });
+      }
+
+      if (cb.data === 'shop') {
+        await answerCallback(cb, 'Магазин');
+        await telegram('sendMessage', {
+          chat_id: chatId,
+          text: formatShop(),
+          parse_mode: 'HTML',
+          ...mainMenu(url)
+        });
+      }
+
+      if (cb.data === 'weekly_leaderboard') {
+        await answerCallback(cb, 'Weekly Top');
+        const rows = await weeklyLeaderboard(10);
+        await telegram('sendMessage', {
+          chat_id: chatId,
+          text: formatWeekly(rows),
+          parse_mode: 'HTML',
           ...mainMenu(url)
         });
       }
