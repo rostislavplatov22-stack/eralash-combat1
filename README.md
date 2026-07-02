@@ -151,3 +151,8 @@ ADMIN_API_SECRET
 ```
 
 После деплоя выполни свежий `supabase_schema.sql` в Supabase SQL Editor.
+
+
+## Content System
+
+Добавлены API `/api/content`, `/api/fighters`, `/api/arenas`, `/api/abilities`, таблицы `fighters`, `arenas`, `abilities`, `content_balance`, выбор бойца/арены в Mini App и admin-actions для live-баланса.

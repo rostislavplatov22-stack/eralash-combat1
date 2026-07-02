@@ -11,6 +11,10 @@ import starsInvoice from '../lib/handlers/stars-invoice.js';
 import admin from '../lib/handlers/admin.js';
 import promo from '../lib/handlers/promo.js';
 import antiCheat from '../lib/handlers/anti-cheat.js';
+import content from '../lib/handlers/content.js';
+import fighters from '../lib/handlers/fighters.js';
+import arenas from '../lib/handlers/arenas.js';
+import abilities from '../lib/handlers/abilities.js';
 
 // Single Vercel Serverless Function dispatcher.
 // This keeps the project inside the Hobby plan limit while preserving public URLs:
@@ -29,7 +33,11 @@ const routes = {
   'stars-invoice': starsInvoice,
   admin,
   promo,
-  'anti-cheat': antiCheat
+  'anti-cheat': antiCheat,
+  content,
+  fighters,
+  arenas,
+  abilities
 };
 
 export default async function handler(req, res) {

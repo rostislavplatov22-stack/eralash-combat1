@@ -65,3 +65,13 @@ https://eralash-combat1.vercel.app/api/anti-cheat?secret=ТВОЙ_ADMIN_API_SECR
 ```
 
 В Supabase обязательно выполни свежий `supabase_schema.sql`.
+
+
+## После обновления Content System
+
+1. В Supabase SQL Editor выполни свежий `supabase_schema.sql`.
+2. Выполни `notify pgrst, 'reload schema';`.
+3. Проверь `/api/content`, `/api/fighters`, `/api/arenas`, `/api/abilities`.
+4. В Mini App нажми `🧬 Контент` и выбери бойца/арену.
+
+Смотри также `CONTENT_SYSTEM_UPDATE_RU.md`.

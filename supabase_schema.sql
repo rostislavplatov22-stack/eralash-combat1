@@ -233,3 +233,189 @@ on conflict (code) do update set
   updated_at = now();
 
 notify pgrst, 'reload schema';
+
+
+-- Content system update: fighters, arenas, abilities and live balance.
+-- Safe to run multiple times in Supabase SQL Editor.
+
+create table if not exists public.fighters (
+  id text primary key,
+  name text not null,
+  archetype text not null default '',
+  description text not null default '',
+  power integer not null default 75,
+  speed integer not null default 75,
+  defense integer not null default 70,
+  hp integer not null default 100,
+  energy integer not null default 35,
+  jump integer not null default 900,
+  width integer not null default 78,
+  height integer not null default 172,
+  color_a text not null default '#14171e',
+  color_b text not null default '#c92832',
+  accent text not null default '#d9b76a',
+  special_name text not null default '',
+  ultimate_name text not null default '',
+  portrait_url text not null default '',
+  sprite_url text not null default '',
+  unlock_level integer not null default 1,
+  price_coins integer not null default 0,
+  price_stars integer not null default 0,
+  metadata jsonb not null default '{}'::jsonb,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.arenas (
+  id text primary key,
+  title text not null,
+  description text not null default '',
+  palette text not null default '',
+  background_type text not null default '',
+  floor text not null default '',
+  accent text not null default '#d9b76a',
+  unlock_level integer not null default 1,
+  price_coins integer not null default 0,
+  price_stars integer not null default 0,
+  metadata jsonb not null default '{}'::jsonb,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.abilities (
+  id text primary key,
+  fighter_id text not null references public.fighters(id) on delete cascade,
+  slot text not null check (slot in ('light', 'heavy', 'special', 'ultimate', 'passive')),
+  title text not null default '',
+  description text not null default '',
+  damage integer not null default 0,
+  block_damage integer not null default 0,
+  startup_ms integer not null default 80,
+  active_ms integer not null default 80,
+  recovery_ms integer not null default 150,
+  range integer not null default 80,
+  knockback integer not null default 250,
+  energy_cost integer not null default 0,
+  cooldown_ms integer not null default 0,
+  metadata jsonb not null default '{}'::jsonb,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (fighter_id, slot, title)
+);
+
+create table if not exists public.content_balance (
+  id text primary key default 'live',
+  active_fighter_id text references public.fighters(id) on delete set null,
+  enemy_fighter_id text references public.fighters(id) on delete set null,
+  active_arena_id text references public.arenas(id) on delete set null,
+  damage_multiplier numeric not null default 1,
+  ai_difficulty numeric not null default 0.62,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists fighters_active_idx on public.fighters (active, unlock_level);
+create index if not exists arenas_active_idx on public.arenas (active, unlock_level);
+create index if not exists abilities_fighter_idx on public.abilities (fighter_id, slot, active);
+
+alter table public.fighters enable row level security;
+alter table public.arenas enable row level security;
+alter table public.abilities enable row level security;
+alter table public.content_balance enable row level security;
+
+insert into public.fighters
+  (id, name, archetype, description, power, speed, defense, hp, energy, jump, width, height, color_a, color_b, accent, special_name, ultimate_name, unlock_level, price_coins, price_stars, metadata, active)
+values
+  ('raven', 'Raven', 'Balanced Duelist', 'Быстрый премиальный боец с crimson impact, стабильным уроном и хорошим контролем дистанции.', 78, 86, 72, 100, 35, 960, 78, 172, '#14171e', '#c92832', '#d9b76a', 'Crimson Rift', 'Obsidian Verdict', 1, 0, 0, '{"role":"player-default","visual":"dark-red"}', true),
+  ('iron_warden', 'Iron Warden', 'Heavy Punisher', 'Медленнее, тяжелее и опаснее в ближней дистанции. Хорош для AI boss-подачи.', 88, 62, 84, 110, 30, 850, 90, 188, '#17191c', '#3eb6ff', '#d9f2ff', 'Steel Breaker', 'Warden Execution', 1, 0, 0, '{"role":"enemy-default","visual":"steel-blue"}', true),
+  ('velvet_viper', 'Velvet Viper', 'Fast Assassin', 'Очень быстрый персонаж с меньшей защитой, сильным темпом и evasive комбо.', 70, 96, 58, 92, 45, 1020, 72, 166, '#180d1f', '#9b5cff', '#ffcf7a', 'Violet Fang', 'Silent Guillotine', 3, 850, 160, '{"role":"speed","visual":"violet-gold"}', true),
+  ('ember_khan', 'Ember Khan', 'Grappler Bruiser', 'Массивный боец с высоким HP и тяжёлыми ударами, но более медленным перемещением.', 94, 54, 90, 122, 25, 780, 96, 196, '#1a0c08', '#ff6a1a', '#f4d29a', 'Molten Clinch', 'Forge Collapse', 5, 1200, 220, '{"role":"heavy","visual":"ember-bronze"}', true)
+on conflict (id) do update set
+  name = excluded.name,
+  archetype = excluded.archetype,
+  description = excluded.description,
+  power = excluded.power,
+  speed = excluded.speed,
+  defense = excluded.defense,
+  hp = excluded.hp,
+  energy = excluded.energy,
+  jump = excluded.jump,
+  width = excluded.width,
+  height = excluded.height,
+  color_a = excluded.color_a,
+  color_b = excluded.color_b,
+  accent = excluded.accent,
+  special_name = excluded.special_name,
+  ultimate_name = excluded.ultimate_name,
+  unlock_level = excluded.unlock_level,
+  price_coins = excluded.price_coins,
+  price_stars = excluded.price_stars,
+  metadata = excluded.metadata,
+  active = excluded.active,
+  updated_at = now();
+
+insert into public.arenas
+  (id, title, description, palette, background_type, floor, accent, unlock_level, price_coins, price_stars, metadata, active)
+values
+  ('obsidian_ring', 'Obsidian Ring', 'Тёмная арена с золотым полом, красным туманом и cinematic vignette.', 'dark-brutal-premium', 'obsidian-city', 'black-gold', '#d9b76a', 1, 0, 0, '{"fog":"crimson","skyline":true}', true),
+  ('neon_rooftop', 'Neon Rooftop', 'Крыша ночного города: дождь, синий неон и высокая глубина фона.', 'cyber-arena', 'neon-rooftop', 'chrome-wet', '#3eb6ff', 2, 900, 150, '{"rain":true,"parallax":true}', true),
+  ('hell_forge', 'Hell Forge', 'Адская кузница: жар, искры, бронза и мощный свет позади бойцов.', 'mythic-combat', 'forge', 'dark-bronze', '#ff6a1a', 4, 1300, 240, '{"embers":true,"heat":true}', true)
+on conflict (id) do update set
+  title = excluded.title,
+  description = excluded.description,
+  palette = excluded.palette,
+  background_type = excluded.background_type,
+  floor = excluded.floor,
+  accent = excluded.accent,
+  unlock_level = excluded.unlock_level,
+  price_coins = excluded.price_coins,
+  price_stars = excluded.price_stars,
+  metadata = excluded.metadata,
+  active = excluded.active,
+  updated_at = now();
+
+insert into public.abilities
+  (id, fighter_id, slot, title, description, damage, block_damage, startup_ms, active_ms, recovery_ms, range, knockback, energy_cost, cooldown_ms, active)
+values
+  ('raven_light', 'raven', 'light', 'Raven Jab', 'Быстрый удар.', 7, 2, 75, 75, 145, 72, 235, 0, 0, true),
+  ('raven_heavy', 'raven', 'heavy', 'Gold Hook', 'Тяжёлый боковой удар.', 15, 4, 165, 95, 245, 92, 430, 0, 0, true),
+  ('raven_special', 'raven', 'special', 'Crimson Rift', 'Красный рывок-рассечение.', 22, 7, 200, 130, 340, 132, 650, 42, 1400, true),
+  ('iron_light', 'iron_warden', 'light', 'Steel Check', 'Мощный короткий удар.', 8, 3, 90, 80, 165, 74, 260, 0, 0, true),
+  ('iron_heavy', 'iron_warden', 'heavy', 'Warden Hammer', 'Медленный тяжёлый удар.', 18, 5, 205, 110, 295, 96, 470, 0, 0, true),
+  ('iron_special', 'iron_warden', 'special', 'Steel Breaker', 'Пробивной спецприём.', 25, 9, 240, 140, 380, 126, 710, 48, 1600, true),
+  ('viper_light', 'velvet_viper', 'light', 'Viper Tap', 'Очень быстрый jab.', 6, 2, 55, 65, 120, 68, 210, 0, 0, true),
+  ('viper_heavy', 'velvet_viper', 'heavy', 'Velvet Arc', 'Быстрый тяжёлый удар.', 13, 4, 135, 85, 205, 90, 390, 0, 0, true),
+  ('viper_special', 'velvet_viper', 'special', 'Violet Fang', 'Дальний быстрый спецприём.', 20, 6, 160, 115, 300, 148, 590, 38, 1200, true),
+  ('khan_light', 'ember_khan', 'light', 'Forge Palm', 'Тяжёлый light.', 9, 3, 105, 80, 175, 76, 280, 0, 0, true),
+  ('khan_heavy', 'ember_khan', 'heavy', 'Molten Breaker', 'Очень сильный heavy.', 21, 6, 240, 120, 340, 102, 540, 0, 0, true),
+  ('khan_special', 'ember_khan', 'special', 'Molten Clinch', 'Силовой спецприём.', 28, 10, 270, 150, 420, 116, 780, 50, 1800, true)
+on conflict (id) do update set
+  fighter_id = excluded.fighter_id,
+  slot = excluded.slot,
+  title = excluded.title,
+  description = excluded.description,
+  damage = excluded.damage,
+  block_damage = excluded.block_damage,
+  startup_ms = excluded.startup_ms,
+  active_ms = excluded.active_ms,
+  recovery_ms = excluded.recovery_ms,
+  range = excluded.range,
+  knockback = excluded.knockback,
+  energy_cost = excluded.energy_cost,
+  cooldown_ms = excluded.cooldown_ms,
+  active = excluded.active,
+  updated_at = now();
+
+insert into public.content_balance
+  (id, active_fighter_id, enemy_fighter_id, active_arena_id, damage_multiplier, ai_difficulty)
+values
+  ('live', 'raven', 'iron_warden', 'obsidian_ring', 1, 0.62)
+on conflict (id) do update set
+  active_fighter_id = coalesce(public.content_balance.active_fighter_id, excluded.active_fighter_id),
+  enemy_fighter_id = coalesce(public.content_balance.enemy_fighter_id, excluded.enemy_fighter_id),
+  active_arena_id = coalesce(public.content_balance.active_arena_id, excluded.active_arena_id),
+  updated_at = now();
+
+notify pgrst, 'reload schema';

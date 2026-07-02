@@ -164,6 +164,7 @@
         <div class="economy-actions">
           <button id="dailyBtn" class="secondary">🎁 Daily</button>
           <button id="shopBtn" class="secondary">🛒 Магазин</button>
+          <button id="contentBtn" class="secondary">🧬 Контент</button>
           <button id="promoBtn" class="secondary">🎟️ Promo</button>
           <button id="weeklyBtn" class="secondary">🥇 Weekly Top</button>
           <button id="adminBtn" class="secondary">⚙️ Admin</button>
@@ -174,6 +175,7 @@
             <span class="pill">Premium shop</span>
             <span class="pill">Weekly leaderboard</span>
             <span class="pill">Telegram Stars ready</span>
+            <span class="pill">Fighters & arenas DB</span>
           </div>
         </div>
       </div>
@@ -267,6 +269,21 @@
   let pendingStarsItemId = '';
   let appProfile = loadProfile();
 
+  const DEFAULT_CONTENT = {
+    fighters: [
+      { id:'raven', name:'Raven', archetype:'Balanced Duelist', power:78, speed:86, defense:72, hp:100, energy:35, jump:960, width:78, height:172, colorA:'#14171e', colorB:'#c92832', accent:'#d9b76a', specialName:'Crimson Rift', ultimateName:'Obsidian Verdict' },
+      { id:'iron_warden', name:'Iron Warden', archetype:'Heavy Punisher', power:88, speed:62, defense:84, hp:110, energy:30, jump:850, width:90, height:188, colorA:'#17191c', colorB:'#3eb6ff', accent:'#d9f2ff', specialName:'Steel Breaker', ultimateName:'Warden Execution' }
+    ],
+    arenas: [
+      { id:'obsidian_ring', title:'Obsidian Ring', description:'Dark brutal premium arena', accent:'#d9b76a', backgroundType:'obsidian-city' }
+    ],
+    abilities: [],
+    balance: { activeFighterId:'raven', enemyFighterId:'iron_warden', activeArenaId:'obsidian_ring', damageMultiplier:1, aiDifficulty:.62 }
+  };
+
+  let contentState = loadContentState();
+  let contentBundle = DEFAULT_CONTENT;
+
   const input = {
     left:false,right:false,jump:false,block:false,
     light:false,heavy:false,special:false,
@@ -325,21 +342,79 @@
     return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   }
 
+
+  function loadContentState(){
+    try {
+      return JSON.parse(localStorage.getItem('eralashCombatContentState') || 'null') || {
+        fighterId: 'raven',
+        enemyId: 'iron_warden',
+        arenaId: 'obsidian_ring'
+      };
+    } catch (_) {
+      return { fighterId: 'raven', enemyId: 'iron_warden', arenaId: 'obsidian_ring' };
+    }
+  }
+
+  function saveContentState(){
+    try { localStorage.setItem('eralashCombatContentState', JSON.stringify(contentState)); } catch (_) {}
+  }
+
+  function contentFighter(kind){
+    const list = contentBundle.fighters?.length ? contentBundle.fighters : DEFAULT_CONTENT.fighters;
+    const id = kind === 'player'
+      ? (contentState.fighterId || contentBundle.balance?.activeFighterId || 'raven')
+      : (contentState.enemyId || contentBundle.balance?.enemyFighterId || 'iron_warden');
+    return list.find(f => f.id === id) || list.find(f => f.id === (kind === 'player' ? 'raven' : 'iron_warden')) || list[0] || DEFAULT_CONTENT.fighters[kind === 'player' ? 0 : 1];
+  }
+
+  function contentArena(){
+    const list = contentBundle.arenas?.length ? contentBundle.arenas : DEFAULT_CONTENT.arenas;
+    const id = contentState.arenaId || contentBundle.balance?.activeArenaId || 'obsidian_ring';
+    return list.find(a => a.id === id) || list[0] || DEFAULT_CONTENT.arenas[0];
+  }
+
+  function abilityFor(fighterId, slot){
+    return (contentBundle.abilities || []).find(a => a.fighterId === fighterId && a.slot === slot && a.active !== false);
+  }
+
+  function applyAbilityConfig(){
+    const fighter = contentFighter('player');
+    const mult = Number(contentBundle.balance?.damageMultiplier || 1);
+    ['light','heavy','special'].forEach(slot => {
+      const a = abilityFor(fighter.id, slot);
+      if (!a || !attacks[slot]) return;
+      attacks[slot].damage = Math.max(1, Math.round(Number(a.damage || attacks[slot].damage) * mult));
+      attacks[slot].blockDamage = Math.max(0, Math.round(Number(a.blockDamage || attacks[slot].blockDamage) * mult));
+      attacks[slot].startup = Math.max(.03, Number(a.startupMs || 80) / 1000);
+      attacks[slot].active = Math.max(.03, Number(a.activeMs || 80) / 1000);
+      attacks[slot].recovery = Math.max(.05, Number(a.recoveryMs || 150) / 1000);
+      attacks[slot].range = Math.max(48, Number(a.range || attacks[slot].range));
+      attacks[slot].kb = Math.max(120, Number(a.knockback || attacks[slot].kb));
+      if (slot === 'special') attacks[slot].cost = Math.max(0, Number(a.energyCost || attacks[slot].cost || 0));
+      attacks[slot].total = attacks[slot].startup + attacks[slot].active + attacks[slot].recovery;
+    });
+  }
+
   function makeFighter(kind){
     const isPlayer = kind === 'player';
+    const cfg = contentFighter(kind);
+    const hp = Number(cfg.hp || 100);
     return {
       id: kind,
-      name: isPlayer ? 'Raven' : 'Iron Warden',
+      contentId: cfg.id || kind,
+      name: cfg.name || (isPlayer ? 'Raven' : 'Iron Warden'),
+      archetype: cfg.archetype || '',
       x: isPlayer ? 350 : 930,
       y: groundY,
       vx: 0,
       vy: 0,
-      w: isPlayer ? 78 : 90,
-      h: isPlayer ? 172 : 188,
+      w: Number(cfg.width || (isPlayer ? 78 : 90)),
+      h: Number(cfg.height || (isPlayer ? 172 : 188)),
       dir: isPlayer ? 1 : -1,
-      hp: 100,
-      hpDelay: 100,
-      energy: isPlayer ? 35 : 30,
+      hp,
+      hpDelay: hp,
+      maxHp: hp,
+      energy: Number(cfg.energy || (isPlayer ? 35 : 30)),
       stamina: 100,
       state: 'idle',
       stateT: 0,
@@ -347,20 +422,22 @@
       canHit: true,
       attack: null,
       attackHasHit: false,
-      colorA: isPlayer ? '#14171e' : '#17191c',
-      colorB: isPlayer ? '#c92832' : '#3eb6ff',
-      accent: isPlayer ? '#d9b76a' : '#d9f2ff',
+      colorA: cfg.colorA || (isPlayer ? '#14171e' : '#17191c'),
+      colorB: cfg.colorB || (isPlayer ? '#c92832' : '#3eb6ff'),
+      accent: cfg.accent || (isPlayer ? '#d9b76a' : '#d9f2ff'),
+      specialName: cfg.specialName || 'Special',
+      ultimateName: cfg.ultimateName || 'Ultimate',
       stats: {
-        speed: isPlayer ? 560 : 470,
-        jump: isPlayer ? 960 : 850,
-        hp: 100
+        speed: Math.round(360 + Number(cfg.speed || 75) * 2.35),
+        jump: Number(cfg.jump || (isPlayer ? 960 : 850)),
+        hp
       },
       ai: {
         think: 0,
         next: 0,
-        aggression: 0.62,
-        blockChance: 0.32,
-        mistake: 0.22
+        aggression: clamp(Number(contentBundle.balance?.aiDifficulty || .62), .2, .95),
+        blockChance: isPlayer ? .32 : clamp(.22 + Number(cfg.defense || 70) / 300, .22, .52),
+        mistake: isPlayer ? .22 : clamp(.36 - Number(cfg.speed || 70) / 500, .12, .34)
       }
     };
   }
@@ -375,6 +452,7 @@
   };
 
   function resetRoundPositions(){
+    applyAbilityConfig();
     player = makeFighter('player');
     enemy = makeFighter('enemy');
     player.x = w * .28;
@@ -953,10 +1031,23 @@
   }
 
   function drawArena(){
+    const arena = contentArena();
+    const arenaAccent = arena.accent || '#d9b76a';
+    const bgType = arena.backgroundType || 'obsidian-city';
     const grd = ctx.createLinearGradient(0,0,0,h);
-    grd.addColorStop(0,'#07080c');
-    grd.addColorStop(.42,'#151016');
-    grd.addColorStop(1,'#030304');
+    if (bgType === 'neon-rooftop') {
+      grd.addColorStop(0,'#05081a');
+      grd.addColorStop(.42,'#111827');
+      grd.addColorStop(1,'#010208');
+    } else if (bgType === 'forge') {
+      grd.addColorStop(0,'#150806');
+      grd.addColorStop(.42,'#1f1007');
+      grd.addColorStop(1,'#030201');
+    } else {
+      grd.addColorStop(0,'#07080c');
+      grd.addColorStop(.42,'#151016');
+      grd.addColorStop(1,'#030304');
+    }
     ctx.fillStyle = grd;
     ctx.fillRect(0,0,w,h);
 
@@ -973,7 +1064,7 @@
     ctx.restore();
 
     const fog = ctx.createRadialGradient(w*.5,h*.42,0,w*.5,h*.42,w*.78);
-    fog.addColorStop(0,'rgba(217,183,106,.13)');
+    fog.addColorStop(0, arenaAccent + '22');
     fog.addColorStop(.35,'rgba(201,40,50,.08)');
     fog.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = fog;
@@ -998,7 +1089,7 @@
     ctx.fillStyle = floor;
     ctx.fillRect(0,floorY-16,w,h-floorY+16);
 
-    ctx.strokeStyle='rgba(217,183,106,.35)';
+    ctx.strokeStyle=arenaAccent + '88';
     ctx.lineWidth=2;
     ctx.beginPath();
     ctx.moveTo(0,floorY);
@@ -1008,7 +1099,7 @@
     const cx = w*.5, cy = floorY + 18;
     ctx.save();
     ctx.globalAlpha=.16;
-    ctx.strokeStyle='#d9b76a';
+    ctx.strokeStyle=arenaAccent;
     for(let r=70;r<420;r+=70){
       ctx.beginPath();
       ctx.ellipse(cx,cy,r,r*.13,0,0,Math.PI*2);
@@ -1293,6 +1384,7 @@
     return {
       daily: document.getElementById('dailyBtn'),
       shop: document.getElementById('shopBtn'),
+      contentBtn: document.getElementById('contentBtn'),
       promo: document.getElementById('promoBtn'),
       weekly: document.getElementById('weeklyBtn'),
       admin: document.getElementById('adminBtn'),
@@ -1550,10 +1642,108 @@
   }
 
 
+
+  async function loadContentPanel(){
+    setEconomyContent('<div class="pill">Загрузка персонажей и арен из Supabase...</div>');
+    try {
+      const res = await fetch('/api/content', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'content error');
+      contentBundle = {
+        fighters: data.fighters || DEFAULT_CONTENT.fighters,
+        arenas: data.arenas || DEFAULT_CONTENT.arenas,
+        abilities: data.abilities || [],
+        balance: data.balance || DEFAULT_CONTENT.balance
+      };
+      if (!contentState.fighterId) contentState.fighterId = contentBundle.balance.activeFighterId || 'raven';
+      if (!contentState.enemyId) contentState.enemyId = contentBundle.balance.enemyFighterId || 'iron_warden';
+      if (!contentState.arenaId) contentState.arenaId = contentBundle.balance.activeArenaId || 'obsidian_ring';
+      saveContentState();
+      renderContentPanel(data.storage || 'supabase-postgres');
+    } catch (error) {
+      contentBundle = DEFAULT_CONTENT;
+      renderContentPanel('offline-defaults');
+    }
+  }
+
+  function statBar(label, value){
+    const v = Math.max(0, Math.min(100, Number(value || 0)));
+    return `<div style="margin-top:6px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>${label}</span><span>${v}</span></div><div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden"><i style="display:block;width:${v}%;height:100%;background:linear-gradient(90deg,var(--red),var(--gold))"></i></div></div>`;
+  }
+
+  function renderContentPanel(storage = ''){
+    const fighters = contentBundle.fighters || [];
+    const arenas = contentBundle.arenas || [];
+    const fighterCards = fighters.map(f => `
+      <div class="shop-card">
+        <div>
+          <h4>${escapeUi(f.name)} · ${escapeUi(f.archetype || 'Fighter')}</h4>
+          <p>${escapeUi(f.description || '')}</p>
+          ${statBar('Power', f.power)}${statBar('Speed', f.speed)}${statBar('Defense', f.defense)}
+          <div class="price">HP ${f.hp || 100} · Special: ${escapeUi(f.specialName || 'Special')} · LVL ${f.unlockLevel || 1}</div>
+        </div>
+        <div class="shop-actions">
+          ${contentState.fighterId === f.id ? '<span class="pill">Player</span>' : `<button class="mini-btn choose-fighter" data-id="${escapeUi(f.id)}">Выбрать</button>`}
+          ${contentState.enemyId === f.id ? '<span class="pill">AI</span>' : `<button class="mini-btn secondary choose-enemy" data-id="${escapeUi(f.id)}">AI</button>`}
+        </div>
+      </div>
+    `).join('');
+
+    const arenaCards = arenas.map(a => `
+      <div class="shop-card">
+        <div>
+          <h4>${escapeUi(a.title)} · ${escapeUi(a.palette || 'arena')}</h4>
+          <p>${escapeUi(a.description || '')}</p>
+          <div class="price">Accent ${escapeUi(a.accent || '#d9b76a')} · LVL ${a.unlockLevel || 1}</div>
+        </div>
+        <div class="shop-actions">
+          ${contentState.arenaId === a.id ? '<span class="pill">Active</span>' : `<button class="mini-btn choose-arena" data-id="${escapeUi(a.id)}">Арена</button>`}
+        </div>
+      </div>
+    `).join('');
+
+    setEconomyContent(`
+      <div class="pill-list">
+        <span class="pill">Content DB: ${escapeUi(storage)}</span>
+        <span class="pill">Fighters: ${fighters.length}</span>
+        <span class="pill">Arenas: ${arenas.length}</span>
+        <span class="pill">Abilities: ${(contentBundle.abilities || []).length}</span>
+      </div>
+      <h3 style="margin:12px 0 8px">Бойцы</h3>
+      ${fighterCards || '<div class="pill">Нет бойцов</div>'}
+      <h3 style="margin:12px 0 8px">Арены</h3>
+      ${arenaCards || '<div class="pill">Нет арен</div>'}
+      <div class="pill-list" style="margin-top:12px">
+        <span class="pill">Текущий боец применится со следующего раунда</span>
+        <span class="pill">Admin API умеет создавать новых бойцов</span>
+      </div>
+    `);
+
+    document.querySelectorAll('.choose-fighter').forEach(btn => btn.addEventListener('click', () => {
+      contentState.fighterId = btn.dataset.id;
+      saveContentState();
+      audio.ui();
+      renderContentPanel(storage);
+    }));
+    document.querySelectorAll('.choose-enemy').forEach(btn => btn.addEventListener('click', () => {
+      contentState.enemyId = btn.dataset.id;
+      saveContentState();
+      audio.ui();
+      renderContentPanel(storage);
+    }));
+    document.querySelectorAll('.choose-arena').forEach(btn => btn.addEventListener('click', () => {
+      contentState.arenaId = btn.dataset.id;
+      saveContentState();
+      audio.ui();
+      renderContentPanel(storage);
+    }));
+  }
+
   function bindEconomyControls(){
     const els = economyEls();
     els.daily?.addEventListener('click', () => { audio.ui(); claimDaily(); });
     els.shop?.addEventListener('click', () => { audio.ui(); loadShop(); });
+    els.contentBtn?.addEventListener('click', () => { audio.ui(); loadContentPanel(); });
     els.promo?.addEventListener('click', () => { audio.ui(); promoForm(); });
     els.weekly?.addEventListener('click', () => { audio.ui(); loadWeekly(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
@@ -1589,10 +1779,12 @@
     } catch(_) {}
     updateTelegramBadge();
     syncProfileFromBackend();
+    fetch('/api/content').then(r=>r.json()).then(data=>{ if(data.ok){ contentBundle={ fighters:data.fighters||DEFAULT_CONTENT.fighters, arenas:data.arenas||DEFAULT_CONTENT.arenas, abilities:data.abilities||[], balance:data.balance||DEFAULT_CONTENT.balance }; }}).catch(()=>{});
     const params = new URLSearchParams(location.search);
     setTimeout(() => {
       if (params.get('admin') === '1') loadAdmin();
       if (params.get('promo') === '1') promoForm();
+      if (params.get('content') === '1') loadContentPanel();
     }, 350);
   }
 
