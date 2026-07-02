@@ -1,4 +1,5 @@
 import { appUrl, telegram, parseBody, WEBHOOK_SECRET } from './_telegram.js';
+import { leaderboard, getProfile, storageMode } from './_store.js';
 
 function mainMenu(url) {
   return {
@@ -13,6 +14,40 @@ function mainMenu(url) {
       ]
     }
   };
+}
+
+function formatLeaderboard(rows = []) {
+  if (!rows.length) return '🏆 <b>Weekly Arena Leaderboard</b>\n\nПока нет боёв. Открой Mini App и заверши первый матч.';
+
+  const lines = rows.slice(0, 10).map((p, index) => {
+    const name = p.name || p.username || `Fighter ${p.telegramId || ''}`;
+    return `${index + 1}. <b>${escapeHtml(name)}</b> — ${p.wins}W/${p.losses}L · LVL ${p.level} · ${p.coins} coins`;
+  });
+
+  return ['🏆 <b>Weekly Arena Leaderboard</b>', '', ...lines, '', `Storage: ${storageMode()}`].join('\n');
+}
+
+function formatProfile(profile) {
+  return [
+    '👤 <b>Combat Profile</b>',
+    '',
+    `<b>${escapeHtml(profile.name || 'Fighter')}</b>`,
+    `LVL: ${profile.level}`,
+    `XP: ${profile.xp}/250`,
+    `Coins: ${profile.coins}`,
+    `Wins/Losses: ${profile.wins}/${profile.losses}`,
+    `Current streak: ${profile.streak}`,
+    `Best streak: ${profile.bestStreak}`,
+    '',
+    `Storage: ${storageMode()}`
+  ].join('\n');
+}
+
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
 }
 
 async function answerCallback(callbackQuery, text = 'Готово') {
@@ -37,10 +72,30 @@ async function sendHome(chatId, url) {
   });
 }
 
+async function sendLeaderboard(chatId, url) {
+  const rows = await leaderboard(10);
+  await telegram('sendMessage', {
+    chat_id: chatId,
+    text: formatLeaderboard(rows),
+    parse_mode: 'HTML',
+    ...mainMenu(url)
+  });
+}
+
+async function sendProfile(chatId, url, telegramUser) {
+  const profile = await getProfile(telegramUser || { id: chatId });
+  await telegram('sendMessage', {
+    chat_id: chatId,
+    text: formatProfile(profile),
+    parse_mode: 'HTML',
+    ...mainMenu(url)
+  });
+}
+
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
-      res.status(200).json({ ok: true, endpoint: 'eralash-combat-bot' });
+      res.status(200).json({ ok: true, endpoint: 'eralash-combat-bot', storage: storageMode() });
       return;
     }
 
@@ -66,17 +121,9 @@ export default async function handler(req, res) {
           ...mainMenu(url)
         });
       } else if (text.startsWith('/profile')) {
-        await telegram('sendMessage', {
-          chat_id: chatId,
-          text: '👤 Профиль обновляется после боя в Mini App. Открой игру и заверши матч.',
-          ...mainMenu(url)
-        });
+        await sendProfile(chatId, url, msg.from);
       } else if (text.startsWith('/leaderboard')) {
-        await telegram('sendMessage', {
-          chat_id: chatId,
-          text: '🏆 Рейтинг будет отображаться после первых боёв. Для production подключи постоянную БД.',
-          ...mainMenu(url)
-        });
+        await sendLeaderboard(chatId, url);
       } else if (msg.web_app_data?.data) {
         await telegram('sendMessage', {
           chat_id: chatId,
@@ -94,33 +141,25 @@ export default async function handler(req, res) {
 
       if (cb.data === 'leaderboard') {
         await answerCallback(cb, 'Рейтинг');
-        await telegram('sendMessage', {
-          chat_id: chatId,
-          text: '🏆 Weekly Arena Leaderboard появится после подключения постоянной БД. Сейчас результаты принимает /api/result.',
-          ...mainMenu(url)
-        });
+        await sendLeaderboard(chatId, url);
       }
 
       if (cb.data === 'profile') {
         await answerCallback(cb, 'Профиль');
-        await telegram('sendMessage', {
-          chat_id: chatId,
-          text: '👤 Combat Profile: сыграй бой в Mini App, чтобы обновить XP, coins, wins и streak.',
-          ...mainMenu(url)
-        });
+        await sendProfile(chatId, url, cb.from);
       }
 
       if (cb.data === 'rewards') {
         await answerCallback(cb, 'Награды');
         await telegram('sendMessage', {
           chat_id: chatId,
-          text: '🎁 Награды: победа +100 XP / +50 coins, поражение +25 XP / +10 coins.',
+          text: '🎁 Награды: победа +100 XP / +50 coins, поражение +25 XP / +10 coins. База данных сохраняет прогресс по Telegram ID.',
           ...mainMenu(url)
         });
       }
     }
 
-    res.status(200).json({ ok: true });
+    res.status(200).json({ ok: true, storage: storageMode() });
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false, error: error.message });

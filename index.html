@@ -399,6 +399,39 @@
     try { localStorage.setItem('eralashCombatProfile', JSON.stringify(appProfile)); } catch(_) {}
   }
 
+  function normalizeServerProfile(profile){
+    if (!profile) return null;
+    return {
+      level: Number(profile.level || 1),
+      xp: Number(profile.xp || 0),
+      xpTotal: Number(profile.xpTotal || 0),
+      coins: Number(profile.coins || 0),
+      wins: Number(profile.wins || 0),
+      losses: Number(profile.losses || 0),
+      matches: Number(profile.matches || 0),
+      bestStreak: Number(profile.bestStreak || 0),
+      streak: Number(profile.streak || 0)
+    };
+  }
+
+  async function syncProfileFromBackend(){
+    if (!telegramContext.insideTelegram || !telegramContext.initData) return;
+    try {
+      const res = await fetch('/api/profile', {
+        headers: { 'X-Telegram-Init-Data': telegramContext.initData || '' }
+      });
+      const data = await res.json();
+      const profile = normalizeServerProfile(data.profile);
+      if (data.ok && profile) {
+        appProfile = { ...appProfile, ...profile };
+        saveProfile();
+        updateTelegramBadge();
+      }
+    } catch(_) {
+      // Browser/local preview remains playable without backend.
+    }
+  }
+
   function profileName(){
     const u = telegramContext.user;
     if (!u) return 'Guest Fighter';
@@ -472,7 +505,7 @@
     } catch(_) {}
 
     try {
-      await fetch('/api/result', {
+      const res = await fetch('/api/result', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -480,6 +513,13 @@
         },
         body: JSON.stringify(payload)
       });
+      const data = await res.json().catch(()=>null);
+      const profile = normalizeServerProfile(data?.profile);
+      if (data?.ok && profile) {
+        appProfile = { ...appProfile, ...profile };
+        saveProfile();
+        updateTelegramBadge();
+      }
     } catch(_) {
       // Offline/browser preview must keep working even without backend.
     }
@@ -1221,6 +1261,7 @@
       }
     } catch(_) {}
     updateTelegramBadge();
+    syncProfileFromBackend();
   }
 
   resize();

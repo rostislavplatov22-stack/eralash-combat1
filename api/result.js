@@ -1,5 +1,5 @@
 import { parseBody, validateInitData, extractUserFromInitData } from './_telegram.js';
-import { saveResult } from './_store.js';
+import { saveResult, storageMode } from './_store.js';
 
 export default async function handler(req, res) {
   try {
@@ -20,8 +20,14 @@ export default async function handler(req, res) {
       serverReceivedAt: new Date().toISOString()
     };
 
-    const profile = saveResult(record);
-    res.status(200).json({ ok: true, verifiedTelegram: Boolean(isTelegram), profile });
+    const profile = await saveResult(record);
+
+    res.status(200).json({
+      ok: true,
+      verifiedTelegram: Boolean(isTelegram),
+      storage: storageMode(),
+      profile
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ ok: false, error: error.message });

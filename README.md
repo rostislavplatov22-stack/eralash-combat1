@@ -68,3 +68,26 @@ PUBLIC_APP_URL
 TELEGRAM_WEBHOOK_SECRET
 SETUP_SECRET
 ```
+
+
+## Production DB Update — Supabase/Postgres
+
+Версия `1.2.0` добавляет реальное сохранение прогресса через Supabase/Postgres:
+
+- `/api/result` сохраняет бой в `battles` и обновляет профиль в `users`;
+- `/api/profile` отдаёт сохранённый профиль игрока по Telegram `initData`;
+- `/api/leaderboard` отдаёт настоящий leaderboard;
+- бот показывает реальные `/profile` и `/leaderboard`;
+- если Supabase не настроен, проект автоматически работает в `memory-preview` режиме.
+
+Файлы:
+
+```text
+api/_db.js
+api/_store.js
+api/profile.js
+supabase_schema.sql
+SUPABASE_SETUP_RU.md
+```
+
+Настройка базы описана в `SUPABASE_SETUP_RU.md`.
