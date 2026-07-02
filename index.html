@@ -262,6 +262,7 @@
   let roundIndex = 1;
   let flash = 0;
   let telegramContext = { insideTelegram:false, user:null, initData:'' };
+  let pendingStarsItemId = '';
   let appProfile = loadProfile();
 
   const input = {
@@ -1367,6 +1368,7 @@
   }
 
   async function buyWithStars(itemId){
+    setEconomyContent('<div class="pill">Создаём Telegram Stars invoice...</div>');
     try {
       const res = await fetch('/api/stars-invoice', {
         method: 'POST',
@@ -1381,10 +1383,25 @@
         setEconomyContent('<div class="pill">Stars доступны только внутри Telegram Mini App</div>');
         return;
       }
+
+      pendingStarsItemId = itemId;
+      const onClose = (status) => {
+        if (status === 'paid') {
+          setEconomyContent('<div class="pill">✅ Stars payment complete. Обновляем inventory...</div>');
+          setTimeout(loadShop, 1200);
+        } else if (status === 'cancelled' || status === 'failed') {
+          setEconomyContent('<div class="pill">Stars payment cancelled</div>');
+        } else {
+          setEconomyContent('<div class="pill">Invoice closed. Если оплата прошла, inventory обновится через несколько секунд.</div>');
+          setTimeout(loadShop, 1500);
+        }
+      };
+
       if (window.Telegram?.WebApp?.openInvoice) {
-        window.Telegram.WebApp.openInvoice(data.invoiceLink);
+        window.Telegram.WebApp.openInvoice(data.invoiceLink, onClose);
       } else {
         window.open(data.invoiceLink, '_blank');
+        setEconomyContent('<div class="pill">Invoice открыт в новой вкладке. После оплаты вернись и обнови магазин.</div>');
       }
     } catch (error) {
       setEconomyContent('<div class="pill">Не удалось создать Stars invoice</div>');
@@ -1451,6 +1468,15 @@
         tg.expand();
         tg.setHeaderColor('#050506');
         tg.setBackgroundColor('#050506');
+        if (tg.onEvent) {
+          tg.onEvent('invoiceClosed', (eventData) => {
+            const status = eventData?.status || eventData;
+            if (status === 'paid') {
+              setEconomyContent('<div class="pill">✅ Stars payment accepted. Inventory обновляется...</div>');
+              setTimeout(loadShop, 1200);
+            }
+          });
+        }
         if (tg.MainButton) {
           tg.MainButton.setText('ENTER ARENA');
           tg.MainButton.onClick(()=>{ audio.ui(); audio.ensure(); newMatch(); });

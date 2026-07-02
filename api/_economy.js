@@ -382,27 +382,163 @@ export async function purchaseWithCoins(user, itemId) {
   };
 }
 
-export async function createStarsInvoice(user, itemId) {
+export function createStarsPayload(user, itemId) {
   const item = catalogItem(itemId);
   if (!item) throw new Error('Unknown shop item');
   if (!item.priceStars) throw new Error('Item does not support Stars purchase');
 
-  const payload = JSON.stringify({
+  return JSON.stringify({
     type: 'eralash_item',
     itemId: item.id,
     userId: String(user?.id || ''),
     ts: Date.now()
   });
+}
+
+export function parseStarsPayload(payload = '') {
+  try {
+    const data = typeof payload === 'string' ? JSON.parse(payload) : payload;
+    if (!data || data.type !== 'eralash_item' || !data.itemId) {
+      return { ok: false, error: 'invalid_payload' };
+    }
+
+    const item = catalogItem(data.itemId);
+    if (!item) return { ok: false, error: 'unknown_item' };
+
+    return { ok: true, data, item };
+  } catch (_) {
+    return { ok: false, error: 'payload_parse_failed' };
+  }
+}
+
+export function validateStarsCheckout(query) {
+  const parsed = parseStarsPayload(query?.invoice_payload || '');
+  if (!parsed.ok) return parsed;
+
+  if (query.currency !== 'XTR') {
+    return { ok: false, error: 'invalid_currency', item: parsed.item };
+  }
+
+  if (toInt(query.total_amount) !== toInt(parsed.item.priceStars)) {
+    return {
+      ok: false,
+      error: 'invalid_amount',
+      item: parsed.item,
+      expected: toInt(parsed.item.priceStars),
+      received: toInt(query.total_amount)
+    };
+  }
+
+  const expectedUserId = String(parsed.data.userId || '');
+  const actualUserId = String(query.from?.id || '');
+  if (expectedUserId && actualUserId && expectedUserId !== actualUserId) {
+    return { ok: false, error: 'user_mismatch', item: parsed.item };
+  }
+
+  return { ok: true, item: parsed.item, payload: parsed.data };
+}
+
+export async function createStarsInvoice(user, itemId) {
+  const item = catalogItem(itemId);
+  if (!item) throw new Error('Unknown shop item');
+  if (!item.priceStars) throw new Error('Item does not support Stars purchase');
 
   const invoice = await telegram('createInvoiceLink', {
     title: item.title,
     description: item.description,
-    payload,
+    payload: createStarsPayload(user, item.id),
     currency: 'XTR',
     prices: [{ label: item.title, amount: item.priceStars }]
   });
 
   return { ok: true, item, invoiceLink: invoice.result || invoice };
+}
+
+export async function recordPurchase(row, item, payment, rawPayload = {}) {
+  if (!canUseDb() || !row?.id || !item?.id) {
+    return { ok: true, storage: 'memory-preview', item };
+  }
+
+  const chargeId = String(payment?.telegram_payment_charge_id || '');
+  if (chargeId) {
+    const existing = await supabase(
+      `purchases?telegram_charge_id=eq.${encodeURIComponent(chargeId)}&select=*&limit=1`,
+      { method: 'GET' }
+    );
+
+    if (existing?.[0]) {
+      await addInventory(row.id, item.id, 'telegram-stars');
+      return {
+        ok: true,
+        storage: storageMode(),
+        alreadyProcessed: true,
+        purchase: existing[0],
+        item,
+        inventory: await getInventory(row.id)
+      };
+    }
+  }
+
+  const rows = await supabase('purchases', {
+    method: 'POST',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify({
+      user_id: row.id,
+      item_id: item.id,
+      currency: 'XTR',
+      amount: toInt(payment?.total_amount, item.priceStars),
+      telegram_charge_id: chargeId,
+      raw_payload: rawPayload || {}
+    })
+  });
+
+  await addInventory(row.id, item.id, 'telegram-stars');
+
+  return {
+    ok: true,
+    storage: storageMode(),
+    purchased: true,
+    purchase: Array.isArray(rows) ? rows[0] : null,
+    item,
+    inventory: await getInventory(row.id)
+  };
+}
+
+export async function completeStarsPayment(user, payment) {
+  const parsed = parseStarsPayload(payment?.invoice_payload || '');
+  if (!parsed.ok) {
+    return { ok: false, storage: storageMode(), error: parsed.error };
+  }
+
+  if (payment?.currency !== 'XTR') {
+    return { ok: false, storage: storageMode(), error: 'invalid_currency', item: parsed.item };
+  }
+
+  if (toInt(payment?.total_amount) !== toInt(parsed.item.priceStars)) {
+    return {
+      ok: false,
+      storage: storageMode(),
+      error: 'invalid_amount',
+      expected: toInt(parsed.item.priceStars),
+      received: toInt(payment?.total_amount),
+      item: parsed.item
+    };
+  }
+
+  const row = await ensureUser(user);
+  if (!row?.id) throw new Error('Unable to create user for Stars payment');
+
+  const expectedUserId = String(parsed.data.userId || '');
+  const actualUserId = String(user?.id || row.telegram_id || '');
+  if (expectedUserId && actualUserId && expectedUserId !== actualUserId) {
+    return { ok: false, storage: storageMode(), error: 'user_mismatch', item: parsed.item };
+  }
+
+  return recordPurchase(row, parsed.item, payment, {
+    telegramUser: user,
+    successfulPayment: payment,
+    invoicePayload: parsed.data
+  });
 }
 
 export async function weeklyLeaderboard(limit = 20) {

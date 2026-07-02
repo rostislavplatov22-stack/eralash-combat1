@@ -144,3 +144,11 @@ left join public.battles b
   on b.user_id = u.id
   and b.created_at >= date_trunc('week', now())
 group by u.id, u.telegram_id, u.username, u.display_name, u.level, u.best_streak;
+
+-- Telegram Stars payment hardening.
+-- Prevents duplicate delivery if Telegram retries successful_payment webhook.
+create unique index if not exists purchases_telegram_charge_unique_idx
+  on public.purchases (telegram_charge_id)
+  where telegram_charge_id is not null and telegram_charge_id <> '';
+
+notify pgrst, 'reload schema';

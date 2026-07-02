@@ -105,3 +105,17 @@ SUPABASE_SETUP_RU.md
 - `/api/admin` — безопасная админ-синхронизация каталога по `ADMIN_TELEGRAM_IDS`.
 
 Перед деплоем выполни SQL из `supabase_schema.sql` в Supabase.
+
+
+## Telegram Stars Payments Update
+
+В этой версии добавлена полноценная обработка Stars:
+
+- `/api/stars-invoice` создаёт invoice link.
+- `/api/bot` подтверждает `pre_checkout_query`.
+- `/api/bot` обрабатывает `successful_payment`.
+- Покупка записывается в `purchases`.
+- Предмет добавляется в `inventory`.
+- В боте команда `/shop` показывает кнопки прямой покупки за Stars.
+
+После обновления обязательно выполнить свежий `supabase_schema.sql` в Supabase SQL Editor.

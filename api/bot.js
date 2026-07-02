@@ -1,6 +1,6 @@
 import { appUrl, telegram, parseBody, WEBHOOK_SECRET } from './_telegram.js';
 import { leaderboard, getProfile, storageMode } from './_store.js';
-import { claimDailyReward, SHOP_CATALOG, weeklyLeaderboard, addInventory, catalogItem } from './_economy.js';
+import { claimDailyReward, SHOP_CATALOG, weeklyLeaderboard, catalogItem, createStarsPayload, validateStarsCheckout, completeStarsPayment } from './_economy.js';
 import { ensureUser } from './_db.js';
 
 function mainMenu(url) {
@@ -50,11 +50,28 @@ function formatProfile(profile) {
 }
 
 
+function shopKeyboard(url) {
+  const rows = SHOP_CATALOG.map(item => ([
+    { text: `⭐ ${item.priceStars} Stars · ${item.title}`, callback_data: `stars_buy:${item.id}` }
+  ]));
+
+  rows.push([{ text: '⚔️ Открыть Mini App', web_app: { url } }]);
+  rows.push([{ text: '🏠 Главное меню', callback_data: 'home' }]);
+
+  return { reply_markup: { inline_keyboard: rows } };
+}
+
 function formatShop() {
   const lines = SHOP_CATALOG.map(item =>
     `• <b>${escapeHtml(item.title)}</b> — ${item.priceCoins} coins / ${item.priceStars} Stars · ${escapeHtml(item.rarity)}`
   );
-  return ['🛒 <b>Premium Shop</b>', '', ...lines, '', 'Покупки делаются внутри Mini App. Telegram Stars invoice endpoint уже готов.'].join('\n');
+  return [
+    '🛒 <b>Premium Shop</b>',
+    '',
+    ...lines,
+    '',
+    'Можно купить за coins внутри Mini App или напрямую за Telegram Stars через кнопки ниже.'
+  ].join('\n');
 }
 
 function formatWeekly(rows = []) {
@@ -131,11 +148,13 @@ export default async function handler(req, res) {
     const url = appUrl(req);
 
     if (update.pre_checkout_query) {
+      const check = validateStarsCheckout(update.pre_checkout_query);
       await telegram('answerPreCheckoutQuery', {
         pre_checkout_query_id: update.pre_checkout_query.id,
-        ok: true
+        ok: Boolean(check.ok),
+        ...(check.ok ? {} : { error_message: 'Платёж не прошёл проверку. Обнови магазин и попробуй ещё раз.' })
       });
-      res.status(200).json({ ok: true, type: 'pre_checkout' });
+      res.status(200).json({ ok: true, type: 'pre_checkout', accepted: Boolean(check.ok), reason: check.error || null });
       return;
     }
 
@@ -146,20 +165,20 @@ export default async function handler(req, res) {
 
       if (msg.successful_payment?.invoice_payload) {
         try {
-          const payload = JSON.parse(msg.successful_payment.invoice_payload);
-          const item = catalogItem(payload.itemId);
-          const userRow = await ensureUser(msg.from || { id: chatId });
-          if (item && userRow?.id) await addInventory(userRow.id, item.id, 'telegram-stars');
+          const result = await completeStarsPayment(msg.from || { id: chatId }, msg.successful_payment);
+          const item = result.item || catalogItem(JSON.parse(msg.successful_payment.invoice_payload || '{}').itemId);
           await telegram('sendMessage', {
             chat_id: chatId,
-            text: item ? `✅ Stars purchase complete: ${escapeHtml(item.title)} добавлен в inventory.` : '✅ Stars purchase complete.',
+            text: result.ok
+              ? `✅ <b>Stars purchase complete</b>\n\n${escapeHtml(item?.title || 'Item')} добавлен в inventory. Открой Mini App и проверь магазин.`
+              : `⚠️ Платёж получен, но inventory не обновился: ${escapeHtml(result.error || 'unknown_error')}`,
             parse_mode: 'HTML',
             ...mainMenu(url)
           });
-        } catch (_) {
+        } catch (error) {
           await telegram('sendMessage', {
             chat_id: chatId,
-            text: '✅ Stars payment received. Inventory sync will be checked in Mini App.',
+            text: `✅ Stars payment received. Inventory sync needs review: ${escapeHtml(error.message || 'unknown error')}`,
             ...mainMenu(url)
           });
         }
@@ -180,7 +199,7 @@ export default async function handler(req, res) {
           chat_id: chatId,
           text: formatShop(),
           parse_mode: 'HTML',
-          ...mainMenu(url)
+          ...shopKeyboard(url)
         });
       } else if (text.startsWith('/daily')) {
         const result = await claimDailyReward(msg.from || { id: chatId });
@@ -205,6 +224,29 @@ export default async function handler(req, res) {
     if (update.callback_query) {
       const cb = update.callback_query;
       const chatId = cb.message.chat.id;
+
+      if (cb.data === 'home') {
+        await answerCallback(cb, 'Меню');
+        await sendHome(chatId, url);
+      }
+
+      if (cb.data?.startsWith('stars_buy:')) {
+        const itemId = cb.data.split(':')[1];
+        const item = catalogItem(itemId);
+        if (!item) {
+          await answerCallback(cb, 'Товар не найден');
+        } else {
+          await answerCallback(cb, 'Открываю Stars invoice');
+          await telegram('sendInvoice', {
+            chat_id: chatId,
+            title: item.title,
+            description: item.description,
+            payload: createStarsPayload(cb.from, item.id),
+            currency: 'XTR',
+            prices: [{ label: item.title, amount: item.priceStars }]
+          });
+        }
+      }
 
       if (cb.data === 'leaderboard') {
         await answerCallback(cb, 'Рейтинг');
@@ -243,7 +285,7 @@ export default async function handler(req, res) {
           chat_id: chatId,
           text: formatShop(),
           parse_mode: 'HTML',
-          ...mainMenu(url)
+          ...shopKeyboard(url)
         });
       }
 
