@@ -1,16 +1,12 @@
 {
-  "name": "eralash-combat-telegram-db-ready",
-  "version": "1.2.1",
+  "name": "eralash-combat-telegram-db-no-vite",
+  "version": "1.2.2",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0",
+    "dev": "node scripts/dev-static.mjs",
+    "build": "node scripts/build-static.mjs",
     "set:webhook": "node scripts/set-webhook-local.mjs"
-  },
-  "devDependencies": {
-    "vite": "^7.0.0"
   },
   "engines": {
     "node": "24.x"
