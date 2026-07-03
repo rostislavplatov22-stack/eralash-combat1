@@ -222,3 +222,8 @@ ADMIN_API_SECRET
 ## Dark Cinematic Reference V3
 
 Fullscreen lobby rebuild: крупный hero-art, левое меню, правые reward widgets, меньше ощущения веб-панели.
+
+
+## Dark Cinematic Real Art V4
+
+Главное меню получает painted reference layer и прозрачные кликабельные зоны поверх него.

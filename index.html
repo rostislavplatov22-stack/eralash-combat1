@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Dark Cinematic Reference V3</title>
+  <title>EraLash Combat — Dark Cinematic Real Art V4</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -1853,9 +1853,141 @@ body.dc-ref-ready{background:#020305!important}
   .dc-v3-widget{margin-bottom:12px}
 }
 
+
+/* ==========================================================
+   DARK CINEMATIC REAL ART V4
+   Uses a dedicated painted reference artwork as the actual
+   lobby presentation layer. Desktop only; mobile keeps native
+   responsive layout to preserve Telegram usability.
+   ========================================================== */
+@media (min-width: 900px){
+  body.real-art-v4 #menu.dc-v3-menu{
+    padding:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:100svh !important;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(180,28,32,.16), transparent 52%),
+      #000 !important;
+    overflow:hidden !important;
+  }
+
+  body.real-art-v4 #menu .dc-v3-lobby{
+    position:relative !important;
+    display:block !important;
+    width:min(100vw, 150svh) !important;
+    height:min(100svh, 66.6667vw) !important;
+    min-height:unset !important;
+    max-width:none !important;
+    margin:auto !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    overflow:hidden !important;
+    background:
+      url("assets/dark-cinematic-menu-reference.png") center center / 100% 100% no-repeat !important;
+    box-shadow:
+      0 0 0 1px rgba(217,183,106,.16),
+      0 0 80px rgba(0,0,0,.95),
+      inset 0 0 120px rgba(0,0,0,.22) !important;
+  }
+
+  body.real-art-v4 #menu .dc-v3-bg-noise,
+  body.real-art-v4 #menu .dc-v3-stage,
+  body.real-art-v4 #menu .dc-v3-right,
+  body.real-art-v4 #menu .dc-v3-player,
+  body.real-art-v4 #menu .dc-v3-topbar,
+  body.real-art-v4 #menu .dc-v3-titleblock,
+  body.real-art-v4 #menu .dc-v3-art,
+  body.real-art-v4 #menu .dc-v3-hero{
+    display:none !important;
+  }
+
+  body.real-art-v4 #menu .dc-v3-left,
+  body.real-art-v4 #menu .dc-v3-nav,
+  body.real-art-v4 #menu .dc-v3-utility{
+    display:block !important;
+    position:static !important;
+    width:0 !important;
+    height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+  }
+
+  body.real-art-v4 #menu button{
+    position:absolute !important;
+    z-index:50 !important;
+    display:block !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:rgba(255,255,255,.001) !important;
+    box-shadow:none !important;
+    outline:0 !important;
+    color:transparent !important;
+    text-shadow:none !important;
+    font-size:0 !important;
+    opacity:1 !important;
+    cursor:pointer !important;
+    backdrop-filter:none !important;
+  }
+
+  body.real-art-v4 #menu button:hover{
+    background:rgba(255,50,40,.075) !important;
+    box-shadow:0 0 26px rgba(255,40,30,.18) !important;
+  }
+
+  /* Reference-mapped click zones */
+  body.real-art-v4 #dailyBtn{left:2.05%;top:11.7%;width:18.5%;height:4.8%}
+  body.real-art-v4 #shopBtn{left:2.05%;top:17.1%;width:18.5%;height:4.8%}
+  body.real-art-v4 #contentBtn{left:2.05%;top:22.5%;width:18.5%;height:4.8%}
+  body.real-art-v4 #missionsBtn{left:2.05%;top:27.9%;width:18.5%;height:4.8%}
+  body.real-art-v4 #bossBtn{left:2.05%;top:33.3%;width:18.5%;height:4.8%}
+  body.real-art-v4 #seasonBtn{left:2.05%;top:38.7%;width:18.5%;height:4.8%}
+  body.real-art-v4 #weeklyBtn{left:2.05%;top:44.1%;width:18.5%;height:4.8%}
+  body.real-art-v4 #inviteBtn{left:2.05%;top:49.5%;width:18.5%;height:4.8%}
+  body.real-art-v4 #promoBtn{left:2.05%;top:54.9%;width:18.5%;height:4.8%}
+  body.real-art-v4 #achievementsBtn{left:2.05%;top:60.3%;width:18.5%;height:4.8%}
+  body.real-art-v4 #launchBtn{left:2.05%;top:65.7%;width:18.5%;height:4.8%}
+  body.real-art-v4 #newsBtn{left:2.05%;top:71.1%;width:18.5%;height:4.8%}
+  body.real-art-v4 #founderBtn{left:2.05%;top:76.5%;width:18.5%;height:4.8%}
+  body.real-art-v4 #feedbackBtn{left:2.05%;top:81.9%;width:18.5%;height:4.8%}
+  body.real-art-v4 #analyticsBtn{left:2.05%;top:87.3%;width:18.5%;height:4.8%}
+
+  body.real-art-v4 #startBtn{
+    left:31.35% !important;
+    top:75.8% !important;
+    width:31.9% !important;
+    height:9.2% !important;
+    border-radius:18px !important;
+  }
+
+  body.real-art-v4 #muteBtn{
+    right:2.25% !important;
+    top:2.35% !important;
+    width:4.35% !important;
+    height:6.2% !important;
+    border-radius:14px !important;
+  }
+
+  body.real-art-v4 #liveopsBtn,
+  body.real-art-v4 #adminBtn,
+  body.real-art-v4 #qaBtn{
+    display:none !important;
+  }
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -1928,7 +2060,7 @@ body.dc-ref-ready{background:#020305!important}
 
         <section class="dc-v3-hero">
           <div class="dc-v3-titleblock">
-            <div class="dc-v3-kicker">DARK CINEMATIC · VARIANT 1</div>
+            <div class="dc-v3-kicker">DARK CINEMATIC · REAL ART V4</div>
             <h1>ERALASH<br><span>COMBAT</span></h1>
             <p>Премиальный файтинг в Telegram: темная арена, мощные удары, сезонные награды и cinematic battles.</p>
           </div>
