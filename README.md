@@ -193,3 +193,8 @@ ADMIN_API_SECRET
 ## Missions + Achievements + Boss Rush
 
 Добавлены `/api/missions`, `/api/achievements`, `/api/boss`, Supabase-таблицы миссий/достижений/боссов и новые UI-кнопки в Mini App.
+
+
+## Visual 3.0
+
+Добавлен premium art direction: новая кинематографичная арена, улучшенные бойцы, свет, туман, руны, slash trails и улучшенный mobile readability.

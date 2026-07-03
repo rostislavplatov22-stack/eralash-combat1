@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat 2.1, missions, boss rush, achievements and cinematic hit feel, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Visual 3.0 cinematic art direction, Combat 2.1, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Missions & Boss Rush</title>
+  <title>EraLash Combat — Visual 3.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -150,6 +150,184 @@
     .pill-list{display:flex;gap:8px;flex-wrap:wrap}
     .pill{padding:8px 10px;border:1px solid rgba(217,183,106,.25);border-radius:999px;background:rgba(255,255,255,.055);font-size:12px;color:#fff}
 
+  
+    /* =========================
+       VISUAL 3.0 — Premium Art Direction
+       ========================= */
+    :root{
+      --obsidian:#030305;
+      --void:#07080d;
+      --blood:#d5313d;
+      --ember:#ff9b38;
+      --royal:#dfbd73;
+      --cyan:#51c7ff;
+      --violet:#8a66ff;
+      --smoke:rgba(228,226,218,.72);
+    }
+    #app::before{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      z-index:1;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(213,49,61,.18), transparent 22%),
+        radial-gradient(circle at 82% 15%, rgba(81,199,255,.13), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(223,189,115,.12), transparent 34%),
+        linear-gradient(115deg, transparent 0 35%, rgba(255,255,255,.025) 36% 37%, transparent 38% 100%);
+      filter: blur(.2px);
+      animation: premiumDrift 13s ease-in-out infinite alternate;
+    }
+    #app::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:2;
+      pointer-events:none;
+      opacity:.19;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:54px 54px;
+      mask-image: radial-gradient(circle at 50% 46%, transparent 0 30%, black 70%);
+    }
+    @keyframes premiumDrift{
+      from{transform:translate3d(-1.5%, -1%, 0) scale(1.02)}
+      to{transform:translate3d(1.5%, 1%, 0) scale(1.06)}
+    }
+    canvas{z-index:3}
+    .hud,.center-callout,.combo-tag,.controls,.debug{z-index:25}
+    .menu,.result{z-index:60;background:
+      radial-gradient(circle at 50% 18%, rgba(223,189,115,.16), transparent 18%),
+      radial-gradient(circle at 12% 16%, rgba(213,49,61,.21), transparent 28%),
+      radial-gradient(circle at 90% 18%, rgba(81,199,255,.13), transparent 24%),
+      linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.73));
+      backdrop-filter:blur(14px) saturate(1.2);
+    }
+    .menu-panel{
+      position:relative;
+      isolation:isolate;
+      overflow:hidden;
+      border:1px solid rgba(223,189,115,.48);
+      background:
+        linear-gradient(180deg,rgba(20,22,29,.90),rgba(4,5,8,.93)),
+        radial-gradient(circle at 50% 0%,rgba(223,189,115,.14),transparent 36%);
+      box-shadow:
+        0 40px 110px rgba(0,0,0,.78),
+        0 0 0 1px rgba(255,255,255,.045) inset,
+        0 0 80px rgba(213,49,61,.08);
+    }
+    .menu-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      background:
+        linear-gradient(120deg,transparent 0 18%,rgba(255,255,255,.06) 19%,transparent 21% 100%),
+        radial-gradient(circle at 50% 7%,rgba(223,189,115,.18),transparent 18%);
+      opacity:.65;
+    }
+    .menu-panel::after{
+      content:"";
+      position:absolute;
+      left:18px; right:18px; top:18px; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(223,189,115,.8),transparent);
+      opacity:.7;
+    }
+    .kicker{color:#ffe0a2;text-shadow:0 0 18px rgba(223,189,115,.24)}
+    h1{
+      background:linear-gradient(180deg,#fff8e4 0%,#dfbd73 42%,#8e5f21 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:none;
+      filter:drop-shadow(0 16px 22px rgba(0,0,0,.48));
+    }
+    .subtitle{color:rgba(245,240,230,.74)}
+    .profile-badge,.tip,.step,.economy-panel,.shop-card{
+      border-color:rgba(223,189,115,.28);
+      background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(0,0,0,.25));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    button{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg,#f0d38a 0%,#b57a25 52%,#59320d 100%);
+      box-shadow:0 18px 42px rgba(223,189,115,.22),0 0 0 1px rgba(255,255,255,.18) inset;
+    }
+    button::after{
+      content:"";
+      position:absolute;
+      inset:-120% -60%;
+      background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.34),transparent 62%);
+      transform:translateX(-55%) rotate(8deg);
+      transition:transform .55s ease;
+      pointer-events:none;
+    }
+    button:hover::after,button:active::after{transform:translateX(55%) rotate(8deg)}
+    button.secondary{
+      background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.045));
+      border:1px solid rgba(223,189,115,.20);
+    }
+    .fighter-card{
+      background:
+        linear-gradient(180deg,rgba(17,20,27,.88),rgba(4,5,8,.72)),
+        radial-gradient(circle at 50% 0%,rgba(223,189,115,.11),transparent 55%);
+      border-color:rgba(223,189,115,.36);
+    }
+    .timer{
+      background:
+        radial-gradient(circle at 50% 0%,rgba(255,235,180,.25),transparent 34%),
+        linear-gradient(180deg,rgba(18,21,28,.88),rgba(0,0,0,.82));
+    }
+    .combo-tag{
+      border-color:rgba(255,224,162,.48);
+      background:linear-gradient(180deg,rgba(33,18,18,.82),rgba(0,0,0,.56));
+      box-shadow:0 18px 50px rgba(213,49,61,.18);
+    }
+    .control-btn{
+      backdrop-filter:blur(10px);
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.055)),
+        radial-gradient(circle at 50% 0%,rgba(223,189,115,.14),transparent 55%);
+      border-color:rgba(255,255,255,.22);
+    }
+    .control-btn.big{
+      box-shadow:0 16px 38px rgba(0,0,0,.42),0 0 22px rgba(223,189,115,.08) inset;
+    }
+    .control-btn.special,.control-btn.ultimate{
+      animation:combatPulse 1.7s ease-in-out infinite alternate;
+    }
+    @keyframes combatPulse{
+      from{filter:saturate(1); box-shadow:0 12px 28px rgba(0,0,0,.36),0 0 12px rgba(223,189,115,.08)}
+      to{filter:saturate(1.25); box-shadow:0 12px 30px rgba(0,0,0,.40),0 0 22px rgba(223,189,115,.22)}
+    }
+    .visual-mark{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin:0 auto 12px;
+      padding:8px 12px;
+      border:1px solid rgba(223,189,115,.24);
+      border-radius:999px;
+      color:#ffe0a2;
+      background:rgba(0,0,0,.24);
+      font-size:11px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-weight:950;
+    }
+    @media (max-width:700px){
+      .menu-panel{box-shadow:0 26px 75px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.045) inset}
+      .economy-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      .economy-actions button{width:100%}
+      .controls{filter:drop-shadow(0 14px 18px rgba(0,0,0,.48))}
+      .control-btn{width:48px;height:48px}
+      .control-btn.big{width:52px;height:52px}
+      .pad,.actions{max-width:48vw}
+    }
+
   </style>
 </head>
 <body>
@@ -182,6 +360,7 @@
   <div id="menu" class="menu">
     <div class="menu-panel">
       <div class="kicker">Premium Telegram Mini App / Browser Fighting Game</div>
+      <div class="visual-mark">Visual 3.0 · Cinematic Arena Build</div>
       <h1>ERALASH<br/>COMBAT</h1>
       <p class="subtitle">Dark premium файтинг 1 на 1: мощные удары, блок, спецприём, AI-противник, hit stop, knockback, cinematic FX, раунды и удобные мобильные кнопки.</p>
       <div id="tgProfileBadge" class="profile-badge">Offline Arena Preview · Guest Fighter · LVL 1 · 0 coins</div>
@@ -1257,287 +1436,517 @@
     updateHUD();
   }
 
+
   function drawArena(){
     const arena = contentArena();
     const arenaAccent = arena.accent || '#d9b76a';
     const bgType = arena.backgroundType || 'obsidian-city';
-    const grd = ctx.createLinearGradient(0,0,0,h);
+    const time = performance.now();
+    const pulse = Math.sin(time/900) * .5 + .5;
+
+    const sky = ctx.createLinearGradient(0,0,0,h);
     if (bgType === 'neon-rooftop') {
-      grd.addColorStop(0,'#05081a');
-      grd.addColorStop(.42,'#111827');
-      grd.addColorStop(1,'#010208');
+      sky.addColorStop(0,'#030615');
+      sky.addColorStop(.34,'#081225');
+      sky.addColorStop(.72,'#06070d');
+      sky.addColorStop(1,'#010104');
     } else if (bgType === 'forge') {
-      grd.addColorStop(0,'#150806');
-      grd.addColorStop(.42,'#1f1007');
-      grd.addColorStop(1,'#030201');
+      sky.addColorStop(0,'#160504');
+      sky.addColorStop(.35,'#251005');
+      sky.addColorStop(.72,'#0b0503');
+      sky.addColorStop(1,'#010101');
     } else {
-      grd.addColorStop(0,'#07080c');
-      grd.addColorStop(.42,'#151016');
-      grd.addColorStop(1,'#030304');
+      sky.addColorStop(0,'#030306');
+      sky.addColorStop(.32,'#0b0d15');
+      sky.addColorStop(.70,'#090709');
+      sky.addColorStop(1,'#010101');
     }
-    ctx.fillStyle = grd;
+    ctx.fillStyle = sky;
     ctx.fillRect(0,0,w,h);
 
+    // Cinematic moon / arena sun.
     ctx.save();
-    ctx.globalAlpha = .7;
-    for(let i=0;i<9;i++){
-      const x = (i/8)*w;
-      const height = h*(.18 + (i%3)*.06);
-      ctx.fillStyle = i%2 ? 'rgba(24,27,34,.72)' : 'rgba(15,18,24,.82)';
-      ctx.fillRect(x-80,h*.38-height,160,height);
-      ctx.fillStyle = 'rgba(217,183,106,.08)';
-      ctx.fillRect(x-60,h*.38-height+20,120,2);
+    ctx.globalCompositeOperation='lighter';
+    const orbX = bgType === 'neon-rooftop' ? w*.78 : w*.50;
+    const orbY = h*.18;
+    const orb = ctx.createRadialGradient(orbX,orbY,8,orbX,orbY,w*.25);
+    orb.addColorStop(0, bgType === 'forge' ? 'rgba(255,150,55,.30)' : 'rgba(255,232,172,.24)');
+    orb.addColorStop(.22, bgType === 'neon-rooftop' ? 'rgba(81,199,255,.10)' : 'rgba(217,183,106,.11)');
+    orb.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = orb;
+    ctx.fillRect(0,0,w,h*.62);
+    ctx.restore();
+
+    // Back architecture silhouettes.
+    ctx.save();
+    for(let layer=0; layer<3; layer++){
+      const alpha = [.22,.34,.52][layer];
+      const base = h*(.38 + layer*.035);
+      const count = 7 + layer*2;
+      ctx.fillStyle = layer === 0 ? `rgba(18,22,31,${alpha})` : `rgba(9,12,18,${alpha})`;
+      for(let i=0;i<count;i++){
+        const x = ((i/count)*w + Math.sin(i*2.2 + time/5000)*8) - 70;
+        const bw = w/(count+1) * (1.10 + (i%3)*.14);
+        const bh = h*(.16 + ((i+layer)%4)*.055 + layer*.035);
+        if (bgType === 'forge') {
+          ctx.beginPath();
+          ctx.moveTo(x,base);
+          ctx.lineTo(x+bw*.18,base-bh*.88);
+          ctx.lineTo(x+bw*.34,base-bh*.58);
+          ctx.lineTo(x+bw*.50,base-bh);
+          ctx.lineTo(x+bw*.82,base);
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          roundRect(ctx,x,base-bh,bw,bh,layer?7:12,true,false);
+        }
+        // Premium light slits.
+        ctx.fillStyle = layer === 2 ? arenaAccent + '24' : 'rgba(255,255,255,.035)';
+        for(let k=0;k<4;k++){
+          ctx.fillRect(x+bw*(.18+k*.18), base-bh+22+(k%2)*18, bw*.07, 2);
+        }
+        ctx.fillStyle = layer === 0 ? `rgba(18,22,31,${alpha})` : `rgba(9,12,18,${alpha})`;
+      }
     }
     ctx.restore();
 
-    const fog = ctx.createRadialGradient(w*.5,h*.42,0,w*.5,h*.42,w*.78);
+    // Arena spotlights.
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+    const leftLight = ctx.createLinearGradient(w*.14,0,w*.45,groundY);
+    leftLight.addColorStop(0, 'rgba(217,183,106,.12)');
+    leftLight.addColorStop(1, 'rgba(217,183,106,0)');
+    ctx.fillStyle = leftLight;
+    ctx.beginPath();
+    ctx.moveTo(w*.08,0); ctx.lineTo(w*.25,0); ctx.lineTo(w*.54,groundY); ctx.lineTo(w*.36,groundY); ctx.closePath();
+    ctx.fill();
+
+    const rightLight = ctx.createLinearGradient(w*.86,0,w*.55,groundY);
+    rightLight.addColorStop(0, bgType === 'neon-rooftop' ? 'rgba(81,199,255,.15)' : 'rgba(201,40,50,.10)');
+    rightLight.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rightLight;
+    ctx.beginPath();
+    ctx.moveTo(w*.75,0); ctx.lineTo(w*.94,0); ctx.lineTo(w*.64,groundY); ctx.lineTo(w*.47,groundY); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Rain / sparks / dust.
+    ctx.save();
+    ctx.globalAlpha = bgType === 'forge' ? .20 : .16;
+    ctx.strokeStyle = bgType === 'neon-rooftop' ? 'rgba(120,214,255,.45)' : 'rgba(255,230,180,.30)';
+    ctx.lineWidth = 1;
+    const streaks = Math.max(28, Math.floor(w/28));
+    for(let i=0;i<streaks;i++){
+      const x = (i*47 + time*.055) % (w+120) - 60;
+      const y = (i*83 + time*.11) % (h*.62);
+      ctx.beginPath();
+      ctx.moveTo(x,y);
+      ctx.lineTo(x + (bgType === 'forge' ? -10 : -18), y + (bgType === 'forge' ? 22 : 34));
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Depth fog.
+    const fog = ctx.createRadialGradient(w*.5,h*.50,0,w*.5,h*.50,w*.82);
     fog.addColorStop(0, arenaAccent + '22');
-    fog.addColorStop(.35,'rgba(201,40,50,.08)');
+    fog.addColorStop(.32, bgType === 'neon-rooftop' ? 'rgba(81,199,255,.09)' : 'rgba(201,40,50,.08)');
     fog.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = fog;
     ctx.fillRect(0,0,w,h);
 
-    for(let i=0;i<5;i++){
-      const y = h*.48 + i*38;
-      ctx.strokeStyle = `rgba(217,183,106,${0.14 - i*.018})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0,y);
-      ctx.lineTo(w,y+Math.sin(performance.now()/900+i)*6);
-      ctx.stroke();
-    }
-
+    // Premium floor with perspective grid.
     const floorY = groundY;
-    const floor = ctx.createLinearGradient(0,floorY-80,0,h);
-    floor.addColorStop(0,'rgba(90,62,32,.12)');
-    floor.addColorStop(.1,'rgba(217,183,106,.18)');
-    floor.addColorStop(.12,'rgba(255,255,255,.08)');
-    floor.addColorStop(1,'rgba(0,0,0,.88)');
+    const floor = ctx.createLinearGradient(0,floorY-90,0,h);
+    floor.addColorStop(0,'rgba(255,255,255,.04)');
+    floor.addColorStop(.10, arenaAccent + '2e');
+    floor.addColorStop(.16,'rgba(255,255,255,.10)');
+    floor.addColorStop(.55,'rgba(9,9,11,.82)');
+    floor.addColorStop(1,'rgba(0,0,0,.98)');
     ctx.fillStyle = floor;
-    ctx.fillRect(0,floorY-16,w,h-floorY+16);
+    ctx.fillRect(0,floorY-32,w,h-floorY+32);
 
-    ctx.strokeStyle=arenaAccent + '88';
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    ctx.strokeStyle=arenaAccent + '9a';
     ctx.lineWidth=2;
     ctx.beginPath();
     ctx.moveTo(0,floorY);
-    ctx.lineTo(w,floorY);
+    ctx.quadraticCurveTo(w*.50,floorY+10,w,floorY);
     ctx.stroke();
 
-    const cx = w*.5, cy = floorY + 18;
-    ctx.save();
-    ctx.globalAlpha=.16;
-    ctx.strokeStyle=arenaAccent;
-    for(let r=70;r<420;r+=70){
+    // Runes / circles.
+    const cx = w*.5, cy = floorY + 22;
+    ctx.globalAlpha=.22 + pulse*.04;
+    for(let r=65;r<Math.min(460,w*.48);r+=58){
       ctx.beginPath();
-      ctx.ellipse(cx,cy,r,r*.13,0,0,Math.PI*2);
+      ctx.ellipse(cx,cy,r,r*.12,0,0,Math.PI*2);
       ctx.stroke();
+    }
+    ctx.globalAlpha=.18;
+    for(let i=0;i<12;i++){
+      const a = i/12*Math.PI*2 + time/5000;
+      const rx = Math.cos(a)*Math.min(330,w*.34);
+      const ry = Math.sin(a)*42;
+      ctx.beginPath();
+      ctx.arc(cx+rx, cy+ry, 3 + (i%3),0,Math.PI*2);
+      ctx.fillStyle=arenaAccent;
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Perspective floor lines.
+    ctx.save();
+    ctx.globalAlpha=.11;
+    ctx.strokeStyle='rgba(255,255,255,.8)';
+    for(let i=-6;i<=6;i++){
+      ctx.beginPath();
+      ctx.moveTo(w*.5 + i*34, floorY);
+      ctx.lineTo(w*.5 + i*w*.18, h);
+      ctx.stroke();
+    }
+    for(let i=0;i<7;i++){
+      const y = floorY + 18 + i*i*7;
+      ctx.beginPath();
+      ctx.moveTo(0,y);
+      ctx.lineTo(w,y);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Foreground haze.
+    ctx.save();
+    ctx.globalAlpha=.12;
+    ctx.fillStyle=bgType==='forge' ? 'rgba(255,92,28,.35)' : 'rgba(220,220,240,.25)';
+    for(let i=0;i<6;i++){
+      const x = (time*.025 + i*w*.21) % (w+160) - 80;
+      ctx.beginPath();
+      ctx.ellipse(x, groundY+44+(i%2)*28, 110, 18, Math.sin(i)*.2, 0, Math.PI*2);
+      ctx.fill();
     }
     ctx.restore();
   }
 
+
+
   function drawFighter(f){
-    const bob = f.state === 'idle' ? Math.sin(performance.now()/210)*2 : 0;
+    const time = performance.now();
+    const bob = f.state === 'idle' ? Math.sin(time/210)*2.4 : 0;
     const x=f.x, y=f.y + bob, dir=f.dir;
     const hurt = f.state === 'hitstun';
     const blocking = f.state === 'block';
     const attacking = f.state === 'attack';
+    const dodging = f.state === 'dodge';
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
-    const visualScale = coarse ? 1.12 : 1;
+    const visualScale = coarse ? 1.14 : 1.03;
 
     ctx.save();
     ctx.translate(x,y);
     ctx.scale(dir * visualScale, visualScale);
 
+    const coreA = hurt ? '#ff5364' : (f.colorA || '#12161d');
+    const coreB = hurt ? '#ffd0d3' : (f.colorB || '#c92832');
+    const accent = f.accent || '#d9b76a';
+    const isEnemy = f.id !== 'player';
+    const armorDark = isEnemy ? '#070910' : '#080a0f';
+
+    // Ground contact shadow.
     ctx.save();
-    ctx.globalAlpha = .30;
-    const shadow = ctx.createRadialGradient(0,10,4,0,10,f.w*.9);
-    shadow.addColorStop(0,'rgba(0,0,0,.55)');
+    ctx.globalAlpha = .38;
+    const shadow = ctx.createRadialGradient(0,11,5,0,11,f.w*1.10);
+    shadow.addColorStop(0,'rgba(0,0,0,.68)');
+    shadow.addColorStop(.58,'rgba(0,0,0,.26)');
     shadow.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = shadow;
     ctx.beginPath();
-    ctx.ellipse(0,10,f.w*.86,18,0,0,Math.PI*2);
+    ctx.ellipse(0,12,f.w*1.02,20,0,0,Math.PI*2);
     ctx.fill();
     ctx.restore();
 
-    if (f.state === 'dodge' || f.afterImage > 0) {
+    // Motion afterimages for dodge / ultimate.
+    if (dodging || f.afterImage > 0 || (attacking && f.attack?.name === 'ultimate')) {
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = .16 + Math.max(0, f.afterImage || 0) * 1.2;
-      ctx.fillStyle = f.colorB + '66';
-      ctx.beginPath();
-      ctx.ellipse(-f.dir*24,-f.h*.48,f.w*.62,f.h*.46,-.08,0,Math.PI*2);
-      ctx.fill();
+      for(let i=0;i<3;i++){
+        ctx.globalAlpha = (dodging ? .14 : .10) * (3-i);
+        ctx.fillStyle = i%2 ? coreB + '66' : accent + '66';
+        ctx.beginPath();
+        ctx.ellipse(-f.dir*(26+i*18),-f.h*.48,f.w*(.52+i*.07),f.h*(.44+i*.03),-.08,0,Math.PI*2);
+        ctx.fill();
+      }
       ctx.restore();
     }
 
-    const coreA = hurt ? '#ff5865' : f.colorA;
-    const coreB = hurt ? '#ff9aa2' : f.colorB;
-    const accent = f.accent || '#d9b76a';
-
+    // Blocking shield.
     if (blocking) {
       ctx.save();
       ctx.globalCompositeOperation='lighter';
-      ctx.globalAlpha=.78;
-      const shieldColor = f.id === 'player' ? 'rgba(62,182,255,.88)' : 'rgba(217,183,106,.78)';
+      const shieldColor = f.id === 'player' ? 'rgba(81,199,255,.88)' : 'rgba(223,189,115,.78)';
       ctx.strokeStyle = shieldColor;
       ctx.lineWidth=5;
+      ctx.shadowColor=shieldColor;
+      ctx.shadowBlur=18;
       ctx.beginPath();
-      ctx.ellipse(24,-92,42,82,-.12,0,Math.PI*2);
+      ctx.ellipse(30,-94,45,88,-.12,0,Math.PI*2);
       ctx.stroke();
-      ctx.globalAlpha=.16;
+      ctx.globalAlpha=.13;
       ctx.fillStyle=shieldColor;
       ctx.fill();
       ctx.restore();
     }
 
+    // Attack aura.
     if (attacking && f.attack && (f.attack.name === 'special' || f.attack.name === 'ultimate')) {
       ctx.save();
       ctx.globalCompositeOperation='lighter';
-      ctx.globalAlpha=(f.attack?.name === 'ultimate' ? .34 : .20) + Math.sin(performance.now()/55)*.08;
-      const aura = ctx.createRadialGradient(0,-92,10,0,-92,92);
-      aura.addColorStop(0, coreB + 'aa');
-      aura.addColorStop(.45, accent + '44');
+      ctx.globalAlpha=(f.attack.name === 'ultimate' ? .40 : .24) + Math.sin(time/45)*.05;
+      const aura = ctx.createRadialGradient(0,-94,8,0,-94,f.attack.name === 'ultimate' ? 150 : 104);
+      aura.addColorStop(0, coreB + 'bb');
+      aura.addColorStop(.36, accent + '55');
       aura.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle = aura;
       ctx.beginPath();
-      ctx.arc(0,-92,f.attack?.name === 'ultimate' ? 126 : 92,0,Math.PI*2);
+      ctx.arc(0,-94,f.attack.name === 'ultimate' ? 145 : 104,0,Math.PI*2);
       ctx.fill();
       ctx.restore();
     }
 
-    const armY = -f.h*.61;
-    const legY = -f.h*.26;
+    const armY = -f.h*.62;
+    const legY = -f.h*.27;
     let punch = 0;
     let recoil = 0;
+    let attackT = 0;
     if (attacking && f.attack) {
       const t = f.stateT;
-      if (t < f.attack.startup) punch = -10 * (t / f.attack.startup);
-      else if (t < f.attack.startup + f.attack.active) punch = f.attack.range * .58;
-      else punch = lerp(f.attack.range*.28,0,(t - f.attack.startup - f.attack.active)/f.attack.recovery);
-      recoil = Math.min(12, Math.abs(punch) * .10);
+      attackT = clamp(t / (f.attack.startup + f.attack.active + f.attack.recovery), 0, 1);
+      if (t < f.attack.startup) punch = -12 * (t / f.attack.startup);
+      else if (t < f.attack.startup + f.attack.active) punch = f.attack.range * (f.attack.name === 'ultimate' ? .72 : .62);
+      else punch = lerp(f.attack.range*.30,0,(t - f.attack.startup - f.attack.active)/Math.max(.001,f.attack.recovery));
+      recoil = Math.min(16, Math.abs(punch) * .10);
     }
 
-    // Back cloak / cape silhouette
+    // Back banner / cape, wide and readable silhouette.
     ctx.save();
-    ctx.globalAlpha=.84;
-    const cloak = ctx.createLinearGradient(-f.w*.45,-f.h*.76,f.w*.18,4);
-    cloak.addColorStop(0,'rgba(0,0,0,.86)');
-    cloak.addColorStop(.45, coreA);
-    cloak.addColorStop(1,'rgba(0,0,0,.72)');
-    ctx.fillStyle = cloak;
+    const cape = ctx.createLinearGradient(-f.w*.58,-f.h*.80,f.w*.08,6);
+    cape.addColorStop(0,'rgba(0,0,0,.96)');
+    cape.addColorStop(.45, coreA);
+    cape.addColorStop(1,'rgba(0,0,0,.70)');
+    ctx.fillStyle = cape;
+    ctx.globalAlpha = .88;
     ctx.beginPath();
-    ctx.moveTo(-f.w*.25,-f.h*.76);
-    ctx.quadraticCurveTo(-f.w*.68,-f.h*.48,-f.w*.55,-f.h*.06);
-    ctx.quadraticCurveTo(-f.w*.25,8,f.w*.08,-f.h*.05);
-    ctx.quadraticCurveTo(f.w*.05,-f.h*.48,-f.w*.25,-f.h*.76);
+    ctx.moveTo(-f.w*.22,-f.h*.78);
+    ctx.quadraticCurveTo(-f.w*.84,-f.h*.55,-f.w*.70,-f.h*.06);
+    ctx.quadraticCurveTo(-f.w*.36,12,f.w*.16,-f.h*.08);
+    ctx.quadraticCurveTo(f.w*.04,-f.h*.48,-f.w*.22,-f.h*.78);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
 
-    // Legs: armored, not stick-like.
+    // Back energy spine.
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    ctx.globalAlpha=.30;
+    ctx.strokeStyle=accent;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(-5,-f.h*.77);
+    ctx.lineTo(4,-f.h*.20);
+    ctx.stroke();
+    ctx.restore();
+
+    // Legs: thick armored greaves.
     ctx.lineCap='round';
     ctx.lineJoin='round';
-    ctx.lineWidth=20;
-    ctx.strokeStyle='rgba(8,10,14,.98)';
-    ctx.beginPath(); ctx.moveTo(-17,legY); ctx.lineTo(-28,0); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(19,legY); ctx.lineTo(34,0); ctx.stroke();
-    ctx.lineWidth=11;
-    ctx.strokeStyle='rgba(255,255,255,.08)';
-    ctx.beginPath(); ctx.moveTo(-19,legY+10); ctx.lineTo(-28,-3); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(21,legY+10); ctx.lineTo(34,-3); ctx.stroke();
+    const step = f.state === 'walking' ? Math.sin(time/95) * 8 : 0;
+    ctx.lineWidth=22;
+    ctx.strokeStyle=armorDark;
+    ctx.beginPath(); ctx.moveTo(-17,legY); ctx.quadraticCurveTo(-26+step*.25,-f.h*.14,-32+step,2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(19,legY); ctx.quadraticCurveTo(28-step*.25,-f.h*.14,38-step,2); ctx.stroke();
 
-    // Torso armor.
-    const bodyGrad = ctx.createLinearGradient(-f.w/2,-f.h, f.w/2,0);
+    ctx.lineWidth=12;
+    ctx.strokeStyle='rgba(255,255,255,.075)';
+    ctx.beginPath(); ctx.moveTo(-19,legY+10); ctx.lineTo(-31+step,0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(21,legY+10); ctx.lineTo(37-step,0); ctx.stroke();
+
+    // Boots.
+    ctx.fillStyle='#050608';
+    roundRect(ctx,-48+step, -4, 36, 13, 7, true, false);
+    roundRect(ctx,20-step, -4, 40, 13, 7, true, false);
+
+    // Torso armor base.
+    const bodyGrad = ctx.createLinearGradient(-f.w/2,-f.h*.80, f.w/2,0);
     bodyGrad.addColorStop(0, coreA);
-    bodyGrad.addColorStop(.45, '#050608');
+    bodyGrad.addColorStop(.28, '#0b0d13');
+    bodyGrad.addColorStop(.62, '#050608');
     bodyGrad.addColorStop(1, coreB);
     ctx.fillStyle = bodyGrad;
-    roundRect(ctx,-f.w*.38 + recoil,-f.h*.74,f.w*.76,f.h*.55,20,true,false);
+    roundRect(ctx,-f.w*.42 + recoil,-f.h*.75,f.w*.84,f.h*.56,22,true,false);
 
-    // Chest plate.
+    // Chest plated geometry.
+    ctx.save();
     ctx.fillStyle='rgba(255,255,255,.055)';
     ctx.beginPath();
-    ctx.moveTo(-f.w*.22,-f.h*.66);
-    ctx.lineTo(f.w*.22,-f.h*.66);
-    ctx.lineTo(f.w*.14,-f.h*.34);
-    ctx.lineTo(-f.w*.14,-f.h*.34);
+    ctx.moveTo(-f.w*.24 + recoil,-f.h*.67);
+    ctx.lineTo(f.w*.24 + recoil,-f.h*.67);
+    ctx.lineTo(f.w*.15 + recoil,-f.h*.35);
+    ctx.lineTo(0 + recoil,-f.h*.29);
+    ctx.lineTo(-f.w*.15 + recoil,-f.h*.35);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle=accent + '66';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Belt / waist.
+    ctx.fillStyle='rgba(0,0,0,.72)';
+    roundRect(ctx,-f.w*.35 + recoil,-f.h*.33,f.w*.70,12,7,true,false);
+    ctx.fillStyle=accent;
+    ctx.globalAlpha=.78;
+    roundRect(ctx,-8 + recoil,-f.h*.34,16,14,5,true,false);
+    ctx.globalAlpha=1;
+
+    ctx.strokeStyle = 'rgba(255,255,255,.15)';
+    ctx.lineWidth=2;
+    roundRect(ctx,-f.w*.42 + recoil,-f.h*.75,f.w*.84,f.h*.56,22,false,true);
+
+    // Shoulder armor.
+    ctx.fillStyle = coreB;
+    ctx.globalAlpha=.96;
+    roundRect(ctx,-f.w*.58,-f.h*.69,f.w*.40,20,11,true,false);
+    roundRect(ctx,f.w*.18,-f.h*.69,f.w*.40,20,11,true,false);
+    ctx.globalAlpha=1;
+    ctx.fillStyle='rgba(255,255,255,.10)';
+    roundRect(ctx,-f.w*.50,-f.h*.685,f.w*.22,4,2,true,false);
+    roundRect(ctx,f.w*.28,-f.h*.685,f.w*.22,4,2,true,false);
+
+    // Helmet / face.
+    const headGrad = ctx.createLinearGradient(-f.w*.33,-f.h*1.01,f.w*.33,-f.h*.70);
+    headGrad.addColorStop(0,'#1a1e28');
+    headGrad.addColorStop(.52,'#050608');
+    headGrad.addColorStop(1,coreB);
+    ctx.fillStyle = headGrad;
+    roundRect(ctx,-f.w*.32,-f.h*1.00,f.w*.64,f.h*.35,23,true,false);
+    ctx.strokeStyle='rgba(255,255,255,.16)';
+    ctx.lineWidth=2;
+    roundRect(ctx,-f.w*.32,-f.h*1.00,f.w*.64,f.h*.35,23,false,true);
+
+    // Horns / crest.
+    ctx.fillStyle='rgba(0,0,0,.82)';
+    ctx.beginPath();
+    ctx.moveTo(-f.w*.20,-f.h*.98);
+    ctx.lineTo(-f.w*.50,-f.h*1.10);
+    ctx.lineTo(-f.w*.26,-f.h*.90);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(f.w*.20,-f.h*.98);
+    ctx.lineTo(f.w*.50,-f.h*1.10);
+    ctx.lineTo(f.w*.26,-f.h*.90);
     ctx.closePath();
     ctx.fill();
 
-    ctx.strokeStyle = 'rgba(255,255,255,.16)';
-    ctx.lineWidth=2;
-    roundRect(ctx,-f.w*.38 + recoil,-f.h*.74,f.w*.76,f.h*.55,20,false,true);
-
-    // Shoulders.
-    ctx.fillStyle = coreB;
-    ctx.globalAlpha=.96;
-    roundRect(ctx,-f.w*.52,-f.h*.68,f.w*.34,18,11,true,false);
-    roundRect(ctx,f.w*.18,-f.h*.68,f.w*.34,18,11,true,false);
-    ctx.globalAlpha=1;
-
-    // Head / helmet.
-    const headGrad = ctx.createLinearGradient(-f.w*.30,-f.h*.99,f.w*.30,-f.h*.72);
-    headGrad.addColorStop(0,'#141820');
-    headGrad.addColorStop(.55,'#050608');
-    headGrad.addColorStop(1,coreB);
-    ctx.fillStyle = headGrad;
-    roundRect(ctx,-f.w*.30,-f.h*.99,f.w*.60,f.h*.34,22,true,false);
-    ctx.strokeStyle='rgba(255,255,255,.15)';
-    ctx.lineWidth=2;
-    roundRect(ctx,-f.w*.30,-f.h*.99,f.w*.60,f.h*.34,22,false,true);
-
-    // Visor.
+    // Visor glow.
     ctx.save();
     ctx.globalCompositeOperation='lighter';
     ctx.fillStyle=accent;
     ctx.shadowColor=accent;
-    ctx.shadowBlur=12;
-    roundRect(ctx,-f.w*.20,-f.h*.88,f.w*.40,8,6,true,false);
+    ctx.shadowBlur=16;
+    roundRect(ctx,-f.w*.22,-f.h*.885,f.w*.44,8,6,true,false);
     ctx.restore();
 
-    // Arms and fists.
+    // Arms.
     ctx.lineCap='round';
     ctx.lineJoin='round';
-    ctx.lineWidth = 18;
+    ctx.lineWidth = 20;
     ctx.strokeStyle = coreB;
     ctx.beginPath();
-    ctx.moveTo(13,armY);
-    ctx.quadraticCurveTo(36+punch*.35,armY-20,56+punch,armY-8);
+    ctx.moveTo(15,armY);
+    ctx.quadraticCurveTo(42+punch*.30,armY-22,62+punch,armY-8);
     ctx.stroke();
 
-    ctx.strokeStyle = '#0a0c11';
+    ctx.strokeStyle = armorDark;
     ctx.beginPath();
-    ctx.moveTo(-16,armY+4);
-    ctx.quadraticCurveTo(-40,armY+16,-48,armY+40);
+    ctx.moveTo(-18,armY+4);
+    ctx.quadraticCurveTo(-44,armY+20,-51,armY+45);
     ctx.stroke();
 
+    // Forearm blade / fist.
     ctx.fillStyle=accent;
-    ctx.globalAlpha=.96;
+    ctx.globalAlpha=.98;
     ctx.beginPath();
-    ctx.ellipse(61+punch, armY-8, 13, 10, .1, 0, Math.PI*2);
+    ctx.ellipse(66+punch, armY-8, 15, 11, .1, 0, Math.PI*2);
     ctx.fill();
     ctx.globalAlpha=1;
 
     if (attacking && f.attack) {
+      const isUlt = f.attack.name === 'ultimate';
+      const isSpec = f.attack.name === 'special';
       ctx.save();
       ctx.globalCompositeOperation='lighter';
-      const trailAlpha = f.attack.name === 'special' ? .78 : .55;
-      ctx.globalAlpha=trailAlpha;
-      ctx.strokeStyle=f.attack.name==='special'?'#fff0b7':coreB;
-      ctx.lineWidth=f.attack.name==='special'?11:7;
+
+      // Primary arc trail.
+      const grad = ctx.createLinearGradient(16, armY-65, 112+punch, armY+38);
+      grad.addColorStop(0, 'rgba(255,255,255,.0)');
+      grad.addColorStop(.42, isUlt ? '#fff4c8' : (isSpec ? '#ffe6a4' : coreB));
+      grad.addColorStop(1, 'rgba(255,255,255,.0)');
+      ctx.strokeStyle=grad;
+      ctx.lineWidth=isUlt?16:(isSpec?12:8);
+      ctx.globalAlpha=isUlt?.86:(isSpec?.72:.56);
       ctx.beginPath();
-      ctx.arc(58+punch,armY-8, f.attack.name==='special'?58:38, -.95, .72);
+      ctx.arc(58+punch,armY-8, isUlt?74:(isSpec?58:40), -.98, .78);
       ctx.stroke();
-      ctx.globalAlpha=.20;
-      ctx.fillStyle=f.attack.name==='special' ? '#fff0b7' : coreB;
+
+      // Energy blade body.
+      ctx.globalAlpha=isUlt?.32:(isSpec?.24:.18);
+      ctx.fillStyle=isUlt ? '#fff0b7' : (isSpec ? '#ffd37a' : coreB);
       ctx.beginPath();
-      ctx.ellipse(72+punch,armY-8,f.attack.name==='special'?52:34,18,0,0,Math.PI*2);
+      ctx.ellipse(78+punch,armY-8,isUlt?68:(isSpec?52:34),20,0,0,Math.PI*2);
       ctx.fill();
+
+      // Ultimate diagonal slash.
+      if (isUlt) {
+        ctx.globalAlpha=.55;
+        ctx.strokeStyle='#fff5d8';
+        ctx.lineWidth=5;
+        ctx.beginPath();
+        ctx.moveTo(-62,armY-72);
+        ctx.quadraticCurveTo(44+punch,armY-14,146+punch,armY+56);
+        ctx.stroke();
+      }
       ctx.restore();
     }
 
+    // Hurt flash cracks.
+    if (hurt) {
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      ctx.strokeStyle='rgba(255,255,255,.78)';
+      ctx.lineWidth=2;
+      ctx.globalAlpha=.65;
+      for(let i=0;i<3;i++){
+        ctx.beginPath();
+        ctx.moveTo(-18+i*18,-f.h*.70+i*18);
+        ctx.lineTo(-2+i*14,-f.h*.61+i*12);
+        ctx.lineTo(-14+i*19,-f.h*.52+i*16);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // Tiny nameplate under fighter for readability.
+    ctx.save();
+    ctx.globalAlpha=.72;
+    ctx.fillStyle='rgba(0,0,0,.48)';
+    roundRect(ctx,-42,15,84,16,8,true,false);
+    ctx.fillStyle=accent;
+    ctx.font='900 9px Inter, Arial';
+    ctx.textAlign='center';
+    ctx.fillText((f.name || (isEnemy?'WARDEN':'RAVEN')).slice(0,11).toUpperCase(),0,26);
+    ctx.restore();
+
     ctx.restore();
   }
+
 
   function roundRect(ctx,x,y,w,h,r,fill,stroke){
     const rr = Math.min(r,w/2,h/2);
