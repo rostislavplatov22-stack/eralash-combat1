@@ -80,3 +80,21 @@ https://eralash-combat1.vercel.app/api/anti-cheat?secret=ТВОЙ_ADMIN_API_SECR
 ## После Referral + Season update
 
 После загрузки архива обязательно выполни свежий `supabase_schema.sql` в Supabase SQL Editor и затем `notify pgrst, 'reload schema';`. Проверь `/api/referral` и `/api/season`.
+
+
+## Release 1.0 checks
+
+После деплоя проверь:
+
+```text
+/api/health
+/api/status
+/api/qa?secret=ТВОЙ_ADMIN_API_SECRET
+/api/admin?action=launch&secret=ТВОЙ_ADMIN_API_SECRET
+```
+
+Если schema cache не видит новые таблицы ошибок, выполни в Supabase:
+
+```sql
+notify pgrst, 'reload schema';
+```

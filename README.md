@@ -166,3 +166,10 @@ ADMIN_API_SECRET
 ## Referral + Season Update
 
 Добавлены referral, share victory, сезонный рейтинг и начисление season points после боя. Подробности: `REFERRAL_SEASON_UPDATE_RU.md`.
+
+
+## Release 1.0 Ready
+
+Добавлены `/api/health`, `/api/status`, `/api/qa`, `/api/client-error`, onboarding, launch checklist, error logs и команда Telegram `/status`.
+
+Подробнее: `RELEASE_1_0_UPDATE_RU.md`.

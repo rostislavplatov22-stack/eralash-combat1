@@ -67,6 +67,14 @@
     .tip{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.055);border-radius:16px;padding:12px}
     .tip b{display:block;color:#fff;font-size:12px;margin-bottom:4px}
     .tip span{display:block;color:#aeb1ba;font-size:11px;line-height:1.35}
+
+    .launch-steps{margin-top:18px;border:1px solid rgba(217,183,106,.24);background:linear-gradient(180deg,rgba(217,183,106,.08),rgba(255,255,255,.04));border-radius:20px;padding:13px;text-align:left}
+    .launch-steps .step-title{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:900;margin-bottom:10px}
+    .step-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+    .step{border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:10px;background:rgba(0,0,0,.22)}
+    .step b{display:block;font-size:11px;color:#fff;margin-bottom:3px}
+    .step span{display:block;font-size:10.5px;color:#aeb1ba;line-height:1.28}
+
     .controls{position:absolute;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));z-index:25;display:flex;justify-content:space-between;align-items:end;padding:0 16px;pointer-events:none}
     .pad,.actions{display:flex;gap:10px;pointer-events:auto}
     .pad{align-items:end}
@@ -97,6 +105,8 @@
       .control-btn{width:48px;height:48px;border-radius:16px;font-size:12px}
       .control-btn.big{width:54px;height:54px}
       .tips{grid-template-columns:1fr;gap:8px}
+      .step-grid{grid-template-columns:1fr}
+      .launch-steps{padding:12px}
       .tip{padding:11px 12px}
       .economy-actions button{font-size:11px;padding:10px 11px}
       .economy-content{max-height:none;overflow:visible}
@@ -171,6 +181,18 @@
       <p class="subtitle">Dark premium файтинг 1 на 1: мощные удары, блок, спецприём, AI-противник, hit stop, knockback, cinematic FX, раунды и удобные мобильные кнопки.</p>
       <div id="tgProfileBadge" class="profile-badge">Offline Arena Preview · Guest Fighter · LVL 1 · 0 coins</div>
 
+      <div class="launch-steps">
+        <div class="step-title">Release 1.0 onboarding</div>
+        <div class="step-grid">
+          <div class="step"><b>01 · Fighter</b><span>Выбери бойца и арену в блоке 🧬 Контент.</span></div>
+          <div class="step"><b>02 · Fight</b><span>Нажми «Начать бой» и победи AI в best of 3.</span></div>
+          <div class="step"><b>03 · Rewards</b><span>Получай XP, coins, daily и season points.</span></div>
+          <div class="step"><b>04 · Shop</b><span>Открывай предметы через coins или Telegram Stars.</span></div>
+          <div class="step"><b>05 · Invite</b><span>Делись победой и зови друзей в сезонный топ.</span></div>
+        </div>
+      </div>
+
+
       <div class="btn-row">
         <button id="startBtn">Начать бой</button>
         <button id="muteBtn" class="secondary">Звук: ON</button>
@@ -194,6 +216,7 @@
           <button id="inviteBtn" class="secondary">🤝 Invite</button>
           <button id="seasonBtn" class="secondary">🏆 Season</button>
           <button id="adminBtn" class="secondary">⚙️ Admin</button>
+          <button id="qaBtn" class="secondary">🚀 QA</button>
         </div>
         <div id="economyContent" class="economy-content">
           <div class="pill-list">
@@ -203,6 +226,7 @@
             <span class="pill">Telegram Stars ready</span>
             <span class="pill">Fighters & arenas DB</span>
             <span class="pill">Referral & Season ready</span>
+            <span class="pill">Release 1.0 QA ready</span>
           </div>
         </div>
       </div>
@@ -1498,6 +1522,7 @@
       invite: document.getElementById('inviteBtn'),
       season: document.getElementById('seasonBtn'),
       admin: document.getElementById('adminBtn'),
+      qa: document.getElementById('qaBtn'),
       content: document.getElementById('economyContent')
     };
   }
@@ -1518,6 +1543,26 @@
       '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
     }[ch]));
   }
+
+
+  async function reportClientError(type, error, extra = {}){
+    try {
+      await fetch('/api/client-error', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          type:type || 'client',
+          source:'miniapp-client',
+          message:String(error?.message || error || 'unknown_error'),
+          stack:String(error?.stack || ''),
+          path:location.pathname + location.search,
+          userId:telegramContext.user?.id || appProfile?.telegramId || 'guest',
+          payload:extra
+        })
+      });
+    } catch (_) {}
+  }
+
 
   async function loadShop(){
     setEconomyContent('<div class="pill">Загрузка магазина...</div>');
@@ -1891,6 +1936,33 @@
   }
 
 
+  async function loadQa(){
+    setEconomyContent('<div class="pill">Проверяем Release 1.0 status...</div>');
+    try {
+      const res = await fetch('/api/status', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const checks = (data.checks || []).map(c => `
+        <div class="shop-card">
+          <div><h4>${c.ok ? '✅' : '❌'} ${escapeUi(c.label || c.key)}</h4><p>${escapeUi(c.details || '')}</p></div>
+          <span class="pill">${c.ms ? c.ms + 'ms' : (c.ok ? 'OK' : 'FAIL')}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">${data.ok ? '🚀 Ready for launch' : '⚠️ Needs attention'}</span>
+          <span class="pill">Release ${escapeUi(data.release || '1.0')}</span>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+        </div>
+        ${checks || '<div class="pill">QA checks unavailable</div>'}
+      `);
+    } catch (error) {
+      await reportClientError('client', error, { screen:'qa' });
+      setEconomyContent('<div class="pill">QA API недоступен</div>');
+    }
+  }
+
+
+
 
   async function loadContentPanel(){
     setEconomyContent('<div class="pill">Загрузка персонажей и арен из Supabase...</div>');
@@ -1998,6 +2070,7 @@
     els.invite?.addEventListener('click', () => { audio.ui(); loadReferral(); });
     els.season?.addEventListener('click', () => { audio.ui(); loadSeason(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
+    els.qa?.addEventListener('click', () => { audio.ui(); loadQa(); });
     ui.shareVictoryBtn?.addEventListener('click', () => { audio.ui(); shareVictory(); });
   }
 
@@ -2043,8 +2116,17 @@
       if (params.get('content') === '1') loadContentPanel();
       if (params.get('invite') === '1' || params.get('ref') === '1') loadReferral();
       if (params.get('season') === '1') loadSeason();
+      if (params.get('qa') === '1') loadQa();
     }, 350);
   }
+
+
+  window.addEventListener('error', event => {
+    reportClientError('client', event.error || event.message, { filename:event.filename, lineno:event.lineno, colno:event.colno });
+  });
+  window.addEventListener('unhandledrejection', event => {
+    reportClientError('client', event.reason || 'unhandledrejection', { type:'unhandledrejection' });
+  });
 
   resize();
   bindControls();

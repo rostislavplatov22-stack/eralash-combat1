@@ -483,3 +483,67 @@ alter table public.referrals enable row level security;
 alter table public.share_events enable row level security;
 
 notify pgrst, 'reload schema';
+
+
+-- Release 1.0 / QA / error logging update.
+-- Safe to run multiple times in Supabase SQL Editor.
+
+create table if not exists public.client_errors (
+  id uuid primary key default gen_random_uuid(),
+  source text not null default 'miniapp-client',
+  message text not null default '',
+  stack text default '',
+  path text default '',
+  user_agent text default '',
+  user_id text default '',
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.api_errors (
+  id uuid primary key default gen_random_uuid(),
+  source text not null default 'api',
+  message text not null default '',
+  stack text default '',
+  path text default '',
+  user_agent text default '',
+  user_id text default '',
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.payment_errors (
+  id uuid primary key default gen_random_uuid(),
+  source text not null default 'payment',
+  message text not null default '',
+  stack text default '',
+  path text default '',
+  user_agent text default '',
+  user_id text default '',
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.telegram_errors (
+  id uuid primary key default gen_random_uuid(),
+  source text not null default 'telegram',
+  message text not null default '',
+  stack text default '',
+  path text default '',
+  user_agent text default '',
+  user_id text default '',
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists client_errors_created_idx on public.client_errors (created_at desc);
+create index if not exists api_errors_created_idx on public.api_errors (created_at desc);
+create index if not exists payment_errors_created_idx on public.payment_errors (created_at desc);
+create index if not exists telegram_errors_created_idx on public.telegram_errors (created_at desc);
+
+alter table public.client_errors enable row level security;
+alter table public.api_errors enable row level security;
+alter table public.payment_errors enable row level security;
+alter table public.telegram_errors enable row level security;
+
+notify pgrst, 'reload schema';

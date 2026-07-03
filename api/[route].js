@@ -17,6 +17,11 @@ import arenas from '../lib/handlers/arenas.js';
 import abilities from '../lib/handlers/abilities.js';
 import referral from '../lib/handlers/referral.js';
 import season from '../lib/handlers/season.js';
+import health from '../lib/handlers/health.js';
+import status from '../lib/handlers/status.js';
+import qa from '../lib/handlers/qa.js';
+import clientError from '../lib/handlers/client-error.js';
+import { logReleaseError } from '../lib/_release.js';
 
 // Single Vercel Serverless Function dispatcher.
 // This keeps the project inside the Hobby plan limit while preserving public URLs:
@@ -41,7 +46,11 @@ const routes = {
   arenas,
   abilities,
   referral,
-  season
+  season,
+  health,
+  status,
+  qa,
+  'client-error': clientError
 };
 
 export default async function handler(req, res) {
@@ -60,5 +69,17 @@ export default async function handler(req, res) {
     return;
   }
 
-  return routeHandler(req, res);
+  try {
+    return await routeHandler(req, res);
+  } catch (error) {
+    console.error(error);
+    await logReleaseError('api', {
+      source: `api/${route}`,
+      message: error.message,
+      stack: error.stack,
+      path: url.pathname,
+      userAgent: req.headers['user-agent'] || ''
+    }).catch(() => {});
+    res.status(error.status || 500).json({ ok: false, error: error.message || 'Internal Server Error' });
+  }
 }
