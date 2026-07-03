@@ -2167,6 +2167,27 @@ body.real-art-v4 #menu .dc-real-hotzones{
   }
 }
 
+
+/* ==========================================================
+   Start Fight visibility fix
+   Real Art V4 used display:flex!important on #menu. During fight
+   the menu must be force-hidden, otherwise click starts logic but
+   painted lobby stays above canvas.
+   ========================================================== */
+body.is-fighting #menu,
+body.real-art-v4.is-fighting #menu,
+body.is-fighting #menu.dc-v3-menu,
+body.real-art-v4.is-fighting #menu.dc-v3-menu{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+body.is-fighting .hud,
+body.is-fighting .controls,
+body.is-fighting canvas{
+  visibility:visible !important;
+}
+
 </style>
 </head>
 <body class="dc-ref-ready dc-reference-v3 real-art-v4">
@@ -2700,11 +2721,13 @@ body.real-art-v4 #menu .dc-real-hotzones{
     roundIndex = 1;
     matchMaxCombo = 0;
     gameState = 'fight';
-    ui.menu.style.display = 'none';
-    ui.result.style.display = 'none';
     document.body.classList.add('is-fighting');
+    ui.menu.style.setProperty('display', 'none', 'important');
+    ui.menu.setAttribute('aria-hidden', 'true');
+    ui.result.style.display = 'none';
     hideTelegramMainButton();
     resetRoundPositions();
+    showCallout('FIGHT', 'Round 1');
   }
 
   function resize(){
@@ -4229,7 +4252,7 @@ body.real-art-v4 #menu .dc-real-hotzones{
 
     ui.startBtn.addEventListener('click',()=>{trackEvent('fight_start');audio.ui();audio.ensure();newMatch();});
     ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
-    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';ui.menu.style.display='flex';gameState='menu';document.body.classList.remove('is-fighting');hideTelegramMainButton();});
+    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';document.body.classList.remove('is-fighting');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();});
     ui.muteBtn.addEventListener('click',()=>{
       muted = !muted;
       ui.muteBtn.textContent = 'Звук: ' + (muted ? 'OFF' : 'ON');
@@ -5394,7 +5417,7 @@ function sessionId(){
       { id:'missions',     x1:1.6,  y1:26.9, x2:21.5, y2:33.1, fn:()=>loadMissions() },
       { id:'boss',         x1:1.6,  y1:32.3, x2:21.5, y2:38.5, fn:()=>loadBossRush() },
       { id:'season',       x1:1.6,  y1:37.7, x2:21.5, y2:43.9, fn:()=>loadSeason() },
-      { id:'weekly',       x1:1.6,  y1:43.1, x2:21.5, y2:49.3, fn:()=>loadWeeklyLeaderboard() },
+      { id:'weekly',       x1:1.6,  y1:43.1, x2:21.5, y2:49.3, fn:()=>loadWeekly() },
       { id:'invite',       x1:1.6,  y1:48.5, x2:21.5, y2:54.7, fn:()=>loadReferral() },
       { id:'promo',        x1:1.6,  y1:53.9, x2:21.5, y2:60.1, fn:()=>promoForm() },
       { id:'achievements', x1:1.6,  y1:59.3, x2:21.5, y2:65.5, fn:()=>loadAchievements() },
@@ -5528,6 +5551,7 @@ function sessionId(){
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
+  window.eralashStartFight = newMatch;
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });
 })();
