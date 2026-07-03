@@ -2188,6 +2188,121 @@ body.is-fighting canvas{
   visibility:visible !important;
 }
 
+
+/* ==========================================================
+   Dark Cinematic V4.3 — clean hover + smooth transitions
+   Fixes crooked hover rectangles on painted click zones and
+   adds premium fade/zoom transitions between lobby, panels and fight.
+   ========================================================== */
+@media (min-width: 900px){
+  body.real-art-v4 #menu button:hover,
+  body.real-art-v4 #menu button:focus-visible{
+    background:rgba(255,255,255,.001) !important;
+    box-shadow:none !important;
+  }
+
+  body.real-art-v4 #menu .dc-real-zone:hover,
+  body.real-art-v4 #menu .dc-real-zone:focus-visible{
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  body.real-art-v4 #menu .dc-v3-lobby{
+    transition:
+      opacity .34s cubic-bezier(.2,.8,.2,1),
+      transform .42s cubic-bezier(.2,.8,.2,1),
+      filter .34s cubic-bezier(.2,.8,.2,1) !important;
+    will-change: opacity, transform, filter;
+  }
+
+  body.real-art-v4.menu-leaving #menu .dc-v3-lobby{
+    opacity:0 !important;
+    transform:scale(1.035) translateY(-8px) !important;
+    filter:blur(8px) brightness(.65) !important;
+  }
+
+  body.real-art-v4 #menu .dc-real-hover-frame{
+    position:absolute;
+    z-index:95;
+    display:block;
+    pointer-events:none;
+    opacity:0;
+    border:1px solid rgba(255,218,142,.48);
+    border-radius:12px;
+    background:
+      linear-gradient(90deg, transparent, rgba(255,53,38,.075), transparent),
+      rgba(255,255,255,.006);
+    box-shadow:
+      0 0 18px rgba(255,50,38,.20),
+      inset 0 0 0 1px rgba(120,20,16,.24);
+    transform:translate3d(0,0,0) scale(.985);
+    transition:
+      opacity .16s ease,
+      left .14s ease,
+      top .14s ease,
+      width .14s ease,
+      height .14s ease,
+      transform .18s cubic-bezier(.2,.8,.2,1);
+  }
+
+  body.real-art-v4 #menu .dc-real-hover-frame.show{
+    opacity:1;
+    transform:translate3d(0,0,0) scale(1);
+  }
+
+  body.real-art-v4 #menu .dc-real-hover-frame.start{
+    border-radius:24px;
+    border-color:rgba(255,231,168,.62);
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,58,42,.12), transparent 66%),
+      rgba(255,255,255,.004);
+    box-shadow:
+      0 0 34px rgba(255,44,32,.25),
+      inset 0 0 0 1px rgba(255,220,150,.24);
+  }
+}
+
+/* Smooth app state transitions */
+#menu{
+  transition:opacity .34s cubic-bezier(.2,.8,.2,1), filter .34s cubic-bezier(.2,.8,.2,1);
+}
+.hud,.controls,canvas{
+  transition:opacity .30s cubic-bezier(.2,.8,.2,1), filter .30s cubic-bezier(.2,.8,.2,1);
+}
+body:not(.is-fighting) .hud,
+body:not(.is-fighting) .controls{
+  opacity:0;
+}
+body.is-fighting .hud,
+body.is-fighting .controls{
+  opacity:1;
+}
+.dcv4-modal{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s cubic-bezier(.2,.8,.2,1);
+}
+.dcv4-modal.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.dcv4-panel{
+  transform:translateY(18px) scale(.985);
+  opacity:.96;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1), opacity .24s cubic-bezier(.2,.8,.2,1);
+}
+.dcv4-modal.show .dcv4-panel{
+  transform:translateY(0) scale(1);
+  opacity:1;
+}
+body.menu-returning #menu .dc-v3-lobby{
+  animation:dcLobbyReturn .42s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes dcLobbyReturn{
+  from{opacity:0;transform:scale(1.025);filter:blur(8px) brightness(.7)}
+  to{opacity:1;transform:scale(1);filter:blur(0) brightness(1)}
+}
+
 </style>
 </head>
 <body class="dc-ref-ready dc-reference-v3 real-art-v4">
@@ -2221,6 +2336,7 @@ body.is-fighting canvas{
     <div class="dc-v3-lobby">
       <div class="dc-v3-bg-noise"></div>
       <div class="dc-real-hotzones" aria-label="Активные зоны Dark Cinematic меню">
+        <i id="dcRealHoverFrame" class="dc-real-hover-frame" aria-hidden="true"></i>
         <button id="realStartZone" class="dc-real-zone" type="button" aria-label="Начать бой"></button>
         <button id="realProfileZone" class="dc-real-zone" type="button" aria-label="Профиль"></button>
         <button id="realSeasonCardBtn" class="dc-real-zone" type="button" aria-label="Сезон"></button>
@@ -2721,13 +2837,21 @@ body.is-fighting canvas{
     roundIndex = 1;
     matchMaxCombo = 0;
     gameState = 'fight';
-    document.body.classList.add('is-fighting');
-    ui.menu.style.setProperty('display', 'none', 'important');
-    ui.menu.setAttribute('aria-hidden', 'true');
     ui.result.style.display = 'none';
     hideTelegramMainButton();
     resetRoundPositions();
-    showCallout('FIGHT', 'Round 1');
+
+    // Premium transition: let the painted lobby fade/zoom out before hiding it.
+    document.body.classList.remove('menu-returning');
+    document.body.classList.add('menu-leaving');
+    ui.menu.setAttribute('aria-hidden', 'true');
+
+    window.setTimeout(() => {
+      document.body.classList.add('is-fighting');
+      ui.menu.style.setProperty('display', 'none', 'important');
+      document.body.classList.remove('menu-leaving');
+      showCallout('FIGHT', 'Round 1');
+    }, document.body.classList.contains('real-art-v4') ? 260 : 0);
   }
 
   function resize(){
@@ -4252,7 +4376,7 @@ body.is-fighting canvas{
 
     ui.startBtn.addEventListener('click',()=>{trackEvent('fight_start');audio.ui();audio.ensure();newMatch();});
     ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
-    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';document.body.classList.remove('is-fighting');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();});
+    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';document.body.classList.remove('is-fighting','menu-leaving');document.body.classList.add('menu-returning');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();window.setTimeout(()=>document.body.classList.remove('menu-returning'),460);});
     ui.muteBtn.addEventListener('click',()=>{
       muted = !muted;
       ui.muteBtn.textContent = 'Звук: ' + (muted ? 'OFF' : 'ON');
@@ -5387,6 +5511,47 @@ function sessionId(){
     bind('realAchievementsBtn', loadAchievements);
     bind('realReferralsBtn', loadReferral);
     bind('realSettingsBtn', loadSettingsPanel);
+
+    // Clean hover frame: one elegant frame follows exact real-art zones instead of
+    // letting browser hover paint large/crooked rectangles over the artwork.
+    const hoverFrame = document.getElementById('dcRealHoverFrame');
+    const lobbyFrame = document.querySelector('#menu .dc-v3-lobby');
+    const zoneIds = [
+      'realStartZone','realProfileZone','realSeasonCardBtn','realDailyCardBtn','realMissionsCardBtn','realStarsCardBtn',
+      'realInventoryBtn','realProfileBtn','realAchievementsBtn','realReferralsBtn','realSettingsBtn',
+      'dailyBtn','shopBtn','contentBtn','missionsBtn','bossBtn','seasonBtn','weeklyBtn','inviteBtn','promoBtn',
+      'achievementsBtn','launchBtn','newsBtn','founderBtn','feedbackBtn','analyticsBtn'
+    ];
+    function moveHoverFrame(el){
+      if (!hoverFrame || !lobbyFrame || !el || !document.body.classList.contains('real-art-v4')) return;
+      const lr = lobbyFrame.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      hoverFrame.style.left = Math.max(0, r.left - lr.left) + 'px';
+      hoverFrame.style.top = Math.max(0, r.top - lr.top) + 'px';
+      hoverFrame.style.width = Math.max(1, r.width) + 'px';
+      hoverFrame.style.height = Math.max(1, r.height) + 'px';
+      hoverFrame.classList.toggle('start', el.id === 'realStartZone' || el.id === 'startBtn');
+      hoverFrame.classList.add('show');
+    }
+    function hideHoverFrame(){
+      if (hoverFrame) hoverFrame.classList.remove('show','start');
+    }
+    zoneIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('pointerenter', () => moveHoverFrame(el), {passive:true});
+      el.addEventListener('focus', () => moveHoverFrame(el), {passive:true});
+      el.addEventListener('pointerleave', hideHoverFrame, {passive:true});
+      el.addEventListener('blur', hideHoverFrame, {passive:true});
+      el.addEventListener('pointerdown', () => {
+        moveHoverFrame(el);
+        if (lobbyFrame) {
+          lobbyFrame.setAttribute('data-pressed-zone', id);
+          window.setTimeout(() => lobbyFrame.removeAttribute('data-pressed-zone'), 190);
+        }
+      }, {passive:true});
+    });
+
 
     document.getElementById('inventoryFakeBtn')?.addEventListener('click', () => { audio.ui(); loadInventoryPanel(); });
     document.getElementById('profileFakeBtn')?.addEventListener('click', () => { audio.ui(); loadProfilePanel(); });
