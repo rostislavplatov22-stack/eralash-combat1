@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Dark Cinematic Real Art V4 FIXED</title>
+  <title>EraLash Combat — Exact Black Citadel Arena</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -2996,6 +2996,11 @@ body.result-entering #result{
   blackCitadelArenaArt.loading = 'eager';
   blackCitadelArenaArt.src = 'assets/arena-black-citadel-courtyard.png';
 
+  // Exact user-provided arena mode:
+  // the fight background must be the uploaded Black Citadel image itself,
+  // without extra painted fallback geometry, debug grid, artificial light panels or fake overlays.
+  const EXACT_BLACK_CITADEL_ARENA = true;
+
 
   const ui = {
     menu: document.getElementById('menu'),
@@ -4058,6 +4063,7 @@ body.result-entering #result{
     const artReady = blackCitadelArenaArt && blackCitadelArenaArt.complete && blackCitadelArenaArt.naturalWidth > 0;
     if (artReady) {
       drawCoverImage(blackCitadelArenaArt, 0, 0, w, h);
+      if (EXACT_BLACK_CITADEL_ARENA) return;
     } else {
       const sky = ctx.createLinearGradient(0,0,0,h);
       sky.addColorStop(0, '#030406');

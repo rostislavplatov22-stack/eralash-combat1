@@ -246,3 +246,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Dark Cinematic Arena 5.1
 
 Добавлена новая боевая арена Black Citadel Courtyard с real art asset, дымом, embers, soft light, premium vignette и без debug-grid ощущения.
+
+
+## Exact Black Citadel Arena
+
+Добавлена версия с точной пользовательской ареной `assets/arena-black-citadel-courtyard.png` и режимом `EXACT_BLACK_CITADEL_ARENA = true`.
