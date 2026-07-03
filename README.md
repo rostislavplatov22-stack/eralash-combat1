@@ -188,3 +188,8 @@ ADMIN_API_SECRET
 ## Combat 2.0 Premium Fight Feel
 
 Добавлены dodge, ultimate, combo counter, cinematic zoom, afterimages, улучшенный AI и усиленные hit sparks/slash trails. Управление: `Q/Space` — dodge, `O` — ultimate, мобильные кнопки `DGE` и `ULT`.
+
+
+## Missions + Achievements + Boss Rush
+
+Добавлены `/api/missions`, `/api/achievements`, `/api/boss`, Supabase-таблицы миссий/достижений/боссов и новые UI-кнопки в Mini App.

@@ -27,6 +27,9 @@ import founderBonus from '../lib/handlers/founder-bonus.js';
 import analytics from '../lib/handlers/analytics.js';
 import feedback from '../lib/handlers/feedback.js';
 import liveops from '../lib/handlers/liveops.js';
+import missions from '../lib/handlers/missions.js';
+import achievements from '../lib/handlers/achievements.js';
+import boss from '../lib/handlers/boss.js';
 import { logReleaseError } from '../lib/_release.js';
 
 // Single Vercel Serverless Function dispatcher.
@@ -62,7 +65,10 @@ const routes = {
   'founder-bonus': founderBonus,
   analytics,
   feedback,
-  liveops
+  liveops,
+  missions,
+  achievements,
+  boss
 };
 
 export default async function handler(req, res) {

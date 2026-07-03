@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat 2.0, cinematic hit feel, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat 2.1, missions, boss rush, achievements and cinematic hit feel, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Dark Arena</title>
+  <title>EraLash Combat — Missions & Boss Rush</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -226,6 +226,9 @@
           <button id="feedbackBtn" class="secondary">💬 Feedback</button>
           <button id="analyticsBtn" class="secondary">📊 Analytics</button>
           <button id="liveopsBtn" class="secondary">🎛️ LiveOps</button>
+          <button id="missionsBtn" class="secondary">🎯 Missions</button>
+          <button id="achievementsBtn" class="secondary">🏅 Achievements</button>
+          <button id="bossBtn" class="secondary">👹 Boss Rush</button>
           <button id="adminBtn" class="secondary">⚙️ Admin</button>
           <button id="qaBtn" class="secondary">🚀 QA</button>
         </div>
@@ -341,6 +344,7 @@
   let comboCount = 0;
   let comboTimer = 0;
   let comboDamage = 0;
+  let matchMaxCombo = 0;
   let lastHitAt = 0;
   let telegramContext = { insideTelegram:false, user:null, initData:'' };
   let pendingStarsItemId = '';
@@ -570,6 +574,7 @@
     playerRounds = 0;
     enemyRounds = 0;
     roundIndex = 1;
+    matchMaxCombo = 0;
     gameState = 'fight';
     ui.menu.style.display = 'none';
     ui.result.style.display = 'none';
@@ -701,6 +706,7 @@
         playerRounds,
         enemyRounds,
         duration: Math.max(0, Math.round(ROUND_TIME - roundTime)),
+        combo: matchMaxCombo,
         level: appProfile.level,
         xp: appProfile.xp,
         coins: appProfile.coins,
@@ -741,6 +747,12 @@
       }
       if (data?.season?.pointsAdded && ui.resultRewards) {
         ui.resultRewards.insertAdjacentHTML('beforeend', `<span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">+${data.season.pointsAdded} season pts</span>`);
+      }
+      if (data?.missions?.updated?.length && ui.resultRewards) {
+        ui.resultRewards.insertAdjacentHTML('beforeend', `<span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">🎯 ${data.missions.updated.length} mission progress</span>`);
+      }
+      if (data?.achievements?.length && ui.resultRewards) {
+        ui.resultRewards.insertAdjacentHTML('beforeend', `<span style="padding:8px 10px;border:1px solid rgba(217,183,106,.28);border-radius:999px;background:rgba(255,255,255,.055)">🏅 ${data.achievements.length} achievement</span>`);
       }
     } catch(_) {
       // Offline/browser preview must keep working even without backend.
@@ -881,6 +893,7 @@
       if (performance.now() - lastHitAt < 1500) comboCount += 1;
       else comboCount = 1;
       comboTimer = 1.45;
+      matchMaxCombo = Math.max(matchMaxCombo, comboCount);
       comboDamage += dmg;
       lastHitAt = performance.now();
       updateComboTag();
@@ -1713,6 +1726,9 @@
       feedback: document.getElementById('feedbackBtn'),
       analytics: document.getElementById('analyticsBtn'),
       liveops: document.getElementById('liveopsBtn'),
+      missions: document.getElementById('missionsBtn'),
+      achievements: document.getElementById('achievementsBtn'),
+      boss: document.getElementById('bossBtn'),
       admin: document.getElementById('adminBtn'),
       qa: document.getElementById('qaBtn'),
       content: document.getElementById('economyContent')
@@ -2423,6 +2439,152 @@ function sessionId(){
 
 
 
+
+  async function loadMissions(){
+    trackEvent('missions_open');
+    setEconomyContent('<div class="pill">Загрузка миссий...</div>');
+    try {
+      const res = await fetch('/api/missions', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'missions error');
+      const cards = (data.missions || []).map(m => `
+        <div class="shop-card">
+          <div>
+            <h4>🎯 ${escapeUi(m.title)} ${m.claimed ? '· CLAIMED' : ''}</h4>
+            <p>${escapeUi(m.description)}</p>
+            <div class="price">${m.progress || 0}/${m.goal_value || 1} · +${m.reward_xp || 0} XP · +${m.reward_coins || 0} coins</div>
+          </div>
+          <div class="shop-actions">
+            ${m.claimed ? '<span class="pill">Done</span>' : m.completed ? `<button class="mini-btn claim-mission" data-id="${escapeUi(m.id)}">Claim</button>` : '<span class="pill">Progress</span>'}
+          </div>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Combat Missions</span>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+          <span class="pill">Combo, wins, matches</span>
+        </div>
+        ${cards || '<div class="pill">Миссии пока недоступны</div>'}
+      `);
+      document.querySelectorAll('.claim-mission').forEach(btn => btn.addEventListener('click', () => claimMission(btn.dataset.id)));
+    } catch (error) {
+      await reportClientError('client', error, { screen:'missions' });
+      setEconomyContent('<div class="pill">Missions API недоступен. Выполни свежий supabase_schema.sql и reload schema.</div>');
+    }
+  }
+
+  async function claimMission(missionId){
+    setEconomyContent('<div class="pill">Выдаём награду миссии...</div>');
+    try {
+      const res = await fetch('/api/missions', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({ action:'claim', missionId, user: telegramContext.user || { id:'guest', first_name:'Guest' } })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      setEconomyContent(data.ok
+        ? `<div class="pill">✅ Mission claimed: +${data.reward?.xp || 0} XP · +${data.reward?.coins || 0} coins</div>`
+        : `<div class="pill">Не удалось забрать миссию: ${escapeUi(data.error || 'unknown')}</div>`);
+      setTimeout(loadMissions, 900);
+    } catch (error) {
+      setEconomyContent('<div class="pill">Ошибка выдачи миссии</div>');
+    }
+  }
+
+  async function loadAchievements(){
+    trackEvent('achievements_open');
+    setEconomyContent('<div class="pill">Загрузка достижений...</div>');
+    try {
+      const res = await fetch('/api/achievements', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'achievements error');
+      const cards = (data.achievements || []).map(a => `
+        <div class="shop-card">
+          <div>
+            <h4>🏅 ${escapeUi(a.title)} · ${escapeUi(a.rarity || 'common')}</h4>
+            <p>${escapeUi(a.description)}</p>
+            <div class="price">Trigger: ${escapeUi(a.trigger_type || '')} ${a.threshold || 1} · +${a.reward_xp || 0} XP · +${a.reward_coins || 0} coins</div>
+          </div>
+          <span class="pill">${a.unlocked ? 'Unlocked' : 'Locked'}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Achievements</span>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+          <span class="pill">Permanent rewards</span>
+        </div>
+        ${cards || '<div class="pill">Достижения пока недоступны</div>'}
+      `);
+    } catch (error) {
+      await reportClientError('client', error, { screen:'achievements' });
+      setEconomyContent('<div class="pill">Achievements API недоступен</div>');
+    }
+  }
+
+  async function loadBossRush(){
+    trackEvent('boss_open');
+    setEconomyContent('<div class="pill">Загрузка Boss Rush...</div>');
+    try {
+      const res = await fetch('/api/boss', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'boss error');
+      const cards = (data.bosses || []).map(b => `
+        <div class="shop-card">
+          <div>
+            <h4>👹 ${escapeUi(b.title)}</h4>
+            <p>${escapeUi(b.description)}</p>
+            <div class="price">HP x${b.hp_multiplier || 1} · DMG x${b.damage_multiplier || 1} · +${b.reward_xp || 0} XP · +${b.reward_coins || 0} coins</div>
+          </div>
+          <button class="mini-btn boss-result" data-id="${escapeUi(b.id)}">Sim Win</button>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Boss Rush</span>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+          <span class="pill">Premium PvE mode</span>
+        </div>
+        ${cards || '<div class="pill">Boss Rush пока недоступен</div>'}
+        <div class="pill" style="margin-top:10px">Сейчас кнопка Sim Win нужна для теста наград. Следующий пакет подключит полноценный boss-fight прямо в бой.</div>
+      `);
+      document.querySelectorAll('.boss-result').forEach(btn => btn.addEventListener('click', () => completeBoss(btn.dataset.id)));
+    } catch (error) {
+      await reportClientError('client', error, { screen:'boss' });
+      setEconomyContent('<div class="pill">Boss API недоступен</div>');
+    }
+  }
+
+  async function completeBoss(bossId){
+    setEconomyContent('<div class="pill">Записываем Boss Rush результат...</div>');
+    try {
+      const res = await fetch('/api/boss', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({ bossId, result:'win', score:{ combo: matchMaxCombo }, user: telegramContext.user || { id:'guest', first_name:'Guest' } })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      setEconomyContent(data.ok
+        ? `<div class="pill">👹 Boss defeated: +${data.reward?.xp || 0} XP · +${data.reward?.coins || 0} coins</div>`
+        : `<div class="pill">Boss result error: ${escapeUi(data.error || 'unknown')}</div>`);
+      setTimeout(loadBossRush, 900);
+    } catch (error) {
+      setEconomyContent('<div class="pill">Boss Rush ошибка</div>');
+    }
+  }
+
+
   async function loadContentPanel(){
     setEconomyContent('<div class="pill">Загрузка персонажей и арен из Supabase...</div>');
     try {
@@ -2534,6 +2696,9 @@ function sessionId(){
     els.feedback?.addEventListener('click', () => { audio.ui(); feedbackForm(); });
     els.analytics?.addEventListener('click', () => { audio.ui(); loadAnalytics(); });
     els.liveops?.addEventListener('click', () => { audio.ui(); loadLiveOps(); });
+    els.missions?.addEventListener('click', () => { audio.ui(); loadMissions(); });
+    els.achievements?.addEventListener('click', () => { audio.ui(); loadAchievements(); });
+    els.boss?.addEventListener('click', () => { audio.ui(); loadBossRush(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
     els.qa?.addEventListener('click', () => { audio.ui(); loadQa(); });
     ui.shareVictoryBtn?.addEventListener('click', () => { audio.ui(); shareVictory(); });
@@ -2588,6 +2753,9 @@ function sessionId(){
       if (params.get('feedback') === '1') feedbackForm();
       if (params.get('analytics') === '1') loadAnalytics();
       if (params.get('liveops') === '1') loadLiveOps();
+      if (params.get('missions') === '1') loadMissions();
+      if (params.get('achievements') === '1') loadAchievements();
+      if (params.get('boss') === '1') loadBossRush();
     }, 350);
   }
 

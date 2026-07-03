@@ -656,3 +656,126 @@ on conflict (key) do nothing;
 alter table public.analytics_events enable row level security;
 alter table public.feedback_messages enable row level security;
 alter table public.liveops_config enable row level security;
+
+
+-- Missions / Achievements / Boss Rush — Combat 2.1
+create table if not exists public.missions (
+  id text primary key,
+  title text not null,
+  description text default '',
+  goal_type text not null default 'matches',
+  goal_value integer not null default 1,
+  reward_xp integer not null default 0,
+  reward_coins integer not null default 0,
+  sort_order integer not null default 100,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.mission_progress (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete cascade,
+  mission_id text references public.missions(id) on delete cascade,
+  progress integer not null default 0,
+  completed boolean not null default false,
+  claimed boolean not null default false,
+  claimed_at timestamptz,
+  updated_at timestamptz not null default now(),
+  unique(user_id, mission_id)
+);
+
+create table if not exists public.achievements (
+  id text primary key,
+  title text not null,
+  description text default '',
+  trigger_type text not null default 'matches',
+  threshold integer not null default 1,
+  reward_xp integer not null default 0,
+  reward_coins integer not null default 0,
+  rarity text not null default 'common',
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.user_achievements (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete cascade,
+  achievement_id text references public.achievements(id) on delete cascade,
+  source text default 'system',
+  unlocked_at timestamptz not null default now(),
+  unique(user_id, achievement_id)
+);
+
+create table if not exists public.bosses (
+  id text primary key,
+  title text not null,
+  description text default '',
+  hp_multiplier numeric not null default 1,
+  damage_multiplier numeric not null default 1,
+  reward_xp integer not null default 0,
+  reward_coins integer not null default 0,
+  unlock_level integer not null default 1,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.boss_runs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete cascade,
+  boss_id text references public.bosses(id) on delete set null,
+  result text not null default 'loss',
+  score jsonb not null default '{}'::jsonb,
+  xp_awarded integer not null default 0,
+  coins_awarded integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+insert into public.missions (id,title,description,goal_type,goal_value,reward_xp,reward_coins,sort_order,active) values
+  ('first_blood','First Blood','Заверши первый бой на арене.','matches',1,50,75,10,true),
+  ('three_wins','Arena Discipline','Победи 3 раза против AI.','wins',3,120,150,20,true),
+  ('combo_hunter','Combo Hunter','Сделай комбо 3+ в бою.','combo',3,80,100,30,true),
+  ('daily_grinder','Daily Grinder','Забери daily reward.','daily_claims',1,40,80,40,true)
+on conflict (id) do update set
+  title=excluded.title,
+  description=excluded.description,
+  goal_type=excluded.goal_type,
+  goal_value=excluded.goal_value,
+  reward_xp=excluded.reward_xp,
+  reward_coins=excluded.reward_coins,
+  sort_order=excluded.sort_order,
+  active=excluded.active;
+
+insert into public.achievements (id,title,description,trigger_type,threshold,reward_xp,reward_coins,rarity,active) values
+  ('rookie_fighter','Rookie Fighter','Сыграй первый матч.','matches',1,25,25,'common',true),
+  ('win_streak_3','Blood Momentum','Достигни серии из 3 побед.','streak',3,100,125,'rare',true),
+  ('boss_slayer','Boss Slayer','Победи босса Obsidian Tyrant.','boss_win',1,200,250,'epic',true),
+  ('season_entry','Season Challenger','Получите первые сезонные очки.','season_points',1,60,70,'common',true)
+on conflict (id) do update set
+  title=excluded.title,
+  description=excluded.description,
+  trigger_type=excluded.trigger_type,
+  threshold=excluded.threshold,
+  reward_xp=excluded.reward_xp,
+  reward_coins=excluded.reward_coins,
+  rarity=excluded.rarity,
+  active=excluded.active;
+
+insert into public.bosses (id,title,description,hp_multiplier,damage_multiplier,reward_xp,reward_coins,unlock_level,active) values
+  ('obsidian_tyrant','Obsidian Tyrant','Тяжёлый босс с бронёй, усиленным HP и мощным ultimate.',1.55,1.25,250,300,1,true),
+  ('neon_executioner','Neon Executioner','Быстрый босс с dodge-реакциями и агрессивными спецприёмами.',1.25,1.45,320,420,3,true)
+on conflict (id) do update set
+  title=excluded.title,
+  description=excluded.description,
+  hp_multiplier=excluded.hp_multiplier,
+  damage_multiplier=excluded.damage_multiplier,
+  reward_xp=excluded.reward_xp,
+  reward_coins=excluded.reward_coins,
+  unlock_level=excluded.unlock_level,
+  active=excluded.active;
+
+alter table public.missions enable row level security;
+alter table public.mission_progress enable row level security;
+alter table public.achievements enable row level security;
+alter table public.user_achievements enable row level security;
+alter table public.bosses enable row level security;
+alter table public.boss_runs enable row level security;
