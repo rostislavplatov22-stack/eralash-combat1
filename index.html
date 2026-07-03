@@ -2991,6 +2991,12 @@ body.result-entering #result{
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d', { alpha: false });
 
+  const blackCitadelArenaArt = new Image();
+  blackCitadelArenaArt.decoding = 'async';
+  blackCitadelArenaArt.loading = 'eager';
+  blackCitadelArenaArt.src = 'assets/arena-black-citadel-courtyard.png';
+
+
   const ui = {
     menu: document.getElementById('menu'),
     result: document.getElementById('result'),
@@ -4028,255 +4034,190 @@ body.result-entering #result{
   function drawArena(){
     const arena = contentArena();
     const arenaAccent = arena.accent || '#d9b76a';
-    const bgType = arena.backgroundType || 'obsidian-city';
     const time = performance.now();
     const t = time / 1000;
     const pulse = Math.sin(time / 900) * .5 + .5;
     const hexA = (c,a)=> (typeof c === 'string' && c[0] === '#' && c.length === 7) ? c + a : c;
 
-    // Fight Screen 5.0 — Dark fortress combat arena.
-    const sky = ctx.createLinearGradient(0,0,0,h);
-    sky.addColorStop(0, bgType === 'forge' ? '#170506' : '#030406');
-    sky.addColorStop(.22, bgType === 'neon-rooftop' ? '#06111e' : '#090a0e');
-    sky.addColorStop(.58, '#030306');
-    sky.addColorStop(1, '#000001');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0,0,w,h);
+    // Dark Cinematic Arena 5.1 — Black Citadel Courtyard.
+    // This version uses a real painted arena asset as the base layer,
+    // then adds live smoke, embers, lighting, shadows and subtle rune VFX.
+    function drawCoverImage(img, dx, dy, dw, dh){
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      if (!iw || !ih) return false;
+      const scale = Math.max(dw / iw, dh / ih);
+      const sw = dw / scale;
+      const sh = dh / scale;
+      const sx = (iw - sw) * .5;
+      const sy = (ih - sh) * .5;
+      ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+      return true;
+    }
 
-    // Moon / infernal light source behind the action.
+    const artReady = blackCitadelArenaArt && blackCitadelArenaArt.complete && blackCitadelArenaArt.naturalWidth > 0;
+    if (artReady) {
+      drawCoverImage(blackCitadelArenaArt, 0, 0, w, h);
+    } else {
+      const sky = ctx.createLinearGradient(0,0,0,h);
+      sky.addColorStop(0, '#030406');
+      sky.addColorStop(.32, '#101018');
+      sky.addColorStop(.68, '#080507');
+      sky.addColorStop(1, '#000001');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0,0,w,h);
+    }
+
+    // Cinematic color grading: blends the arena with HUD and fighters.
+    ctx.save();
+    const grade = ctx.createLinearGradient(0,0,w,h);
+    grade.addColorStop(0, 'rgba(8,10,16,.20)');
+    grade.addColorStop(.44, 'rgba(0,0,0,0)');
+    grade.addColorStop(.74, 'rgba(60,8,5,.16)');
+    grade.addColorStop(1, 'rgba(0,0,0,.34)');
+    ctx.fillStyle = grade;
+    ctx.fillRect(0,0,w,h);
+    ctx.restore();
+
+    // Subtle moon / fortress backlight.
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const moonX = w * .50;
-    const moonY = h * .16;
-    const moonR = Math.min(w,h) * .082;
-    const moon = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, moonR*3.2);
-    moon.addColorStop(0, bgType === 'forge' ? 'rgba(255,120,72,.34)' : 'rgba(255,238,198,.30)');
-    moon.addColorStop(.18, bgType === 'forge' ? 'rgba(255,90,45,.22)' : 'rgba(180,190,210,.22)');
-    moon.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = moon;
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, moonR*3.2, 0, Math.PI*2);
-    ctx.fill();
-    ctx.globalAlpha = .42;
-    ctx.fillStyle = bgType === 'forge' ? 'rgba(255,178,116,.32)' : 'rgba(225,231,244,.26)';
-    ctx.beginPath();
-    ctx.arc(moonX, moonY, moonR, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-
-    // Fortress silhouettes: massive gothic walls and towers.
-    function tower(x, base, width, height, alpha, lightColor){
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = '#05060a';
-      ctx.strokeStyle = 'rgba(246,213,139,.09)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x, base);
-      ctx.lineTo(x, base-height*.78);
-      ctx.lineTo(x+width*.20, base-height*.88);
-      ctx.lineTo(x+width*.36, base-height);
-      ctx.lineTo(x+width*.50, base-height*.82);
-      ctx.lineTo(x+width*.68, base-height*.92);
-      ctx.lineTo(x+width, base-height*.72);
-      ctx.lineTo(x+width, base);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      // Vertical windows / embers.
-      ctx.save();
-      ctx.globalCompositeOperation='lighter';
-      for(let k=0;k<5;k++){
-        const lx = x + width*(.18+k*.16);
-        const ly = base - height*(.16 + ((k+1)%3)*.16);
-        ctx.fillStyle = k%2 ? lightColor : 'rgba(246,213,139,.16)';
-        roundRect(ctx,lx,ly,Math.max(2,width*.035),height*.18,3,true,false);
-      }
-      ctx.restore();
-      ctx.restore();
-    }
-
-    const farBase = h*.50;
-    for(let i=0;i<9;i++){
-      const x = -w*.08 + i*w*.14 + Math.sin(t*.18+i)*10;
-      const tw = w*(.055 + (i%3)*.012);
-      const th = h*(.24 + (i%4)*.035);
-      tower(x, farBase + (i%2)*18, tw, th, .34, 'rgba(255,85,45,.14)');
-    }
-
-    const midBase = h*.61;
-    for(let i=0;i<7;i++){
-      const x = -w*.04 + i*w*.18 + Math.sin(t*.12+i*2)*7;
-      const tw = w*(.075 + (i%2)*.018);
-      const th = h*(.30 + (i%3)*.05);
-      tower(x, midBase + (i%2)*12, tw, th, .58, bgType === 'neon-rooftop' ? 'rgba(98,215,255,.20)' : 'rgba(255,79,43,.25)');
-    }
-
-    // Braziers and flame pools.
-    ctx.save();
-    ctx.globalCompositeOperation='lighter';
-    for(let i=0;i<7;i++){
-      const x = w*(.08 + i*.14) + Math.sin(t*.9+i)*7;
-      const y = h*(.58 + (i%2)*.028);
-      const flame = ctx.createRadialGradient(x,y,0,x,y,w*.055);
-      flame.addColorStop(0,'rgba(255,230,150,.46)');
-      flame.addColorStop(.24,'rgba(255,91,43,.28)');
-      flame.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=flame;
-      ctx.beginPath();
-      ctx.arc(x,y,w*.055,0,Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle='rgba(255,83,35,.42)';
-      ctx.beginPath();
-      ctx.ellipse(x,y+8,w*.016,w*.006,0,0,Math.PI*2);
-      ctx.fill();
-    }
-    ctx.restore();
-
-    // Back fog and storm streaks.
-    ctx.save();
-    for(let i=0;i<6;i++){
-      const x = ((t*18) + i*w*.21) % (w + 240) - 120;
-      const y = h*(.40 + (i%3)*.08);
-      const fog = ctx.createRadialGradient(x,y,10,x,y,w*.28);
-      fog.addColorStop(0, bgType === 'neon-rooftop' ? 'rgba(98,215,255,.12)' : 'rgba(210,200,190,.10)');
-      fog.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.globalAlpha = .85;
-      ctx.fillStyle = fog;
-      ctx.beginPath();
-      ctx.arc(x,y,w*.28,0,Math.PI*2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = .22;
-    ctx.strokeStyle = 'rgba(255,255,255,.08)';
-    ctx.lineWidth = 1;
-    for(let i=0;i<24;i++){
-      const x = (i*83 + t*17) % w;
-      const y = (i*47 + t*9) % (h*.55);
-      ctx.beginPath();
-      ctx.moveTo(x,y);
-      ctx.lineTo(x+Math.sin(i)*18,y+h*.08);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Fight plane: wet obsidian floor with perspective grid.
-    const floorTop = h * .58;
-    const floor = ctx.createLinearGradient(0,floorTop,0,h);
-    floor.addColorStop(0,'rgba(22,18,16,.18)');
-    floor.addColorStop(.34,'rgba(18,12,10,.55)');
-    floor.addColorStop(1,'rgba(0,0,2,.94)');
-    ctx.fillStyle = floor;
-    ctx.beginPath();
-    ctx.moveTo(w*.18,floorTop);
-    ctx.lineTo(w*.82,floorTop);
-    ctx.lineTo(w*1.08,h);
-    ctx.lineTo(-w*.08,h);
-    ctx.closePath();
-    ctx.fill();
-
-    // Reflections / wet streaks.
-    ctx.save();
-    ctx.globalCompositeOperation='lighter';
-    for(let i=0;i<18;i++){
-      const x = (i*71 + Math.sin(t*.4+i)*18) % w;
-      const y = floorTop + (i%9)*h*.042 + Math.sin(t+i)*4;
-      const grad = ctx.createLinearGradient(x-w*.08,y,x+w*.12,y);
-      grad.addColorStop(0,'rgba(0,0,0,0)');
-      grad.addColorStop(.48, i%3 ? 'rgba(255,90,42,.09)' : hexA(arenaAccent,'26'));
-      grad.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.strokeStyle=grad;
-      ctx.lineWidth=1.4+(i%3);
-      ctx.beginPath();
-      ctx.moveTo(x-w*.10,y);
-      ctx.lineTo(x+w*.18,y+Math.sin(i)*2);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Perspective grid.
-    ctx.save();
-    ctx.strokeStyle='rgba(246,213,139,.075)';
-    ctx.lineWidth=1;
-    const vpX=w*.5, vpY=floorTop-28;
-    for(let i=-9;i<=9;i++){
-      const x=w*.5 + i*w*.065;
-      ctx.beginPath();
-      ctx.moveTo(x,h);
-      ctx.lineTo(vpX + i*w*.018,vpY);
-      ctx.stroke();
-    }
-    for(let j=0;j<10;j++){
-      const y = floorTop + Math.pow(j/9,1.55)*(h-floorTop);
-      const inset = (y-floorTop)/(h-floorTop)*w*.12;
-      ctx.beginPath();
-      ctx.moveTo(inset,y);
-      ctx.lineTo(w-inset,y);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Center combat sigil / rune.
-    ctx.save();
-    ctx.translate(w*.5, h*.73);
-    ctx.globalCompositeOperation='lighter';
-    ctx.strokeStyle=hexA(arenaAccent,'55');
-    ctx.shadowColor=hexA(arenaAccent,'55');
-    ctx.shadowBlur=16;
-    ctx.lineWidth=Math.max(1.2,w*.002);
-    for(let r=0;r<4;r++){
-      ctx.globalAlpha=.18+r*.05+pulse*.05;
-      ctx.beginPath();
-      ctx.ellipse(0,0,w*(.055+r*.034),h*(.018+r*.012),0,0,Math.PI*2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha=.28+pulse*.10;
-    for(let i=0;i<16;i++){
-      const a=i*Math.PI*2/16 + t*.12;
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(a)*w*.075,Math.sin(a)*h*.026);
-      ctx.lineTo(Math.cos(a)*w*.10,Math.sin(a)*h*.035);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Center spotlight / arena volume.
-    ctx.save();
-    const spot = ctx.createRadialGradient(w*.5,h*.54,10,w*.5,h*.60,w*.42);
-    spot.addColorStop(0,'rgba(246,213,139,.10)');
-    spot.addColorStop(.22,'rgba(255,72,42,.055)');
-    spot.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=spot;
+    const backLight = ctx.createRadialGradient(w*.54, h*.22, 0, w*.54, h*.25, w*.44);
+    backLight.addColorStop(0, 'rgba(228,220,196,.105)');
+    backLight.addColorStop(.26, 'rgba(255,104,52,.05)');
+    backLight.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = backLight;
     ctx.fillRect(0,0,w,h);
     ctx.restore();
 
-    // Front ember particles.
+    // Low moving fog — keeps the stage alive without looking like a debug layer.
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    for(let i=0;i<7;i++){
+      const x = ((t * (18 + i*4)) + i*w*.23) % (w + 320) - 160;
+      const y = h*(.62 + (i%3)*.055) + Math.sin(t*.55+i)*8;
+      const fog = ctx.createRadialGradient(x,y,0,x,y,w*(.22 + (i%3)*.035));
+      fog.addColorStop(0, 'rgba(194,164,132,.070)');
+      fog.addColorStop(.35, 'rgba(120,100,86,.035)');
+      fog.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = fog;
+      ctx.beginPath();
+      ctx.arc(x,y,w*(.22 + (i%3)*.035),0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Ground volume and center combat area. No bright grid, no debug look.
+    const floorTop = h * .60;
+    ctx.save();
+    const floorShade = ctx.createLinearGradient(0,floorTop,0,h);
+    floorShade.addColorStop(0,'rgba(0,0,0,.02)');
+    floorShade.addColorStop(.44,'rgba(0,0,0,.22)');
+    floorShade.addColorStop(1,'rgba(0,0,0,.68)');
+    ctx.fillStyle = floorShade;
+    ctx.beginPath();
+    ctx.moveTo(-w*.06,h);
+    ctx.lineTo(w*1.06,h);
+    ctx.lineTo(w*.84,floorTop);
+    ctx.lineTo(w*.16,floorTop);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Wet obsidian reflections: premium streaks instead of a technical floor grid.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for(let i=0;i<24;i++){
+      const x = (i*79 + Math.sin(t*.45+i)*26) % w;
+      const y = floorTop + (i%12)*h*.030 + Math.sin(t*.9+i)*3;
+      const length = w*(.035 + (i%4)*.018);
+      const grad = ctx.createLinearGradient(x-length,y,x+length,y);
+      grad.addColorStop(0,'rgba(0,0,0,0)');
+      grad.addColorStop(.5, i%3 ? 'rgba(255,104,48,.062)' : hexA(arenaAccent,'22'));
+      grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1 + (i%3)*.65;
+      ctx.beginPath();
+      ctx.moveTo(x-length, y);
+      ctx.lineTo(x+length, y + Math.sin(i)*1.8);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Central sigil, much softer than before. It should feel like magic on stone,
+    // not a UI/debug ellipse.
+    ctx.save();
+    ctx.translate(w*.5, h*.748);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = hexA(arenaAccent,'42');
+    ctx.shadowColor = hexA(arenaAccent,'55');
+    ctx.shadowBlur = 18;
+    ctx.lineWidth = Math.max(1, w*.0015);
+    for(let r=0;r<3;r++){
+      ctx.globalAlpha = .10 + r*.035 + pulse*.03;
+      ctx.beginPath();
+      ctx.ellipse(0,0,w*(.070+r*.038),h*(.021+r*.012),0,0,Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = .18 + pulse*.06;
+    for(let i=0;i<18;i++){
+      const a = i*Math.PI*2/18 + t*.08;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*w*.092, Math.sin(a)*h*.029);
+      ctx.lineTo(Math.cos(a)*w*.115, Math.sin(a)*h*.037);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Fighter stage shadows and center spotlight.
+    ctx.save();
+    const spot = ctx.createRadialGradient(w*.5,h*.58,10,w*.5,h*.61,w*.46);
+    spot.addColorStop(0,'rgba(246,213,139,.105)');
+    spot.addColorStop(.18,'rgba(255,104,52,.040)');
+    spot.addColorStop(.60,'rgba(0,0,0,0)');
+    spot.addColorStop(1,'rgba(0,0,0,.22)');
+    ctx.fillStyle = spot;
+    ctx.fillRect(0,0,w,h);
+    ctx.restore();
+
+    // Animated embers.
     ctx.save();
     ctx.globalCompositeOperation='lighter';
-    for(let i=0;i<70;i++){
-      const seed = i*97;
-      const x = (seed + t*(18+(i%7)*7)) % (w+90) - 45;
-      const y = h - ((seed*1.7 + t*(22+(i%5)*8)) % h);
-      const size = .7 + (i%5)*.44;
-      ctx.globalAlpha = .06 + ((i%4)/4)*.18;
-      ctx.fillStyle = i%4 ? 'rgba(255,91,43,.72)' : hexA(arenaAccent,'bb');
+    for(let i=0;i<95;i++){
+      const seed = i*113;
+      const x = (seed + t*(16+(i%7)*6)) % (w+100) - 50;
+      const y = h - ((seed*1.63 + t*(20+(i%5)*7)) % h);
+      const size = .65 + (i%5)*.42;
+      ctx.globalAlpha = .045 + ((i%4)/4)*.16;
+      ctx.fillStyle = i%4 ? 'rgba(255,96,43,.76)' : hexA(arenaAccent,'aa');
       ctx.beginPath();
       ctx.arc(x,y,size,0,Math.PI*2);
       ctx.fill();
     }
     ctx.restore();
 
-    // Dark cinematic vignette.
+    // Premium vignette and letterbox depth.
     ctx.save();
-    const v = ctx.createRadialGradient(w*.5,h*.56,w*.22,w*.5,h*.56,w*.80);
+    const v = ctx.createRadialGradient(w*.5,h*.56,w*.20,w*.5,h*.56,w*.84);
     v.addColorStop(0,'rgba(0,0,0,0)');
-    v.addColorStop(.62,'rgba(0,0,0,.22)');
-    v.addColorStop(1,'rgba(0,0,0,.82)');
-    ctx.fillStyle=v;
+    v.addColorStop(.62,'rgba(0,0,0,.20)');
+    v.addColorStop(1,'rgba(0,0,0,.78)');
+    ctx.fillStyle = v;
     ctx.fillRect(0,0,w,h);
+
+    const top = ctx.createLinearGradient(0,0,0,h*.18);
+    top.addColorStop(0,'rgba(0,0,0,.58)');
+    top.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = top;
+    ctx.fillRect(0,0,w,h*.18);
+
+    const bottom = ctx.createLinearGradient(0,h*.82,0,h);
+    bottom.addColorStop(0,'rgba(0,0,0,0)');
+    bottom.addColorStop(1,'rgba(0,0,0,.72)');
+    ctx.fillStyle = bottom;
+    ctx.fillRect(0,h*.82,w,h*.18);
     ctx.restore();
   }
-
 
 
   function drawFighter(f){

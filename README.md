@@ -241,3 +241,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Dark Cinematic Clickmap Fix
 
 Добавлена fail-safe click-map система для активных кнопок painted-меню.
+
+
+## Dark Cinematic Arena 5.1
+
+Добавлена новая боевая арена Black Citadel Courtyard с real art asset, дымом, embers, soft light, premium vignette и без debug-grid ощущения.
