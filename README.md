@@ -251,3 +251,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Exact Black Citadel Arena
 
 Добавлена версия с точной пользовательской ареной `assets/arena-black-citadel-courtyard.png` и режимом `EXACT_BLACK_CITADEL_ARENA = true`.
+
+
+## Exact Arena Framing Fix
+
+Фикс убирает красный левый прямоугольник и закрепляет exact Black Citadel арт на фоне боя.

@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Exact Black Citadel Arena</title>
+  <title>EraLash Combat — Exact Black Citadel Arena Framing Fixed</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -4708,31 +4708,52 @@ body.result-entering #result{
   }
 
   function render(){
-    ctx.save();
+    // EXACT ARENA FRAMING FIX:
+    // clear the full physical viewport before any camera translation.
+    // Previously the combat camera shifted the whole canvas, so the left edge kept
+    // stale red/transparent frame data and looked like a broken debug wall.
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#020203';
+    ctx.fillRect(0,0,w,h);
+
     const sx = shake ? (Math.random()-.5)*shake : 0;
     const sy = shake ? (Math.random()-.5)*shake : 0;
+
+    // The exact user-provided Black Citadel art must stay locked to the screen.
+    // Camera movement is applied only to fighters and live combat VFX, not to the
+    // background image. This keeps the citadel centered and removes the red left block.
+    ctx.save();
     ctx.translate(sx,sy);
     if (cameraZoom > 1.002) {
       ctx.translate(w*.5, h*.52);
       ctx.scale(cameraZoom, cameraZoom);
       ctx.translate(-w*.5, -h*.52);
     }
+    drawArena();
+    ctx.restore();
 
-    // VISUAL 4.1 — premium combat camera: keeps action framed in the center instead of drifting left/right.
+    let cameraShift = 0;
     if (player && enemy) {
       const actionMid = (player.x + enemy.x) * 0.5;
       const desiredShift = w * 0.5 - actionMid;
-      const maxShift = w * ((window.matchMedia && window.matchMedia('(pointer:coarse)').matches) ? 0.16 : 0.26);
-      const cameraShift = clamp(desiredShift, -maxShift, maxShift);
-      ctx.translate(cameraShift, 0);
+      const maxShift = w * ((window.matchMedia && window.matchMedia('(pointer:coarse)').matches) ? 0.10 : 0.14);
+      cameraShift = clamp(desiredShift, -maxShift, maxShift);
     }
 
-    drawArena();
+    ctx.save();
+    ctx.translate(sx + cameraShift, sy);
+    if (cameraZoom > 1.002) {
+      ctx.translate(w*.5, h*.52);
+      ctx.scale(cameraZoom, cameraZoom);
+      ctx.translate(-w*.5, -h*.52);
+    }
     const first = player.x < enemy.x ? player : enemy;
     const second = first === player ? enemy : player;
     drawFighter(first);
     drawFighter(second);
     drawParticles();
+    ctx.restore();
+
     drawVignette();
 
     if (cinematic > 0) {
@@ -4747,7 +4768,6 @@ body.result-entering #result{
       ctx.fillRect(0,h*.865,w,2);
       ctx.restore();
     }
-    ctx.restore();
   }
 
   function loop(t){

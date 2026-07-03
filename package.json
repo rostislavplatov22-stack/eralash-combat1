@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-black-citadel-arena-5-1-ready",
-  "version": "2.3.1",
+  "name": "eralash-combat-exact-arena-framing-fixed",
+  "version": "2.3.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Dark Cinematic Arena 5.1 Black Citadel Courtyard integration."
+  "description": "EraLash Combat exact Black Citadel arena with fixed canvas framing and camera background lock."
 }
