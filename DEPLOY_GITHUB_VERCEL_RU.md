@@ -103,3 +103,8 @@ notify pgrst, 'reload schema';
 ## Combat 2.0
 
 Для этого пакета новых Supabase-таблиц не требуется. После копирования файлов достаточно Commit → Push → Vercel Ready.
+
+
+## Visual 4.0 update
+
+Для этого пакета Supabase SQL выполнять не нужно. Перед копированием обязательно удалить старую папку `api`, затем скопировать файлы архива, Commit и Push.

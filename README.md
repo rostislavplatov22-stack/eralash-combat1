@@ -1,4 +1,4 @@
-# EraLash Combat — Dark Arena
+# EraLash Combat — Visual 4.0 Cinematic Overhaul — Dark Arena
 ## Mobile Polish 1.8
 
 Исправлены прокрутка меню в Telegram на телефоне, скрыта системная MainButton, усилен визуал боя и добавлен компактный HUD для мобильного экрана.
@@ -198,3 +198,8 @@ ADMIN_API_SECRET
 ## Visual 3.0
 
 Добавлен premium art direction: новая кинематографичная арена, улучшенные бойцы, свет, туман, руны, slash trails и улучшенный mobile readability.
+
+
+## Visual 4.0
+
+Добавлен большой cinematic visual overhaul: 2.5D арена, premium HUD, улучшенные бойцы, slash trails, ultimate aura, foreground particles и меню с top-tier presentation.
