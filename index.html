@@ -218,6 +218,9 @@
           <button id="launchBtn" class="secondary">📣 Launch</button>
           <button id="newsBtn" class="secondary">📰 News</button>
           <button id="founderBtn" class="secondary">🎖️ Founder Gift</button>
+          <button id="feedbackBtn" class="secondary">💬 Feedback</button>
+          <button id="analyticsBtn" class="secondary">📊 Analytics</button>
+          <button id="liveopsBtn" class="secondary">🎛️ LiveOps</button>
           <button id="adminBtn" class="secondary">⚙️ Admin</button>
           <button id="qaBtn" class="secondary">🚀 QA</button>
         </div>
@@ -232,6 +235,7 @@
             <span class="pill">Release 1.0 QA ready</span>
             <span class="pill">Founder launch event</span>
             <span class="pill">Share / News / Public launch</span>
+            <span class="pill">Analytics / Feedback / LiveOps</span>
           </div>
         </div>
       </div>
@@ -850,6 +854,7 @@
     document.body.classList.remove('is-fighting');
     hideTelegramMainButton();
     const rewards = grantRewards(victory);
+    trackEvent('fight_finish', { result:victory ? 'win' : 'loss', rewards, playerRounds, enemyRounds, duration:Math.max(0, Math.round(99 - timer)) });
     ui.result.style.display = 'flex';
     ui.resultTitle.textContent = victory ? 'VICTORY' : 'DEFEAT';
     ui.resultKicker.textContent = victory ? 'ARENA CLAIMED' : 'MATCH LOST';
@@ -1500,8 +1505,8 @@
     window.addEventListener('keydown', e=>key(e,true), {passive:false});
     window.addEventListener('keyup', e=>key(e,false), {passive:false});
 
-    ui.startBtn.addEventListener('click',()=>{audio.ui();audio.ensure();newMatch();});
-    ui.restartBtn.addEventListener('click',()=>{audio.ui();newMatch();});
+    ui.startBtn.addEventListener('click',()=>{trackEvent('fight_start');audio.ui();audio.ensure();newMatch();});
+    ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
     ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';ui.menu.style.display='flex';gameState='menu';document.body.classList.remove('is-fighting');hideTelegramMainButton();});
     ui.muteBtn.addEventListener('click',()=>{
       muted = !muted;
@@ -1529,6 +1534,9 @@
       launch: document.getElementById('launchBtn'),
       news: document.getElementById('newsBtn'),
       founder: document.getElementById('founderBtn'),
+      feedback: document.getElementById('feedbackBtn'),
+      analytics: document.getElementById('analyticsBtn'),
+      liveops: document.getElementById('liveopsBtn'),
       admin: document.getElementById('adminBtn'),
       qa: document.getElementById('qaBtn'),
       content: document.getElementById('economyContent')
@@ -1552,6 +1560,41 @@
     }[ch]));
   }
 
+  
+function sessionId(){
+    try {
+      let id = sessionStorage.getItem('eralash_session_id');
+      if (!id) {
+        id = 's_' + Date.now().toString(36) + '_' + Math.random().toString(16).slice(2);
+        sessionStorage.setItem('eralash_session_id', id);
+      }
+      return id;
+    } catch(_) {
+      return 's_' + Date.now().toString(36);
+    }
+  }
+
+  async function trackEvent(eventName, payload = {}){
+    try {
+      await fetch('/api/analytics', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({
+          event:eventName,
+          source:'miniapp',
+          sessionId:sessionId(),
+          user: telegramContext.user || { id: appProfile?.telegramId || 'guest', first_name:'Guest' },
+          payload:{
+            ...payload,
+            screen: gameState,
+            profile:{ level:appProfile.level, wins:appProfile.wins, losses:appProfile.losses, coins:appProfile.coins }
+          }
+        })
+      });
+    } catch(_) {}
+  }
+
+
 
   async function reportClientError(type, error, extra = {}){
     try {
@@ -1573,6 +1616,7 @@
 
 
   async function loadShop(){
+    trackEvent('shop_open');
     setEconomyContent('<div class="pill">Загрузка магазина...</div>');
     try {
       const res = await fetch('/api/shop', { headers: economyHeaders(false) });
@@ -1627,6 +1671,7 @@
   }
 
   async function buyWithStars(itemId){
+    trackEvent('stars_click', { itemId });
     setEconomyContent('<div class="pill">Создаём Telegram Stars invoice...</div>');
     try {
       const res = await fetch('/api/stars-invoice', {
@@ -1668,6 +1713,7 @@
   }
 
   async function claimDaily(){
+    trackEvent('daily_open');
     setEconomyContent('<div class="pill">Получаем daily reward...</div>');
     try {
       const res = await fetch('/api/daily-reward', {
@@ -1746,6 +1792,7 @@
   }
 
   async function loadSeason(){
+    trackEvent('season_open');
     setEconomyContent('<div class="pill">Загрузка сезонного турнира...</div>');
     try {
       const res = await fetch('/api/season?limit=10', { headers: economyHeaders(false) });
@@ -1780,6 +1827,7 @@
   }
 
   async function shareInvite(inviteLink){
+    trackEvent('invite_click');
     const link = inviteLink || location.href;
     try {
       await fetch('/api/referral', {
@@ -1930,6 +1978,7 @@
         updateTelegramBadge();
       }
       if (data.claimed) {
+        trackEvent('daily_claim', { streak:data.streak, xp:data.reward?.xp, coins:data.reward?.coins });
         setEconomyContent(`
           <div class="pill-list">
             <span class="pill">✅ Founder Gift claimed</span>
@@ -1967,6 +2016,7 @@
   }
 
   async function redeemPromo(){
+    trackEvent('promo_open');
     const code = document.getElementById('promoInput')?.value || '';
     if (!code.trim()) {
       setEconomyContent('<div class="pill">Введи промокод</div>');
@@ -1989,6 +2039,7 @@
         updateTelegramBadge();
       }
       if (data.redeemed) {
+        trackEvent('promo_used', { code });
         setEconomyContent(`
           <div class="pill-list">
             <span class="pill">✅ ${escapeUi(data.promo?.title || 'Promo активирован')}</span>
@@ -2068,6 +2119,128 @@
     } catch (error) {
       await reportClientError('client', error, { screen:'qa' });
       setEconomyContent('<div class="pill">QA API недоступен</div>');
+    }
+  }
+
+
+
+
+  async function loadAnalytics(){
+    setEconomyContent('<div class="pill">Загрузка live analytics...</div>');
+    try {
+      const res = await fetch('/api/analytics?hours=24&limit=250', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'analytics error');
+      const s = data.summary || {};
+      const events = (data.topEvents || []).slice(0, 10).map(e => `
+        <div class="shop-card">
+          <div><h4>${escapeUi(e.event)}</h4><p>${e.count} events за выбранное окно</p></div>
+          <span class="pill">event</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Players: ${s.uniquePlayers || 0}</span>
+          <span class="pill">Events: ${s.events || 0}</span>
+          <span class="pill">Fights: ${s.fightsStarted || 0}/${s.fightsFinished || 0}</span>
+          <span class="pill">Completion: ${s.fightCompletionRate || 0}%</span>
+          <span class="pill">Shop: ${s.shopOpens || 0}</span>
+          <span class="pill">Stars conv: ${s.starsConversionRate || 0}%</span>
+          <span class="pill">Feedback: ${s.feedback || 0}</span>
+        </div>
+        <h3 style="margin:12px 0 8px">Top events</h3>
+        ${events || '<div class="pill">Пока нет analytics events</div>'}
+        <div class="shop-card">
+          <div><h4>LiveOps note</h4><p>Analytics показывает, где игроки выходят: app_open → fight_start → fight_finish → shop_open → stars_success.</p></div>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+        </div>
+      `);
+    } catch (error) {
+      await reportClientError('client', error, { screen:'analytics' });
+      setEconomyContent('<div class="pill">Analytics доступен только админу или API недоступен</div>');
+    }
+  }
+
+  function feedbackForm(){
+    trackEvent('feedback_open');
+    setEconomyContent(`
+      <div class="shop-card">
+        <div>
+          <h4>💬 Feedback</h4>
+          <p>Напиши баг, идею, жалобу или отзыв. Это сохранится в Supabase и попадёт в админку.</p>
+          <select id="feedbackType" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(217,183,106,.3);background:rgba(0,0,0,.35);color:#fff;outline:none">
+            <option value="bug">Баг</option>
+            <option value="idea">Идея</option>
+            <option value="balance">Баланс</option>
+            <option value="payment">Покупка / Stars</option>
+            <option value="feedback">Отзыв</option>
+          </select>
+          <textarea id="feedbackMessage" placeholder="Опиши проблему или идею..." style="width:100%;min-height:110px;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(217,183,106,.3);background:rgba(0,0,0,.35);color:#fff;outline:none;resize:vertical"></textarea>
+          <input id="feedbackContact" placeholder="@username или контакт, опционально" style="width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid rgba(217,183,106,.3);background:rgba(0,0,0,.35);color:#fff;outline:none" />
+        </div>
+        <div class="shop-actions">
+          <button id="feedbackSendBtn" class="mini-btn">Send</button>
+        </div>
+      </div>
+    `);
+    document.getElementById('feedbackSendBtn')?.addEventListener('click', sendFeedback);
+  }
+
+  async function sendFeedback(){
+    const type = document.getElementById('feedbackType')?.value || 'feedback';
+    const message = document.getElementById('feedbackMessage')?.value || '';
+    const contact = document.getElementById('feedbackContact')?.value || telegramContext.user?.username || '';
+    if (!message.trim()) {
+      setEconomyContent('<div class="pill">Напиши сообщение перед отправкой</div>');
+      return;
+    }
+    setEconomyContent('<div class="pill">Отправляем feedback...</div>');
+    try {
+      const res = await fetch('/api/feedback', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body:JSON.stringify({
+          type,
+          message,
+          contact,
+          user: telegramContext.user || { id:'guest', first_name:'Guest' },
+          metadata:{ screen:gameState, version:'analytics-liveops' }
+        })
+      });
+      const data = await res.json();
+      trackEvent('feedback_submit', { type });
+      setEconomyContent(data.ok
+        ? '<div class="pill">✅ Feedback отправлен. Спасибо, боец.</div>'
+        : `<div class="pill">Feedback не отправлен: ${escapeUi(data.error || 'unknown')}</div>`);
+    } catch (error) {
+      await reportClientError('client', error, { screen:'feedback' });
+      setEconomyContent('<div class="pill">Feedback API недоступен</div>');
+    }
+  }
+
+  async function loadLiveOps(){
+    setEconomyContent('<div class="pill">Загрузка LiveOps config...</div>');
+    try {
+      const res = await fetch('/api/liveops?admin=1', { headers: economyHeaders(false) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'liveops error');
+      const cards = (data.configs || []).map(c => `
+        <div class="shop-card">
+          <div><h4>🎛️ ${escapeUi(c.key)}</h4><p>${escapeUi(c.description || '')}</p><div class="price">${escapeUi(JSON.stringify(c.value || {})).slice(0, 260)}</div></div>
+          <span class="pill">${c.public ? 'public' : 'private'}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">LiveOps</span>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+          <span class="pill">Configs: ${(data.configs || []).length}</span>
+        </div>
+        ${cards || '<div class="pill">LiveOps configs empty</div>'}
+      `);
+    } catch (error) {
+      await reportClientError('client', error, { screen:'liveops' });
+      setEconomyContent('<div class="pill">LiveOps доступен только админу или API недоступен</div>');
     }
   }
 
@@ -2182,6 +2355,9 @@
     els.launch?.addEventListener('click', () => { audio.ui(); loadLaunch(); });
     els.news?.addEventListener('click', () => { audio.ui(); loadNews(); });
     els.founder?.addEventListener('click', () => { audio.ui(); claimFounderBonus(); });
+    els.feedback?.addEventListener('click', () => { audio.ui(); feedbackForm(); });
+    els.analytics?.addEventListener('click', () => { audio.ui(); loadAnalytics(); });
+    els.liveops?.addEventListener('click', () => { audio.ui(); loadLiveOps(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
     els.qa?.addEventListener('click', () => { audio.ui(); loadQa(); });
     ui.shareVictoryBtn?.addEventListener('click', () => { audio.ui(); shareVictory(); });
@@ -2233,6 +2409,9 @@
       if (params.get('launch') === '1') loadLaunch();
       if (params.get('news') === '1') loadNews();
       if (params.get('founder') === '1') claimFounderBonus();
+      if (params.get('feedback') === '1') feedbackForm();
+      if (params.get('analytics') === '1') loadAnalytics();
+      if (params.get('liveops') === '1') loadLiveOps();
     }, 350);
   }
 
@@ -2248,6 +2427,7 @@
   bindControls();
   bindEconomyControls();
   initTelegram();
+  setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });

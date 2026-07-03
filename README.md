@@ -175,6 +175,11 @@ ADMIN_API_SECRET
 Подробнее: `RELEASE_1_0_UPDATE_RU.md`.
 
 
-## Public Launch Marketing Pack
+## Analytics + LiveOps + Feedback Ready
 
 Добавлены `/api/launch`, `/api/news`, `/api/founder-bonus`, команды `/about`, `/rules`, `/news`, `/launch`, Founder Drop и launch-кнопки внутри Mini App.
+
+
+## Analytics + LiveOps
+
+Добавлены `/api/analytics`, `/api/feedback`, `/api/liveops`, события игроков, feedback форма и LiveOps конфиг.

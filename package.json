@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-public-launch-ready",
-  "version": "1.11.0",
+  "name": "eralash-combat-analytics-liveops-ready",
+  "version": "1.12.0",
   "private": true,
   "type": "module",
   "scripts": {

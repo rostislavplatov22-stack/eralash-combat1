@@ -588,3 +588,71 @@ on conflict (id) do update set
   body = excluded.body,
   tag = excluded.tag,
   published = excluded.published;
+
+
+-- Analytics + LiveOps + Feedback update
+-- Safe to run multiple times.
+
+create table if not exists public.analytics_events (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete set null,
+  telegram_id text default '',
+  event_name text not null,
+  session_id text default '',
+  source text default 'miniapp',
+  payload jsonb not null default '{}'::jsonb,
+  user_agent text default '',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists analytics_events_created_idx
+  on public.analytics_events (created_at desc);
+
+create index if not exists analytics_events_name_created_idx
+  on public.analytics_events (event_name, created_at desc);
+
+create index if not exists analytics_events_telegram_idx
+  on public.analytics_events (telegram_id, created_at desc);
+
+create table if not exists public.feedback_messages (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete set null,
+  telegram_id text default '',
+  type text not null default 'feedback',
+  message text not null,
+  contact text default '',
+  status text not null default 'new',
+  metadata jsonb not null default '{}'::jsonb,
+  user_agent text default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists feedback_messages_status_idx
+  on public.feedback_messages (status, created_at desc);
+
+create index if not exists feedback_messages_telegram_idx
+  on public.feedback_messages (telegram_id, created_at desc);
+
+create table if not exists public.liveops_config (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  description text default '',
+  public boolean not null default true,
+  updated_by text default '',
+  updated_at timestamptz not null default now()
+);
+
+insert into public.liveops_config (key, value, description, public)
+values
+  ('daily_reward', '{"minCoins":50,"maxCoins":250,"baseXp":30,"streakBonusCoins":25}'::jsonb, 'Daily reward tuning', true),
+  ('battle_rewards', '{"winXp":100,"winCoins":50,"lossXp":25,"lossCoins":10,"perfectBonusXp":50}'::jsonb, 'Battle result reward tuning', true),
+  ('season_points', '{"winBase":100,"lossBase":25,"cleanWinBonus":30,"speedBonusMax":60}'::jsonb, 'Season/tournament points tuning', true),
+  ('founder_bonus', '{"active":true,"maxClaims":100,"xp":50,"coins":100,"itemId":"founder_frame"}'::jsonb, 'Founder launch campaign switch', true),
+  ('maintenance', '{"enabled":false,"message":"Arena online. Good fight."}'::jsonb, 'Maintenance mode and public message', true),
+  ('launch_message', '{"title":"EraLash Combat — Public Launch","body":"Enter the Dark Arena, win fights, earn rewards and climb the season ranking."}'::jsonb, 'Public launch copy shown in Mini App', true)
+on conflict (key) do nothing;
+
+alter table public.analytics_events enable row level security;
+alter table public.feedback_messages enable row level security;
+alter table public.liveops_config enable row level security;
