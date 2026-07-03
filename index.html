@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Visual 4.1 cinematic combat framing polish, Combat 2.1, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Visual 4.2 cinematic combat framing polish, Combat 2.1, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Visual 4.1</title>
+  <title>EraLash Combat — Visual 4.2 AAA</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -599,6 +599,290 @@
       .control-btn.big{width:72px;height:72px}
     }
 
+  
+    /* ==========================================================
+       VISUAL 4.2 — AAA PRESENTATION REBUILD
+       Меню больше не выглядит как узкая техническая панель:
+       полный hero-screen, cinematic preview, grouped command deck.
+       ========================================================== */
+    .visual42-menu{
+      align-items:center;
+      padding:calc(26px + env(safe-area-inset-top)) clamp(16px,3vw,46px) calc(40px + env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at 50% 42%, rgba(217,183,106,.16), transparent 25%),
+        radial-gradient(circle at 15% 24%, rgba(213,49,61,.28), transparent 30%),
+        radial-gradient(circle at 86% 20%, rgba(81,199,255,.22), transparent 28%),
+        linear-gradient(118deg, rgba(15,6,8,.96) 0%, rgba(4,5,8,.94) 46%, rgba(2,13,18,.97) 100%);
+      backdrop-filter:none;
+    }
+    .visual42-menu::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.55;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:88px 88px;
+      mask-image:radial-gradient(circle at 50% 44%, transparent 0 32%, black 80%);
+    }
+    .visual42-menu::after{
+      content:"";
+      position:fixed;
+      inset:-12%;
+      pointer-events:none;
+      background:
+        radial-gradient(ellipse at 18% 50%, rgba(213,49,61,.13), transparent 34%),
+        radial-gradient(ellipse at 83% 48%, rgba(81,199,255,.12), transparent 36%),
+        linear-gradient(100deg, transparent 0 42%, rgba(255,255,255,.04) 48%, transparent 60% 100%);
+      filter:blur(10px);
+      animation:premiumDrift 16s ease-in-out infinite alternate;
+    }
+    .visual42-panel{
+      width:min(1260px,calc(100% - 12px));
+      margin:auto;
+      padding:clamp(24px,3vw,42px);
+      display:grid;
+      grid-template-columns:minmax(360px,.86fr) minmax(430px,1.14fr);
+      grid-template-areas:
+        "copy art"
+        "steps art"
+        "tips deck";
+      gap:18px 24px;
+      text-align:left;
+      border-radius:36px;
+      border:1px solid rgba(217,183,106,.34);
+      background:
+        radial-gradient(circle at 20% 5%, rgba(217,183,106,.14), transparent 27%),
+        radial-gradient(circle at 82% 0%, rgba(81,199,255,.12), transparent 28%),
+        linear-gradient(180deg, rgba(14,16,22,.66), rgba(3,4,7,.78));
+      box-shadow:
+        0 45px 130px rgba(0,0,0,.86),
+        inset 0 0 0 1px rgba(255,255,255,.05),
+        inset 0 0 90px rgba(217,183,106,.035);
+      overflow:hidden;
+    }
+    .hero-copy{grid-area:copy;position:relative;z-index:2;padding:6px 0 0}
+    .hero-copy .kicker{margin:0 0 10px;color:#f0d997;font-size:11px;letter-spacing:.30em}
+    .hero-copy .visual-mark{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 13px;
+      border:1px solid rgba(217,183,106,.35);
+      border-radius:999px;
+      background:linear-gradient(180deg,rgba(217,183,106,.14),rgba(255,255,255,.045));
+      color:#ffe0a2;
+      box-shadow:0 14px 38px rgba(0,0,0,.32);
+    }
+    .hero-copy h1{
+      margin:18px 0 0;
+      font-size:clamp(62px,7.6vw,122px);
+      line-height:.78;
+      letter-spacing:.055em;
+      background:linear-gradient(180deg,#fff4c2 0%,#d9b76a 42%,#6e4714 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow:0 18px 55px rgba(217,183,106,.14);
+      filter:drop-shadow(0 4px 0 rgba(0,0,0,.45));
+    }
+    .hero-copy .subtitle{
+      margin:22px 0 18px;
+      max-width:560px;
+      color:rgba(246,242,230,.84);
+      font-size:clamp(15px,1.25vw,19px);
+      line-height:1.65;
+    }
+    .hero-copy .profile-badge{
+      width:100%;
+      max-width:540px;
+      margin:0 0 20px;
+      padding:13px 16px;
+      border-radius:18px;
+      background:linear-gradient(90deg,rgba(217,183,106,.12),rgba(255,255,255,.045),rgba(81,199,255,.08));
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 16px 34px rgba(0,0,0,.28);
+    }
+    .hero-cta{justify-content:flex-start}
+    .hero-cta #startBtn{
+      min-width:220px;
+      min-height:58px;
+      border-radius:18px;
+      background:
+        linear-gradient(180deg,#ffe4a0 0%,#c69336 45%,#6d4210 100%);
+      color:#fff;
+      text-shadow:0 2px 0 rgba(0,0,0,.34);
+      box-shadow:0 22px 60px rgba(217,183,106,.32),inset 0 1px 0 rgba(255,255,255,.65),inset 0 -8px 18px rgba(0,0,0,.22);
+    }
+    .hero-cta #muteBtn{
+      min-height:58px;
+      border-radius:18px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .hero-showcase{grid-area:art;position:relative;min-height:520px;z-index:1}
+    .showcase-frame{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      border-radius:34px;
+      border:1px solid rgba(217,183,106,.30);
+      background:
+        radial-gradient(circle at 50% 30%, rgba(217,183,106,.15), transparent 23%),
+        radial-gradient(circle at 25% 48%, rgba(213,49,61,.20), transparent 24%),
+        radial-gradient(circle at 78% 42%, rgba(81,199,255,.20), transparent 24%),
+        linear-gradient(180deg,rgba(7,9,14,.88),rgba(1,2,4,.96));
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 32px 80px rgba(0,0,0,.55);
+    }
+    .showcase-frame::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(transparent 0 56%, rgba(217,183,106,.05) 57% 58%, transparent 59%),
+        linear-gradient(90deg, transparent 0 48%, rgba(255,255,255,.04) 50%, transparent 52%);
+      opacity:.8;
+    }
+    .showcase-frame::after{
+      content:"";
+      position:absolute;
+      left:-10%;right:-10%;bottom:6%;
+      height:44%;
+      background:
+        repeating-linear-gradient(90deg, rgba(217,183,106,.18) 0 1px, transparent 1px 92px),
+        repeating-linear-gradient(0deg, rgba(217,183,106,.10) 0 1px, transparent 1px 38px),
+        linear-gradient(90deg, rgba(213,49,61,.16), rgba(217,183,106,.11), rgba(81,199,255,.16));
+      transform:perspective(620px) rotateX(62deg);
+      transform-origin:50% 100%;
+      border-top:1px solid rgba(217,183,106,.24);
+      filter:drop-shadow(0 -20px 40px rgba(217,183,106,.06));
+    }
+    .showcase-runes{
+      position:absolute;
+      left:50%;top:54%;
+      width:380px;height:190px;
+      transform:translate(-50%,-50%) perspective(700px) rotateX(64deg);
+      border:1px solid rgba(217,183,106,.20);
+      border-radius:50%;
+      box-shadow:0 0 0 22px rgba(217,183,106,.035),0 0 0 48px rgba(217,183,106,.025),0 0 80px rgba(217,183,106,.18);
+    }
+    .showcase-versus{
+      position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);
+      font-size:clamp(70px,9vw,150px);
+      font-weight:1000;
+      letter-spacing:.05em;
+      color:rgba(255,235,178,.09);
+      text-shadow:0 0 60px rgba(217,183,106,.15);
+    }
+    .showcase-fighter{position:absolute;bottom:14%;width:150px;height:330px;filter:drop-shadow(0 28px 34px rgba(0,0,0,.75))}
+    .showcase-raven{left:21%}
+    .showcase-warden{right:21%;transform:scaleX(-1)}
+    .showcase-fighter .cape{
+      position:absolute;left:-38px;top:78px;width:120px;height:210px;border-radius:60% 20% 55% 35%;
+      background:linear-gradient(160deg,rgba(201,40,50,.65),rgba(4,4,7,.08) 75%);
+      filter:blur(.2px);
+    }
+    .showcase-warden .cape{background:linear-gradient(160deg,rgba(62,182,255,.62),rgba(4,4,7,.08) 75%)}
+    .showcase-fighter .torso{
+      position:absolute;left:43px;top:92px;width:70px;height:142px;border-radius:24px 24px 22px 22px;
+      background:linear-gradient(180deg,#272c36,#07090e 68%,#010102);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.11),0 0 40px rgba(201,40,50,.18);
+    }
+    .showcase-warden .torso{box-shadow:inset 0 0 0 1px rgba(255,255,255,.11),0 0 40px rgba(62,182,255,.18)}
+    .showcase-fighter .torso::before{
+      content:"";position:absolute;inset:16px 18px 30px;border-radius:20px;
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(201,40,50,.34));
+      clip-path:polygon(50% 0,100% 30%,72% 100%,50% 80%,28% 100%,0 30%);
+    }
+    .showcase-warden .torso::before{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(62,182,255,.38))}
+    .showcase-fighter .helm{
+      position:absolute;left:41px;top:36px;width:74px;height:72px;border-radius:36px 36px 24px 24px;
+      background:linear-gradient(180deg,#313743,#07090c);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+    .showcase-fighter .helm::before{
+      content:"";position:absolute;left:16px;right:16px;top:32px;height:7px;border-radius:999px;
+      background:#ff4050;box-shadow:0 0 18px #ff4050;
+    }
+    .showcase-warden .helm::before{background:#59d2ff;box-shadow:0 0 18px #59d2ff}
+    .showcase-fighter .blade{
+      position:absolute;right:-54px;top:122px;width:150px;height:16px;border-radius:999px;
+      background:linear-gradient(90deg,transparent,rgba(255,225,150,.2),#fff4d8);
+      transform:rotate(-18deg);
+      filter:drop-shadow(0 0 20px rgba(217,183,106,.55));
+    }
+
+    .visual42-panel .launch-steps{grid-area:steps;margin:0;padding:16px;border-radius:22px;background:rgba(255,255,255,.045)}
+    .visual42-panel .step-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+    .visual42-panel .step{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(0,0,0,.22));border-color:rgba(217,183,106,.18)}
+    .visual42-panel .tips{grid-area:tips;margin:0;grid-template-columns:repeat(3,1fr)}
+    .visual42-panel .tip{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border-color:rgba(255,255,255,.13)}
+
+    .command-deck{grid-area:deck;margin:0;padding:18px;border-radius:26px;background:linear-gradient(180deg,rgba(14,16,21,.78),rgba(0,0,0,.30));border-color:rgba(217,183,106,.24)}
+    .command-deck .economy-top{margin-bottom:14px}
+    .command-deck .economy-top b{font-size:14px;letter-spacing:.18em}
+    .command-deck .economy-actions{
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:9px;
+    }
+    .command-deck .economy-actions button{
+      margin:0;
+      min-height:48px;
+      padding:10px 8px;
+      border-radius:16px;
+      text-align:center;
+      background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.035));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.035),0 12px 28px rgba(0,0,0,.25);
+    }
+    #shopBtn,#contentBtn,#missionsBtn,#bossBtn,#seasonBtn,#dailyBtn{
+      border-color:rgba(217,183,106,.34)!important;
+      background:linear-gradient(180deg,rgba(217,183,106,.18),rgba(255,255,255,.05))!important;
+    }
+    .command-deck .ops{opacity:.70;font-size:11px!important}
+    .command-deck .economy-content{
+      margin-top:14px;
+      max-height:92px;
+      overflow:auto;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:12px;
+    }
+    .command-deck .pill{font-size:11px;padding:7px 9px;background:rgba(255,255,255,.045)}
+
+    @media (max-width:980px){
+      .visual42-panel{
+        grid-template-columns:1fr;
+        grid-template-areas:"copy" "art" "steps" "tips" "deck";
+        width:min(720px,calc(100% - 20px));
+      }
+      .hero-showcase{min-height:420px}
+      .showcase-raven{left:18%}
+      .showcase-warden{right:18%}
+      .visual42-panel .tips{grid-template-columns:1fr}
+      .command-deck .economy-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .visual42-panel .step-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:620px){
+      .visual42-menu{padding:calc(10px + env(safe-area-inset-top)) 10px calc(96px + env(safe-area-inset-bottom))}
+      .visual42-panel{padding:18px;border-radius:26px;gap:14px}
+      .hero-copy h1{font-size:clamp(48px,18vw,74px)}
+      .hero-copy .subtitle{font-size:14px;line-height:1.52}
+      .hero-cta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .hero-cta #startBtn{min-width:0;min-height:54px}
+      .hero-cta #muteBtn{min-height:54px}
+      .hero-showcase{min-height:300px}
+      .showcase-fighter{width:110px;height:240px;bottom:10%;transform:scale(.82)}
+      .showcase-warden{transform:scaleX(-1) scale(.82)}
+      .showcase-raven{left:12%}
+      .showcase-warden{right:12%}
+      .showcase-runes{width:250px;height:126px}
+      .command-deck .economy-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .command-deck .economy-actions button{min-height:46px;font-size:11px}
+    }
+
   </style>
 </head>
 <body>
@@ -628,16 +912,36 @@
   </div>
   <div id="comboTag" class="combo-tag"><b id="comboCount">0</b> HIT COMBO</div>
 
-  <div id="menu" class="menu">
-    <div class="menu-panel">
-      <div class="kicker">Premium Telegram Mini App / Browser Fighting Game</div>
-      <div class="visual-mark">Visual 4.0 · Cinematic Overhaul</div>
-      <h1>ERALASH<br/>COMBAT</h1>
-      <p class="subtitle">Dark premium файтинг 1 на 1 с Visual 4.0: кинематографичная 2.5D-арена, дорогой HUD, мощные VFX, premium silhouettes, combo FX и адаптация под Telegram.</p>
-      <div id="tgProfileBadge" class="profile-badge">Offline Arena Preview · Guest Fighter · LVL 1 · 0 coins</div>
+  <div id="menu" class="menu visual42-menu">
+    <div class="menu-panel visual42-panel">
+      <section class="hero-copy">
+        <div class="kicker">Premium Telegram Mini App / Browser Fighting Game</div>
+        <div class="visual-mark">Visual 4.2 · AAA Presentation Rebuild</div>
+        <h1>ERALASH<br/>COMBAT</h1>
+        <p class="subtitle">Dark cinematic файтинг 1 на 1: большая 2.5D-арена, premium HUD, мощные VFX, сезонные награды, Stars-магазин и боёвка под Telegram.</p>
+        <div id="tgProfileBadge" class="profile-badge">Offline Arena Preview · Guest Fighter · LVL 1 · 0 coins</div>
+        <div class="btn-row hero-cta">
+          <button id="startBtn">Начать бой</button>
+          <button id="muteBtn" class="secondary">Звук: ON</button>
+        </div>
+      </section>
 
-      <div class="launch-steps">
-        <div class="step-title">Release 1.0 onboarding</div>
+      <section class="hero-showcase" aria-hidden="true">
+        <div class="showcase-frame">
+          <div class="showcase-runes"></div>
+          <div class="showcase-fighter showcase-raven">
+            <i class="helm"></i><i class="torso"></i><i class="cape"></i><i class="blade"></i>
+          </div>
+          <div class="showcase-fighter showcase-warden">
+            <i class="helm"></i><i class="torso"></i><i class="cape"></i><i class="blade"></i>
+          </div>
+          <div class="showcase-versus">VS</div>
+          <div class="showcase-floor"></div>
+        </div>
+      </section>
+
+      <section class="launch-steps">
+        <div class="step-title">Release path</div>
         <div class="step-grid">
           <div class="step"><b>01 · Fighter</b><span>Выбери бойца и арену в блоке 🧬 Контент.</span></div>
           <div class="step"><b>02 · Fight</b><span>Нажми «Начать бой» и победи AI в best of 3.</span></div>
@@ -645,42 +949,38 @@
           <div class="step"><b>04 · Shop</b><span>Открывай предметы через coins или Telegram Stars.</span></div>
           <div class="step"><b>05 · Invite</b><span>Делись победой и зови друзей в сезонный топ.</span></div>
         </div>
-      </div>
+      </section>
 
-
-      <div class="btn-row">
-        <button id="startBtn">Начать бой</button>
-        <button id="muteBtn" class="secondary">Звук: ON</button>
-      </div>
       <div class="tips">
         <div class="tip"><b>Клавиатура</b><span>A/D — движение, W — прыжок, Q/Space — dodge, J/K/L/O — атаки, I — блок.</span></div>
         <div class="tip"><b>Мобильное</b><span>Слева движение, прыжок и dodge; справа удары, блок, спецприём и ultimate.</span></div>
         <div class="tip"><b>Цель</b><span>Best of 3. Комбо заряжают энергию, dodge уходит от удара, ultimate добивает раунд.</span></div>
       </div>
-      <div class="economy-panel">
+
+      <section class="economy-panel command-deck">
         <div class="economy-top">
-          <b>Premium Economy</b>
+          <b>Command Deck</b>
           <span class="badge">Supabase Live</span>
         </div>
         <div class="economy-actions">
           <button id="dailyBtn" class="secondary">🎁 Daily</button>
           <button id="shopBtn" class="secondary">🛒 Магазин</button>
           <button id="contentBtn" class="secondary">🧬 Контент</button>
-          <button id="promoBtn" class="secondary">🎟️ Promo</button>
+          <button id="missionsBtn" class="secondary">🎯 Missions</button>
+          <button id="bossBtn" class="secondary">👹 Boss Rush</button>
+          <button id="seasonBtn" class="secondary">🏆 Season</button>
           <button id="weeklyBtn" class="secondary">🥇 Weekly Top</button>
           <button id="inviteBtn" class="secondary">🤝 Invite</button>
-          <button id="seasonBtn" class="secondary">🏆 Season</button>
+          <button id="promoBtn" class="secondary">🎟️ Promo</button>
+          <button id="achievementsBtn" class="secondary">🏅 Achievements</button>
           <button id="launchBtn" class="secondary">📣 Launch</button>
           <button id="newsBtn" class="secondary">📰 News</button>
           <button id="founderBtn" class="secondary">🎖️ Founder Gift</button>
           <button id="feedbackBtn" class="secondary">💬 Feedback</button>
-          <button id="analyticsBtn" class="secondary">📊 Analytics</button>
-          <button id="liveopsBtn" class="secondary">🎛️ LiveOps</button>
-          <button id="missionsBtn" class="secondary">🎯 Missions</button>
-          <button id="achievementsBtn" class="secondary">🏅 Achievements</button>
-          <button id="bossBtn" class="secondary">👹 Boss Rush</button>
-          <button id="adminBtn" class="secondary">⚙️ Admin</button>
-          <button id="qaBtn" class="secondary">🚀 QA</button>
+          <button id="analyticsBtn" class="secondary ops">📊 Analytics</button>
+          <button id="liveopsBtn" class="secondary ops">🎛️ LiveOps</button>
+          <button id="adminBtn" class="secondary ops">⚙️ Admin</button>
+          <button id="qaBtn" class="secondary ops">🚀 QA</button>
         </div>
         <div id="economyContent" class="economy-content">
           <div class="pill-list">
@@ -696,7 +996,7 @@
             <span class="pill">Analytics / Feedback / LiveOps</span>
           </div>
         </div>
-      </div>
+      </section>
 
     </div>
   </div>

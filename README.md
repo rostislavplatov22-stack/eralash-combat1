@@ -205,6 +205,11 @@ ADMIN_API_SECRET
 Добавлен большой cinematic visual overhaul: 2.5D арена, premium HUD, улучшенные бойцы, slash trails, ultimate aura, foreground particles и меню с top-tier presentation.
 
 
-## Visual 4.1
+## Visual 4.2
 
 Добавлен cinematic combat framing fix: крупнее бойцы, центрирование камеры, исправление mirrored nameplate, усиление stage focus.
+
+
+## Visual 4.2 AAA Presentation Rebuild
+
+Добавлен широкий premium hero-screen, cinematic showcase и Command Deck вместо дешёвой узкой панели.
