@@ -21,6 +21,9 @@ import health from '../lib/handlers/health.js';
 import status from '../lib/handlers/status.js';
 import qa from '../lib/handlers/qa.js';
 import clientError from '../lib/handlers/client-error.js';
+import launch from '../lib/handlers/launch.js';
+import news from '../lib/handlers/news.js';
+import founderBonus from '../lib/handlers/founder-bonus.js';
 import { logReleaseError } from '../lib/_release.js';
 
 // Single Vercel Serverless Function dispatcher.
@@ -50,7 +53,10 @@ const routes = {
   health,
   status,
   qa,
-  'client-error': clientError
+  'client-error': clientError,
+  launch,
+  news,
+  'founder-bonus': founderBonus
 };
 
 export default async function handler(req, res) {

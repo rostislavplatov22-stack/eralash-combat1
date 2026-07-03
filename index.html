@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium dark cinematic fighting game, ready for GitHub and Vercel deployment." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with launch event, referral season, Stars shop and cinematic mobile combat." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
-  <meta property="og:description" content="Premium browser fighting game with mobile controls, AI opponent, rounds, hit stop and cinematic combat feel." />
+  <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
   <title>EraLash Combat — Dark Arena</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -215,6 +215,9 @@
           <button id="weeklyBtn" class="secondary">🥇 Weekly Top</button>
           <button id="inviteBtn" class="secondary">🤝 Invite</button>
           <button id="seasonBtn" class="secondary">🏆 Season</button>
+          <button id="launchBtn" class="secondary">📣 Launch</button>
+          <button id="newsBtn" class="secondary">📰 News</button>
+          <button id="founderBtn" class="secondary">🎖️ Founder Gift</button>
           <button id="adminBtn" class="secondary">⚙️ Admin</button>
           <button id="qaBtn" class="secondary">🚀 QA</button>
         </div>
@@ -227,6 +230,8 @@
             <span class="pill">Fighters & arenas DB</span>
             <span class="pill">Referral & Season ready</span>
             <span class="pill">Release 1.0 QA ready</span>
+            <span class="pill">Founder launch event</span>
+            <span class="pill">Share / News / Public launch</span>
           </div>
         </div>
       </div>
@@ -1521,6 +1526,9 @@
       weekly: document.getElementById('weeklyBtn'),
       invite: document.getElementById('inviteBtn'),
       season: document.getElementById('seasonBtn'),
+      launch: document.getElementById('launchBtn'),
+      news: document.getElementById('newsBtn'),
+      founder: document.getElementById('founderBtn'),
       admin: document.getElementById('adminBtn'),
       qa: document.getElementById('qaBtn'),
       content: document.getElementById('economyContent')
@@ -1840,6 +1848,108 @@
   }
 
 
+
+  async function loadLaunch(){
+    setEconomyContent('<div class="pill">Загрузка launch campaign...</div>');
+    try {
+      const res = await fetch('/api/launch', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const c = data.campaign || {};
+      const founder = data.founder || {};
+      const rewards = (data.seasonRewards || []).map(r => `
+        <div class="shop-card">
+          <div><h4>${escapeUi(r.rank)}</h4><p>${escapeUi(r.reward)}</p></div>
+          <span class="pill">Season</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="shop-card">
+          <div>
+            <h4>🚀 ${escapeUi(c.title || 'Launch Event')}</h4>
+            <p>${escapeUi(c.description || '')}</p>
+            <div class="price">Осталось Founder gifts: ${founder.remaining ?? '—'} / ${c.maxClaims || 100}</div>
+          </div>
+          <div class="shop-actions">
+            <button id="claimFounderInline" class="mini-btn">🎖️ Claim</button>
+            <button id="shareLaunchInline" class="mini-btn secondary">📤 Share</button>
+          </div>
+        </div>
+        <div class="pill-list">
+          <span class="pill">+${c.reward?.xp || 50} XP</span>
+          <span class="pill">+${c.reward?.coins || 100} coins</span>
+          <span class="pill">${escapeUi(c.reward?.title || 'Founder Frame')}</span>
+        </div>
+        <h3 style="margin:12px 0 8px">Season rewards</h3>
+        ${rewards}
+      `);
+      document.getElementById('claimFounderInline')?.addEventListener('click', claimFounderBonus);
+      document.getElementById('shareLaunchInline')?.addEventListener('click', () => openShareUrl(c.botUrl || location.href, c.shareText || 'EraLash Combat launch'));
+    } catch (error) {
+      setEconomyContent('<div class="pill">Launch API недоступен</div>');
+    }
+  }
+
+  async function loadNews(){
+    setEconomyContent('<div class="pill">Загрузка новостей...</div>');
+    try {
+      const res = await fetch('/api/news?limit=8', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const cards = (data.news || []).map(item => `
+        <div class="shop-card">
+          <div>
+            <h4>📰 ${escapeUi(item.title || 'News')}</h4>
+            <p>${escapeUi(item.body || '')}</p>
+          </div>
+          <span class="pill">${escapeUi(item.tag || 'news')}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Public Launch News</span>
+          <span class="pill">${escapeUi(data.storage || 'storage')}</span>
+        </div>
+        ${cards || '<div class="pill">Новостей пока нет</div>'}
+      `);
+    } catch (error) {
+      setEconomyContent('<div class="pill">News API недоступен</div>');
+    }
+  }
+
+  async function claimFounderBonus(){
+    setEconomyContent('<div class="pill">Забираем Founder reward...</div>');
+    try {
+      const res = await fetch('/api/founder-bonus', {
+        method:'POST',
+        headers:economyHeaders(true),
+        body: JSON.stringify({ user: telegramContext.user || { id:'guest', first_name:'Guest' } })
+      });
+      const data = await res.json();
+      if (data.profile) {
+        appProfile = { ...appProfile, ...normalizeServerProfile(data.profile) };
+        saveProfile();
+        updateTelegramBadge();
+      }
+      if (data.claimed) {
+        setEconomyContent(`
+          <div class="pill-list">
+            <span class="pill">✅ Founder Gift claimed</span>
+            <span class="pill">+${data.campaign?.reward?.xp || 50} XP</span>
+            <span class="pill">+${data.campaign?.reward?.coins || 100} coins</span>
+            <span class="pill">${escapeUi(data.campaign?.reward?.title || 'Founder Frame')}</span>
+          </div>
+        `);
+      } else if (data.alreadyClaimed) {
+        setEconomyContent('<div class="pill">🎖️ Founder reward уже получен на этом аккаунте.</div>');
+      } else if (data.soldOut) {
+        setEconomyContent('<div class="pill">Founder Drop закончился. Следи за новыми events.</div>');
+      } else {
+        setEconomyContent(`<div class="pill">Founder reward не выдан: ${escapeUi(data.error || 'unknown')}</div>`);
+      }
+    } catch (error) {
+      setEconomyContent('<div class="pill">Founder API недоступен</div>');
+    }
+  }
+
   function promoForm(){
     setEconomyContent(`
       <div class="shop-card">
@@ -2069,6 +2179,9 @@
     els.weekly?.addEventListener('click', () => { audio.ui(); loadWeekly(); });
     els.invite?.addEventListener('click', () => { audio.ui(); loadReferral(); });
     els.season?.addEventListener('click', () => { audio.ui(); loadSeason(); });
+    els.launch?.addEventListener('click', () => { audio.ui(); loadLaunch(); });
+    els.news?.addEventListener('click', () => { audio.ui(); loadNews(); });
+    els.founder?.addEventListener('click', () => { audio.ui(); claimFounderBonus(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
     els.qa?.addEventListener('click', () => { audio.ui(); loadQa(); });
     ui.shareVictoryBtn?.addEventListener('click', () => { audio.ui(); shareVictory(); });
@@ -2117,6 +2230,9 @@
       if (params.get('invite') === '1' || params.get('ref') === '1') loadReferral();
       if (params.get('season') === '1') loadSeason();
       if (params.get('qa') === '1') loadQa();
+      if (params.get('launch') === '1') loadLaunch();
+      if (params.get('news') === '1') loadNews();
+      if (params.get('founder') === '1') claimFounderBonus();
     }, 350);
   }
 

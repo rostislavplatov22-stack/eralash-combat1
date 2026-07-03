@@ -173,3 +173,8 @@ ADMIN_API_SECRET
 Добавлены `/api/health`, `/api/status`, `/api/qa`, `/api/client-error`, onboarding, launch checklist, error logs и команда Telegram `/status`.
 
 Подробнее: `RELEASE_1_0_UPDATE_RU.md`.
+
+
+## Public Launch Marketing Pack
+
+Добавлены `/api/launch`, `/api/news`, `/api/founder-bonus`, команды `/about`, `/rules`, `/news`, `/launch`, Founder Drop и launch-кнопки внутри Mini App.

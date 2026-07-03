@@ -547,3 +547,44 @@ alter table public.payment_errors enable row level security;
 alter table public.telegram_errors enable row level security;
 
 notify pgrst, 'reload schema';
+
+
+-- Public Launch / Marketing Pack
+-- Safe to run multiple times.
+
+create table if not exists public.launch_claims (
+  id uuid primary key default gen_random_uuid(),
+  campaign text not null,
+  user_id uuid references public.users(id) on delete cascade,
+  telegram_id text not null default '',
+  reward jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  unique (campaign, user_id)
+);
+
+create index if not exists launch_claims_campaign_idx
+  on public.launch_claims (campaign, created_at desc);
+
+alter table public.launch_claims enable row level security;
+
+create table if not exists public.news_posts (
+  id text primary key,
+  title text not null,
+  body text not null,
+  tag text not null default 'news',
+  published boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.news_posts enable row level security;
+
+insert into public.news_posts (id, title, body, tag, published)
+values
+  ('release_1_0', 'Release 1.0 открыт', 'Arena, Supabase-прогресс, магазин, Stars-покупки, promo, referral, season и QA-checklist работают в production.', 'release', true),
+  ('founder_drop', 'Founder Arena Drop', 'Первые 100 игроков могут забрать +50 XP, +100 coins и Founder Frame.', 'reward', true),
+  ('weekly_season', 'Weekly Arena Season', 'Играй бои, получай season points и поднимайся в топе недели.', 'season', true)
+on conflict (id) do update set
+  title = excluded.title,
+  body = excluded.body,
+  tag = excluded.tag,
+  published = excluded.published;
