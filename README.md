@@ -183,3 +183,8 @@ ADMIN_API_SECRET
 ## Analytics + LiveOps
 
 Добавлены `/api/analytics`, `/api/feedback`, `/api/liveops`, события игроков, feedback форма и LiveOps конфиг.
+
+
+## Combat 2.0 Premium Fight Feel
+
+Добавлены dodge, ultimate, combo counter, cinematic zoom, afterimages, улучшенный AI и усиленные hit sparks/slash trails. Управление: `Q/Space` — dodge, `O` — ultimate, мобильные кнопки `DGE` и `ULT`.

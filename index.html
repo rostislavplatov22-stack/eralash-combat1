@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with launch event, referral season, Stars shop and cinematic mobile combat." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat 2.0, cinematic hit feel, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
@@ -82,8 +82,12 @@
     .control-btn{width:58px;height:58px;border-radius:20px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.055));color:#fff;display:grid;place-items:center;font-weight:1000;letter-spacing:.04em;box-shadow:0 14px 34px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.04);user-select:none;touch-action:none}
     .control-btn.big{width:68px;height:68px}
     .control-btn.special{border-color:rgba(217,183,106,.6);color:#ffe1a0;background:linear-gradient(180deg,rgba(217,183,106,.22),rgba(217,183,106,.08))}
+    .control-btn.ultimate{border-color:rgba(255,75,92,.72);color:#ffd5d9;background:linear-gradient(180deg,rgba(255,75,92,.24),rgba(217,183,106,.08));box-shadow:0 0 26px rgba(201,40,50,.16),inset 0 0 0 1px rgba(255,255,255,.045)}
+    .control-btn.dodge{border-color:rgba(255,255,255,.28);color:#e9f5ff;background:linear-gradient(180deg,rgba(62,182,255,.16),rgba(255,255,255,.055))}
     .control-btn.block{color:#bde8ff;border-color:rgba(62,182,255,.45)}
     .control-btn.active{transform:translateY(2px) scale(.96);background:linear-gradient(180deg,rgba(217,183,106,.3),rgba(255,255,255,.08));box-shadow:0 0 24px rgba(217,183,106,.23)}
+    .combo-tag{position:absolute;z-index:31;right:calc(18px + env(safe-area-inset-right));top:calc(104px + env(safe-area-inset-top));padding:8px 12px;border:1px solid rgba(217,183,106,.35);border-radius:999px;background:linear-gradient(180deg,rgba(10,12,16,.76),rgba(0,0,0,.46));box-shadow:0 14px 40px rgba(0,0,0,.35);font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:#fff;pointer-events:none;display:none}
+    .combo-tag b{color:var(--gold);font-size:18px;margin-right:6px}
     .debug{position:absolute;left:12px;bottom:100px;z-index:60;color:#fff;background:rgba(0,0,0,.45);font-size:11px;padding:7px 9px;border-radius:10px;display:none}
     @media (max-width:700px){
       .menu,.result{padding:calc(12px + env(safe-area-inset-top)) 0 calc(96px + env(safe-area-inset-bottom));align-items:flex-start}
@@ -101,9 +105,9 @@
       .timer .num{font-size:20px}
       .timer .rounds{font-size:8px}
       .controls{padding:0 8px;bottom:calc(8px + env(safe-area-inset-bottom))}
-      .pad,.actions{gap:7px}
-      .control-btn{width:48px;height:48px;border-radius:16px;font-size:12px}
-      .control-btn.big{width:54px;height:54px}
+      .pad,.actions{gap:7px;flex-wrap:wrap;max-width:46vw}
+      .control-btn{width:46px;height:46px;border-radius:16px;font-size:11px}
+      .control-btn.big{width:50px;height:50px}
       .tips{grid-template-columns:1fr;gap:8px}
       .step-grid{grid-template-columns:1fr}
       .launch-steps{padding:12px}
@@ -121,8 +125,8 @@
       .timer .num{font-size:19px}
       .timer .rounds{font-size:8px}
       .controls{bottom:calc(6px + env(safe-area-inset-bottom));padding:0 8px}
-      .control-btn{width:46px;height:46px;border-radius:15px}
-      .control-btn.big{width:52px;height:52px}
+      .control-btn{width:44px;height:44px;border-radius:15px;font-size:11px}
+      .control-btn.big{width:48px;height:48px}
       .center-callout .big{font-size:clamp(34px,10vw,62px)}
     }
     @media (min-width:900px){
@@ -173,6 +177,7 @@
     <div id="calloutBig" class="big">FIGHT</div>
     <div id="calloutSmall" class="small">Round 1</div>
   </div>
+  <div id="comboTag" class="combo-tag"><b id="comboCount">0</b> HIT COMBO</div>
 
   <div id="menu" class="menu">
     <div class="menu-panel">
@@ -198,9 +203,9 @@
         <button id="muteBtn" class="secondary">Звук: ON</button>
       </div>
       <div class="tips">
-        <div class="tip"><b>Клавиатура</b><span>A/D — движение, W — прыжок, J/K/L — атаки, I — блок.</span></div>
-        <div class="tip"><b>Мобильное</b><span>Слева движение и прыжок, справа удары, блок и спецприём.</span></div>
-        <div class="tip"><b>Цель</b><span>Best of 3. Спецприём тратит энергию, блок снижает урон.</span></div>
+        <div class="tip"><b>Клавиатура</b><span>A/D — движение, W — прыжок, Q/Space — dodge, J/K/L/O — атаки, I — блок.</span></div>
+        <div class="tip"><b>Мобильное</b><span>Слева движение, прыжок и dodge; справа удары, блок, спецприём и ultimate.</span></div>
+        <div class="tip"><b>Цель</b><span>Best of 3. Комбо заряжают энергию, dodge уходит от удара, ultimate добивает раунд.</span></div>
       </div>
       <div class="economy-panel">
         <div class="economy-top">
@@ -262,12 +267,14 @@
       <div class="control-btn" data-input="left">◀</div>
       <div class="control-btn" data-input="right">▶</div>
       <div class="control-btn" data-input="jump">▲</div>
+      <div class="control-btn dodge" data-input="dodge">DGE</div>
     </div>
     <div class="actions">
       <div class="control-btn big" data-input="light">L</div>
       <div class="control-btn big" data-input="heavy">H</div>
       <div class="control-btn block" data-input="block">BLK</div>
       <div class="control-btn big special" data-input="special">SP</div>
+      <div class="control-btn big ultimate" data-input="ultimate">ULT</div>
     </div>
   </div>
   <div id="debug" class="debug"></div>
@@ -298,6 +305,8 @@
     callout: document.getElementById('callout'),
     calloutBig: document.getElementById('calloutBig'),
     calloutSmall: document.getElementById('calloutSmall'),
+    comboTag: document.getElementById('comboTag'),
+    comboCount: document.getElementById('comboCount'),
     resultTitle: document.getElementById('resultTitle'),
     resultText: document.getElementById('resultText'),
     resultKicker: document.getElementById('resultKicker'),
@@ -327,6 +336,12 @@
   let enemyRounds = 0;
   let roundIndex = 1;
   let flash = 0;
+  let cinematic = 0;
+  let cameraZoom = 1;
+  let comboCount = 0;
+  let comboTimer = 0;
+  let comboDamage = 0;
+  let lastHitAt = 0;
   let telegramContext = { insideTelegram:false, user:null, initData:'' };
   let pendingStarsItemId = '';
   let appProfile = loadProfile();
@@ -347,8 +362,8 @@
   let contentBundle = DEFAULT_CONTENT;
 
   const input = {
-    left:false,right:false,jump:false,block:false,
-    light:false,heavy:false,special:false,
+    left:false,right:false,jump:false,block:false,dodge:false,
+    light:false,heavy:false,special:false,ultimate:false,
     pressed: Object.create(null),
     buffer: []
   };
@@ -393,6 +408,7 @@
     hit(type='light'){
       if(type==='block') { this.tone(380,.05,'square',.045,.62); this.tone(150,.07,'triangle',.04,.8); return; }
       if(type==='heavy') { this.tone(88,.13,'sawtooth',.1,.45); this.tone(560,.055,'square',.035,1.4); return; }
+      if(type==='ultimate') { this.tone(62,.26,'sawtooth',.16,.25); this.tone(920,.14,'triangle',.08,.55); this.tone(1400,.06,'square',.035,1.2); return; }
       if(type==='special') { this.tone(120,.18,'sawtooth',.12,.32); this.tone(880,.09,'triangle',.06,.8); return; }
       this.tone(180,.07,'square',.055,.55);
     }
@@ -484,6 +500,9 @@
       canHit: true,
       attack: null,
       attackHasHit: false,
+      dodgeCd: 0,
+      afterImage: 0,
+      armor: 0,
       colorA: cfg.colorA || (isPlayer ? '#14171e' : '#17191c'),
       colorB: cfg.colorB || (isPlayer ? '#c92832' : '#3eb6ff'),
       accent: cfg.accent || (isPlayer ? '#d9b76a' : '#d9f2ff'),
@@ -510,7 +529,8 @@
   const attacks = {
     light:   { name:'light', startup:.075, active:.075, recovery:.145, damage:7, blockDamage:2, range:72, height:64, y:-112, kb:235, hitStop:.055, energyGain:7 },
     heavy:   { name:'heavy', startup:.165, active:.095, recovery:.245, damage:15, blockDamage:4, range:92, height:82, y:-125, kb:430, hitStop:.105, energyGain:12 },
-    special: { name:'special', startup:.2, active:.13, recovery:.34, damage:22, blockDamage:7, range:132, height:94, y:-136, kb:650, hitStop:.16, energyGain:0, cost:42 }
+    special: { name:'special', startup:.2, active:.13, recovery:.34, damage:22, blockDamage:7, range:132, height:94, y:-136, kb:650, hitStop:.16, energyGain:0, cost:42 },
+    ultimate:{ name:'ultimate', startup:.38, active:.18, recovery:.48, damage:38, blockDamage:12, range:168, height:124, y:-150, kb:920, hitStop:.28, energyGain:0, cost:100 }
   };
 
   function resetRoundPositions(){
@@ -532,7 +552,13 @@
     shake = 0;
     slowMo = 1;
     flash = 0;
-    showCallout('ROUND ' + roundIndex, 'Touch or keyboard ready');
+    cinematic = 0;
+    cameraZoom = 1;
+    comboCount = 0;
+    comboTimer = 0;
+    comboDamage = 0;
+    updateComboTag();
+    showCallout('ROUND ' + roundIndex, 'Touch, dodge and combo ready');
     updateHUD(true);
   }
 
@@ -721,14 +747,62 @@
     }
   }
 
+
+  function performDodge(f){
+    if (gameState !== 'fight' || roundFreeze > 0) return;
+    if (!isGrounded(f) || f.dodgeCd > 0) return;
+    if (f.state === 'attack' || f.state === 'hitstun' || f.state === 'knockdown') return;
+    f.dodgeCd = .72;
+    f.invuln = .34;
+    f.afterImage = .34;
+    f.state = 'dodge';
+    f.stateT = 0;
+    const away = f.id === 'player' ? (input.left ? -1 : input.right ? 1 : -f.dir) : -f.dir;
+    f.vx = away * Math.max(520, f.stats.speed * 1.25);
+    spawnAfterImage(f);
+    floatingText('DODGE', f.x, f.y - f.h - 18, '#bde8ff');
+    audio.tone(520,.045,'triangle',.035,.82);
+    tryHaptic('light');
+  }
+
+  function spawnAfterImage(f){
+    for(let i=0;i<7;i++){
+      particles.push({
+        x:f.x - f.dir * (i*10 + 10),
+        y:f.y - f.h*.5,
+        vx:-f.dir*(80+i*18),
+        vy:-20 + Math.random()*40,
+        life:.22 + i*.025,
+        max:.22 + i*.025,
+        size:22 - i*1.5,
+        color:f.colorB + '88',
+        kind:'after'
+      });
+    }
+  }
+
   function startAttack(f, type){
     if (gameState !== 'fight') return;
     if (roundFreeze > 0) return;
-    if (f.state === 'hitstun' || f.state === 'knockdown' || f.state === 'attack') return;
+    if (f.state === 'hitstun' || f.state === 'knockdown' || f.state === 'attack' || f.state === 'dodge') return;
     const data = attacks[type];
     if (!data) return;
-    if (type === 'special' && f.energy < data.cost) return;
-    if (type === 'special') {
+    if ((type === 'special' || type === 'ultimate') && f.energy < data.cost) {
+      floatingText('NO ENERGY', f.x, f.y - f.h - 22, '#d9b76a');
+      return;
+    }
+    if (type === 'ultimate') {
+      f.energy = clamp(f.energy - data.cost, 0, 100);
+      spawnAura(f, '#fff0b7');
+      spawnAura(f, f.colorB);
+      cinematic = .75;
+      cameraZoom = 1.08;
+      shake = Math.max(shake, 18);
+      flash = Math.max(flash, .32);
+      showCallout('ULTIMATE', f.ultimateName || 'Final Strike');
+      audio.hit('ultimate');
+      tryHaptic('ultimate');
+    } else if (type === 'special') {
       f.energy = clamp(f.energy - data.cost, 0, 100);
       spawnAura(f, f.colorB);
       shake = Math.max(shake, 10);
@@ -794,18 +868,28 @@
       }
     }
 
-    defender.hp = clamp(defender.hp - dmg, 0, 100);
-    defender.invuln = .11;
+    defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    defender.invuln = atk.name === 'ultimate' ? .18 : .11;
     defender.vx = facing * (blocked ? atk.kb*.28 : atk.kb);
-    defender.vy = blocked ? -40 : (atk.name === 'heavy' ? -120 : atk.name === 'special' ? -190 : -55);
+    defender.vy = blocked ? -40 : (atk.name === 'ultimate' ? -250 : atk.name === 'heavy' ? -120 : atk.name === 'special' ? -190 : -55);
     setState(defender, blocked ? 'block' : 'hitstun');
     defender.stateT = 0;
 
     attacker.energy = clamp(attacker.energy + atk.energyGain, 0, 100);
     hitStop = Math.max(hitStop, atk.hitStop);
-    shake = Math.max(shake, blocked ? 6 : atk.name === 'special' ? 20 : atk.name === 'heavy' ? 14 : 8);
-    flash = Math.max(flash, blocked ? .08 : atk.name === 'special' ? .20 : .11);
+    if (!blocked) {
+      if (performance.now() - lastHitAt < 1500) comboCount += 1;
+      else comboCount = 1;
+      comboTimer = 1.45;
+      comboDamage += dmg;
+      lastHitAt = performance.now();
+      updateComboTag();
+    }
+    shake = Math.max(shake, blocked ? 6 : atk.name === 'ultimate' ? 28 : atk.name === 'special' ? 20 : atk.name === 'heavy' ? 14 : 8);
+    flash = Math.max(flash, blocked ? .08 : atk.name === 'ultimate' ? .34 : atk.name === 'special' ? .20 : .11);
+    if (atk.name === 'ultimate') { cinematic = .65; cameraZoom = 1.12; }
     spawnHitSpark(defender.x - facing*28, defender.y - defender.h*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
+    spawnSlashWave(attacker, defender, atk.name);
     floatingText(blocked ? 'BLOCK' : '-' + dmg, defender.x, defender.y - defender.h - 22, blocked ? '#8edcff' : '#fff3d1');
     audio.hit(blocked ? 'block' : atk.name);
     tryHaptic(blocked ? 'light' : atk.name);
@@ -819,10 +903,11 @@
   function tryHaptic(kind){
     try {
       if (window.Telegram?.WebApp?.HapticFeedback) {
-        if (kind === 'special' || kind === 'heavy') window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
+        if (kind === 'ultimate') { window.Telegram.WebApp.HapticFeedback.impactOccurred('rigid'); window.Telegram.WebApp.HapticFeedback.notificationOccurred('success'); }
+        else if (kind === 'special' || kind === 'heavy') window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
         else window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
       } else if (navigator.vibrate) {
-        navigator.vibrate(kind === 'special' ? 35 : kind === 'heavy' ? 22 : 10);
+        navigator.vibrate(kind === 'ultimate' ? [35,20,55] : kind === 'special' ? 35 : kind === 'heavy' ? 22 : 10);
       }
     } catch(_) {}
   }
@@ -835,7 +920,7 @@
     shake = Math.max(shake, 18);
     flash = Math.max(flash, .28);
     if (winner === 'player') playerRounds++; else enemyRounds++;
-    showCallout(winner === 'player' ? 'K.O.' : 'DOWN', winner === 'player' ? 'Raven wins the round' : 'Iron Warden wins the round');
+    showCallout(winner === 'player' ? 'K.O.' : 'DOWN', winner === 'player' ? player.name + ' wins the round' : enemy.name + ' wins the round');
     updateHUD(true);
 
     setTimeout(() => {
@@ -898,6 +983,25 @@
     }
   }
 
+
+  function spawnSlashWave(attacker, defender, type){
+    const color = type === 'ultimate' ? '#fff0b7' : attacker.colorB;
+    const count = type === 'ultimate' ? 16 : type === 'special' ? 10 : type === 'heavy' ? 7 : 4;
+    for(let i=0;i<count;i++){
+      particles.push({
+        x:lerp(attacker.x, defender.x, .5) + (Math.random()-.5)*50,
+        y:defender.y - defender.h*(.42 + Math.random()*.26),
+        vx:attacker.dir * (220 + Math.random()*280),
+        vy:(Math.random()-.5)*120,
+        life:type === 'ultimate' ? .42 : .26,
+        max:type === 'ultimate' ? .42 : .26,
+        size:type === 'ultimate' ? 44 + Math.random()*28 : 22 + Math.random()*24,
+        color,
+        kind:'slash'
+      });
+    }
+  }
+
   function spawnAura(f,color){
     for(let i=0;i<24;i++){
       const a = Math.random()*Math.PI*2;
@@ -918,6 +1022,8 @@
   function updateFighter(f, opponent, dt){
     f.stateT += dt;
     f.invuln = Math.max(0, f.invuln - dt);
+    f.dodgeCd = Math.max(0, (f.dodgeCd || 0) - dt);
+    f.afterImage = Math.max(0, (f.afterImage || 0) - dt);
     f.stamina = clamp(f.stamina + dt*18, 0, 100);
     f.energy = clamp(f.energy + dt*2.2, 0, 100);
 
@@ -933,10 +1039,11 @@
     }
 
     if (f.state === 'hitstun' && f.stateT > .26) setState(f, 'idle');
+    if (f.state === 'dodge' && f.stateT > .26) setState(f, 'idle');
     if (f.state === 'block' && f.id === 'enemy' && f.stateT > .42) setState(f, 'idle');
     if (f.state === 'block' && f.id === 'player' && !input.block) setState(f, 'idle');
 
-    if (f.state !== 'attack' && f.state !== 'hitstun') {
+    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'dodge') {
       if (f.id === 'player') updatePlayerControl(f, dt);
       else updateAI(f, opponent, dt);
     }
@@ -963,7 +1070,7 @@
       enemy.x = clamp(enemy.x, enemy.w*.65, w - enemy.w*.65);
     }
 
-    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'block') {
+    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'block' && f.state !== 'dodge') {
       if (!isGrounded(f)) setState(f, 'jump');
       else if (Math.abs(f.vx) > 35) setState(f, 'walk');
       else setState(f, 'idle');
@@ -972,6 +1079,11 @@
 
   function updatePlayerControl(f, dt){
     const speed = f.stats.speed;
+    if (input.dodge) {
+      input.dodge = false;
+      performDodge(f);
+      return;
+    }
     if (input.block && isGrounded(f)) {
       setState(f, 'block');
       f.vx *= .72;
@@ -1002,6 +1114,10 @@
     }
 
     if (playerThreat && Math.random() < ai.blockChance && f.state !== 'attack') {
+      if (Math.random() < .28 && f.dodgeCd <= 0) {
+        performDodge(f);
+        return;
+      }
       setState(f, 'block');
       f.vx *= .5;
       return;
@@ -1018,7 +1134,8 @@
     }
 
     if (mid && ai.think < .1 && Math.random() > ai.mistake) {
-      if (f.energy >= attacks.special.cost && Math.random() < .34) startAttack(f, 'special');
+      if (f.energy >= attacks.ultimate.cost && Math.random() < .08) startAttack(f, 'ultimate');
+      else if (f.energy >= attacks.special.cost && Math.random() < .34) startAttack(f, 'special');
       else if (close && Math.random() < .55) startAttack(f, Math.random() < .44 ? 'heavy' : 'light');
       else if (mid && Math.random() < .16) startAttack(f, 'heavy');
     }
@@ -1038,6 +1155,18 @@
       roundTime = 0;
       const winner = player.hp >= enemy.hp ? 'player' : 'enemy';
       finishRound(winner);
+    }
+  }
+
+
+  function updateComboTag(){
+    if (!ui.comboTag || !ui.comboCount) return;
+    if (comboCount >= 2) {
+      ui.comboCount.textContent = comboCount;
+      ui.comboTag.style.display = 'block';
+      ui.comboTag.style.opacity = String(clamp(comboTimer, .15, 1));
+    } else {
+      ui.comboTag.style.display = 'none';
     }
   }
 
@@ -1087,6 +1216,15 @@
       updateParticles(dt*.45);
       return;
     }
+
+    comboTimer = Math.max(0, comboTimer - dt);
+    if (comboTimer <= 0 && comboCount > 0) {
+      comboCount = 0;
+      comboDamage = 0;
+      updateComboTag();
+    }
+    cinematic = Math.max(0, cinematic - dt);
+    cameraZoom = lerp(cameraZoom, 1, dt*2.6);
 
     const sdt = dt * slowMo;
     slowMo = lerp(slowMo, 1, dt*3.4);
@@ -1208,6 +1346,17 @@
     ctx.fill();
     ctx.restore();
 
+    if (f.state === 'dodge' || f.afterImage > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = .16 + Math.max(0, f.afterImage || 0) * 1.2;
+      ctx.fillStyle = f.colorB + '66';
+      ctx.beginPath();
+      ctx.ellipse(-f.dir*24,-f.h*.48,f.w*.62,f.h*.46,-.08,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     const coreA = hurt ? '#ff5865' : f.colorA;
     const coreB = hurt ? '#ff9aa2' : f.colorB;
     const accent = f.accent || '#d9b76a';
@@ -1228,17 +1377,17 @@
       ctx.restore();
     }
 
-    if (attacking && f.attack && f.attack.name === 'special') {
+    if (attacking && f.attack && (f.attack.name === 'special' || f.attack.name === 'ultimate')) {
       ctx.save();
       ctx.globalCompositeOperation='lighter';
-      ctx.globalAlpha=.20 + Math.sin(performance.now()/55)*.08;
+      ctx.globalAlpha=(f.attack?.name === 'ultimate' ? .34 : .20) + Math.sin(performance.now()/55)*.08;
       const aura = ctx.createRadialGradient(0,-92,10,0,-92,92);
       aura.addColorStop(0, coreB + 'aa');
       aura.addColorStop(.45, accent + '44');
       aura.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle = aura;
       ctx.beginPath();
-      ctx.arc(0,-92,92,0,Math.PI*2);
+      ctx.arc(0,-92,f.attack?.name === 'ultimate' ? 126 : 92,0,Math.PI*2);
       ctx.fill();
       ctx.restore();
     }
@@ -1398,6 +1547,18 @@
       if (p.kind === 'dust') {
         ctx.fillStyle = p.color;
         ctx.beginPath(); ctx.arc(p.x,p.y,p.size*a,0,Math.PI*2); ctx.fill();
+      } else if (p.kind === 'slash') {
+        ctx.globalCompositeOperation='lighter';
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(2, p.size * .12) * a;
+        ctx.beginPath();
+        ctx.moveTo(p.x - p.size*.7, p.y - p.size*.18);
+        ctx.quadraticCurveTo(p.x, p.y - p.size*.55, p.x + p.size*.72, p.y + p.size*.1);
+        ctx.stroke();
+      } else if (p.kind === 'after') {
+        ctx.globalCompositeOperation='lighter';
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.ellipse(p.x,p.y,p.size*.8*a,p.size*1.8*a,0,0,Math.PI*2); ctx.fill();
       } else {
         ctx.globalCompositeOperation='lighter';
         ctx.fillStyle = p.color;
@@ -1441,6 +1602,11 @@
     const sx = shake ? (Math.random()-.5)*shake : 0;
     const sy = shake ? (Math.random()-.5)*shake : 0;
     ctx.translate(sx,sy);
+    if (cameraZoom > 1.002) {
+      ctx.translate(w*.5, h*.52);
+      ctx.scale(cameraZoom, cameraZoom);
+      ctx.translate(-w*.5, -h*.52);
+    }
 
     drawArena();
     const first = player.x < enemy.x ? player : enemy;
@@ -1449,6 +1615,12 @@
     drawFighter(second);
     drawParticles();
     drawVignette();
+
+    if (cinematic > 0) {
+      ctx.fillStyle = `rgba(0,0,0,${0.20 + cinematic*.32})`;
+      ctx.fillRect(0,0,w,h*.13);
+      ctx.fillRect(0,h*.87,w,h*.13);
+    }
     ctx.restore();
   }
 
@@ -1464,11 +1636,13 @@
     const map = {
       KeyA:'left', ArrowLeft:'left',
       KeyD:'right', ArrowRight:'right',
-      KeyW:'jump', ArrowUp:'jump', Space:'jump',
+      KeyW:'jump', ArrowUp:'jump',
+      Space:'dodge', KeyQ:'dodge',
       KeyI:'block', ShiftLeft:'block',
       KeyJ:'light',
       KeyK:'heavy',
-      KeyL:'special'
+      KeyL:'special',
+      KeyO:'ultimate'
     };
     const k = map[e.code];
     if(!k) return;
@@ -1476,7 +1650,8 @@
     input[k] = down;
     if (down && !input.pressed[k]) {
       input.pressed[k] = true;
-      if(k === 'light' || k === 'heavy' || k === 'special') startAttack(player, k);
+      if(k === 'dodge') performDodge(player);
+      if(k === 'light' || k === 'heavy' || k === 'special' || k === 'ultimate') startAttack(player, k);
     }
     if(!down) input.pressed[k]=false;
   }
@@ -1489,7 +1664,8 @@
         audio.ensure();
         btn.classList.add('active');
         input[name] = true;
-        if(name === 'light' || name === 'heavy' || name === 'special') startAttack(player, name);
+        if(name === 'dodge') performDodge(player);
+        if(name === 'light' || name === 'heavy' || name === 'special' || name === 'ultimate') startAttack(player, name);
       };
       const up = (e)=>{
         e.preventDefault();

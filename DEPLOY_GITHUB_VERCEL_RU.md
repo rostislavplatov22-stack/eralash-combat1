@@ -98,3 +98,8 @@ https://eralash-combat1.vercel.app/api/anti-cheat?secret=ТВОЙ_ADMIN_API_SECR
 ```sql
 notify pgrst, 'reload schema';
 ```
+
+
+## Combat 2.0
+
+Для этого пакета новых Supabase-таблиц не требуется. После копирования файлов достаточно Commit → Push → Vercel Ready.
