@@ -1,3 +1,7 @@
+# EraLash Combat — Dark Cinematic Real Art V4 FIXED
+
+Исправлена проблема пустого экрана: арт встроен в index.html и assets копируются в dist.
+
 # EraLash Combat — Dark Cinematic Variant 1
 
 Выбран и внедрён визуальный вариант 1: Dark Cinematic.
