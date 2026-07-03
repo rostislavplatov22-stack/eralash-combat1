@@ -1985,6 +1985,170 @@ body.dc-ref-ready{background:#020305!important}
   }
 }
 
+
+/* ==========================================================
+   Dark Cinematic Real Art V4.1 — active click zones and modal
+   The background is painted art; this layer makes every visible
+   menu/card/bottom icon behave like a real game UI.
+   ========================================================== */
+body.real-art-v4 #menu .dc-real-hotzones{
+  display:none;
+}
+
+@media (min-width: 900px){
+  body.real-art-v4 #menu .dc-real-hotzones{
+    position:absolute !important;
+    inset:0 !important;
+    z-index:92 !important;
+    display:block !important;
+    pointer-events:none !important;
+  }
+
+  body.real-art-v4 #menu .dc-real-zone{
+    position:absolute !important;
+    z-index:93 !important;
+    display:block !important;
+    pointer-events:auto !important;
+    cursor:pointer !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:12px !important;
+    color:transparent !important;
+    font-size:0 !important;
+    text-shadow:none !important;
+    outline:0 !important;
+    opacity:1 !important;
+    background:rgba(255,255,255,.001) !important;
+    box-shadow:none !important;
+    -webkit-tap-highlight-color:rgba(255,64,48,.22);
+    touch-action:manipulation;
+  }
+
+  body.real-art-v4 #menu .dc-real-zone:hover,
+  body.real-art-v4 #menu .dc-real-zone:focus-visible{
+    background:rgba(210,46,36,.105) !important;
+    box-shadow:0 0 28px rgba(255,45,35,.26), inset 0 0 0 1px rgba(255,205,120,.32) !important;
+  }
+
+  body.real-art-v4 #realStartZone{left:30.6%;top:73.3%;width:34.6%;height:10.9%;border-radius:26px!important}
+  body.real-art-v4 #realProfileZone{left:23.7%;top:2.0%;width:23.5%;height:6.7%;border-radius:12px!important}
+
+  body.real-art-v4 #realSeasonCardBtn{left:75.7%;top:12.0%;width:20.9%;height:18.2%;border-radius:12px!important}
+  body.real-art-v4 #realDailyCardBtn{left:75.7%;top:31.8%;width:20.9%;height:18.2%;border-radius:12px!important}
+  body.real-art-v4 #realMissionsCardBtn{left:75.7%;top:50.9%;width:20.9%;height:13.3%;border-radius:12px!important}
+  body.real-art-v4 #realStarsCardBtn{left:75.7%;top:65.0%;width:20.9%;height:18.4%;border-radius:12px!important}
+
+  body.real-art-v4 #realInventoryBtn{left:23.8%;top:85.4%;width:8.4%;height:9.3%;border-radius:10px!important}
+  body.real-art-v4 #realProfileBtn{left:33.9%;top:85.4%;width:8.4%;height:9.3%;border-radius:10px!important}
+  body.real-art-v4 #realAchievementsBtn{left:44.1%;top:85.4%;width:8.4%;height:9.3%;border-radius:10px!important}
+  body.real-art-v4 #realReferralsBtn{left:54.3%;top:85.4%;width:8.4%;height:9.3%;border-radius:10px!important}
+  body.real-art-v4 #realSettingsBtn{left:64.5%;top:85.4%;width:8.4%;height:9.3%;border-radius:10px!important}
+
+  /* Make the native invisible zones slightly larger and definitely clickable. */
+  body.real-art-v4 #dailyBtn{left:1.95%!important;top:10.9%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #shopBtn{left:1.95%!important;top:16.3%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #contentBtn{left:1.95%!important;top:21.7%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #missionsBtn{left:1.95%!important;top:27.1%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #bossBtn{left:1.95%!important;top:32.5%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #seasonBtn{left:1.95%!important;top:37.9%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #weeklyBtn{left:1.95%!important;top:43.3%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #inviteBtn{left:1.95%!important;top:48.7%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #promoBtn{left:1.95%!important;top:54.1%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #achievementsBtn{left:1.95%!important;top:59.5%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #launchBtn{left:1.95%!important;top:64.9%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #newsBtn{left:1.95%!important;top:70.3%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #founderBtn{left:1.95%!important;top:75.7%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #feedbackBtn{left:1.95%!important;top:81.1%!important;width:19.05%!important;height:5.5%!important}
+  body.real-art-v4 #analyticsBtn{left:1.95%!important;top:86.5%!important;width:19.05%!important;height:5.5%!important}
+}
+
+.dcv4-modal{
+  position:fixed;
+  inset:0;
+  z-index:120;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 40%, rgba(130,28,24,.18), transparent 42%),
+    rgba(0,0,0,.74);
+  backdrop-filter:blur(10px);
+}
+.dcv4-modal.show{display:flex}
+.dcv4-panel{
+  width:min(760px, calc(100vw - 24px));
+  max-height:min(78vh, 760px);
+  overflow:auto;
+  border:1px solid rgba(217,183,106,.35);
+  border-radius:22px;
+  background:
+    linear-gradient(180deg, rgba(16,14,13,.96), rgba(4,5,8,.96)),
+    radial-gradient(circle at 50% 0%, rgba(217,183,106,.12), transparent 48%);
+  box-shadow:0 30px 110px rgba(0,0,0,.84), inset 0 0 0 1px rgba(255,255,255,.055);
+  color:#f4ead3;
+}
+.dcv4-panel-head{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding:16px 18px;
+  border-bottom:1px solid rgba(217,183,106,.22);
+  background:linear-gradient(180deg,rgba(11,10,10,.96),rgba(7,7,9,.92));
+}
+.dcv4-panel-head b{
+  color:#f2d38a;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-size:12px;
+}
+.dcv4-panel-close{
+  border:1px solid rgba(217,183,106,.35);
+  background:linear-gradient(180deg,rgba(195,48,34,.38),rgba(62,14,12,.65));
+  color:#fff;
+  border-radius:12px;
+  padding:9px 12px;
+  cursor:pointer;
+  font-weight:900;
+}
+.dcv4-panel-body{
+  padding:18px;
+}
+.dcv4-panel-body .shop-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(0,0,0,.20));
+  border:1px solid rgba(217,183,106,.22);
+  border-radius:16px;
+  padding:14px;
+  margin:0 0 12px;
+}
+.dcv4-panel-body .pill,
+.dcv4-panel-body .mini-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:34px;
+  padding:8px 11px;
+  border-radius:999px;
+  border:1px solid rgba(217,183,106,.28);
+  background:rgba(255,255,255,.06);
+  color:#f4ead3;
+}
+.dcv4-panel-body .mini-btn{
+  cursor:pointer;
+  font-weight:900;
+}
+@media(max-width:760px){
+  .dcv4-modal{align-items:flex-end;padding:12px}
+  .dcv4-panel{max-height:82vh;border-radius:20px}
+}
+
 </style>
 </head>
 <body class="dc-ref-ready dc-reference-v3 real-art-v4">
@@ -2017,6 +2181,19 @@ body.dc-ref-ready{background:#020305!important}
   <div id="menu" class="menu dc-v3-menu">
     <div class="dc-v3-lobby">
       <div class="dc-v3-bg-noise"></div>
+      <div class="dc-real-hotzones" aria-label="Активные зоны Dark Cinematic меню">
+        <button id="realStartZone" class="dc-real-zone" type="button" aria-label="Начать бой"></button>
+        <button id="realProfileZone" class="dc-real-zone" type="button" aria-label="Профиль"></button>
+        <button id="realSeasonCardBtn" class="dc-real-zone" type="button" aria-label="Сезон"></button>
+        <button id="realDailyCardBtn" class="dc-real-zone" type="button" aria-label="Ежедневная награда"></button>
+        <button id="realMissionsCardBtn" class="dc-real-zone" type="button" aria-label="Задания"></button>
+        <button id="realStarsCardBtn" class="dc-real-zone" type="button" aria-label="Telegram Stars магазин"></button>
+        <button id="realInventoryBtn" class="dc-real-zone" type="button" aria-label="Инвентарь"></button>
+        <button id="realProfileBtn" class="dc-real-zone" type="button" aria-label="Профиль"></button>
+        <button id="realAchievementsBtn" class="dc-real-zone" type="button" aria-label="Достижения"></button>
+        <button id="realReferralsBtn" class="dc-real-zone" type="button" aria-label="Рефералы"></button>
+        <button id="realSettingsBtn" class="dc-real-zone" type="button" aria-label="Настройки"></button>
+      </div>
       <aside class="dc-v3-left">
         <div class="dc-v3-player">
           <div class="avatar"></div>
@@ -4079,9 +4256,51 @@ body.dc-ref-ready{background:#020305!important}
     return headers;
   }
 
+  function ensureCinematicModal(){
+    let modal = document.getElementById('dcv4Modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'dcv4Modal';
+      modal.className = 'dcv4-modal';
+      modal.innerHTML = `
+        <section class="dcv4-panel" role="dialog" aria-modal="true" aria-label="EraLash Combat panel">
+          <div class="dcv4-panel-head">
+            <b id="dcv4ModalTitle">EraLash Combat</b>
+            <button class="dcv4-panel-close" type="button">Закрыть</button>
+          </div>
+          <div id="dcv4ModalBody" class="dcv4-panel-body"></div>
+        </section>
+      `;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal || event.target.classList.contains('dcv4-panel-close')) {
+          closeCinematicModal();
+        }
+      });
+    }
+    return modal;
+  }
+
+  function closeCinematicModal(){
+    const modal = document.getElementById('dcv4Modal');
+    if (modal) modal.classList.remove('show');
+  }
+
+  function showCinematicModal(html, title = 'COMMAND PANEL'){
+    const modal = ensureCinematicModal();
+    const body = document.getElementById('dcv4ModalBody');
+    const titleEl = document.getElementById('dcv4ModalTitle');
+    if (titleEl) titleEl.textContent = title;
+    if (body) body.innerHTML = html;
+    modal.classList.add('show');
+  }
+
   function setEconomyContent(html){
     const el = economyEls().content;
     if (el) el.innerHTML = html;
+    if (document.body.classList.contains('real-art-v4') && gameState === 'menu') {
+      showCinematicModal(html, 'ERALASH COMMAND');
+    }
   }
 
   function escapeUi(value){
@@ -5019,6 +5238,75 @@ function sessionId(){
     }));
   }
 
+
+  async function loadInventoryPanel(){
+    setEconomyContent('<div class="pill">Загрузка инвентаря...</div>');
+    try {
+      const res = await fetch('/api/inventory', { headers: economyHeaders(false) });
+      const data = await res.json();
+      const items = data.inventory || data.items || [];
+      const rows = items.map(item => `
+        <div class="shop-card">
+          <div>
+            <h4>🎒 ${escapeUi(item.title || item.item_id || item.id || 'Item')}</h4>
+            <p>${escapeUi(item.description || item.rarity || 'Owned cosmetic / reward')}</p>
+          </div>
+          <span class="pill">${escapeUi(item.type || item.category || 'Owned')}</span>
+        </div>
+      `).join('');
+      setEconomyContent(`
+        <div class="pill-list">
+          <span class="pill">Inventory</span>
+          <span class="pill">${escapeUi(data.storage || 'supabase')}</span>
+        </div>
+        ${rows || '<div class="pill">Инвентарь пуст. Получи предметы через Daily, Missions, Boss Rush или Stars Shop.</div>'}
+      `);
+    } catch(_) {
+      setEconomyContent('<div class="pill">Inventory API недоступен</div>');
+    }
+  }
+
+  function loadProfilePanel(){
+    const name = profileName();
+    setEconomyContent(`
+      <div class="shop-card">
+        <div>
+          <h4>👤 ${escapeUi(name)}</h4>
+          <p>Telegram Fighter · EraLash Combat profile</p>
+          <div class="price">LVL ${appProfile.level || 1} · ${appProfile.xp || 0} XP · ${appProfile.coins || 0} coins</div>
+        </div>
+        <span class="pill">${appProfile.wins || 0}W/${appProfile.losses || 0}L</span>
+      </div>
+      <div class="pill-list">
+        <span class="pill">Matches ${appProfile.matches || 0}</span>
+        <span class="pill">Best streak ${appProfile.bestStreak || 0}</span>
+        <span class="pill">Daily streak ${appProfile.dailyStreak || 0}</span>
+      </div>
+    `);
+  }
+
+  function loadSettingsPanel(){
+    setEconomyContent(`
+      <div class="shop-card">
+        <div>
+          <h4>⚙️ Настройки</h4>
+          <p>Быстрые настройки клиента. Основные боевые системы и backend не меняются.</p>
+        </div>
+      </div>
+      <div class="pill-list">
+        <button class="mini-btn" type="button" id="dcv4MuteCopy">Звук: ${muted ? 'OFF' : 'ON'}</button>
+        <span class="pill">Telegram WebView ready</span>
+        <span class="pill">Visual V4 active zones</span>
+      </div>
+    `);
+    setTimeout(() => {
+      document.getElementById('dcv4MuteCopy')?.addEventListener('click', () => {
+        ui.muteBtn?.click();
+        loadSettingsPanel();
+      });
+    }, 0);
+  }
+
   function bindEconomyControls(){
     const els = economyEls();
     els.daily?.addEventListener('click', () => { audio.ui(); claimDaily(); });
@@ -5039,6 +5327,30 @@ function sessionId(){
     els.boss?.addEventListener('click', () => { audio.ui(); loadBossRush(); });
     els.admin?.addEventListener('click', () => { audio.ui(); loadAdmin(); });
     els.qa?.addEventListener('click', () => { audio.ui(); loadQa(); });
+
+    const bind = (id, fn) => document.getElementById(id)?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      audio.ui();
+      fn();
+    });
+
+    bind('realStartZone', () => { trackEvent('fight_start', { source:'real_art_start_zone' }); audio.ensure(); newMatch(); });
+    bind('realProfileZone', loadProfilePanel);
+    bind('realSeasonCardBtn', loadSeason);
+    bind('realDailyCardBtn', claimDaily);
+    bind('realMissionsCardBtn', loadMissions);
+    bind('realStarsCardBtn', loadShop);
+    bind('realInventoryBtn', loadInventoryPanel);
+    bind('realProfileBtn', loadProfilePanel);
+    bind('realAchievementsBtn', loadAchievements);
+    bind('realReferralsBtn', loadReferral);
+    bind('realSettingsBtn', loadSettingsPanel);
+
+    document.getElementById('inventoryFakeBtn')?.addEventListener('click', () => { audio.ui(); loadInventoryPanel(); });
+    document.getElementById('profileFakeBtn')?.addEventListener('click', () => { audio.ui(); loadProfilePanel(); });
+    document.getElementById('settingsFakeBtn')?.addEventListener('click', () => { audio.ui(); loadSettingsPanel(); });
+
     ui.shareVictoryBtn?.addEventListener('click', () => { audio.ui(); shareVictory(); });
   }
 

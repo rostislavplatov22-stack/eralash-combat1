@@ -231,3 +231,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Dark Cinematic Real Art V4
 
 Главное меню получает painted reference layer и прозрачные кликабельные зоны поверх него.
+
+
+## Dark Cinematic V4.1 Active Buttons
+
+Кнопки painted main menu теперь активны: Start Fight, left menu, right cards, bottom icons. Для разделов открывается premium modal panel поверх арт-экрана.
