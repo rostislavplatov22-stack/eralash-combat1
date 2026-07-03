@@ -1,3 +1,7 @@
+# EraLash Combat — Dark Cinematic Variant 1
+
+Выбран и внедрён визуальный вариант 1: Dark Cinematic.
+
 # EraLash Combat — Visual 4.0 Cinematic Overhaul — Dark Arena
 ## Mobile Polish 1.8
 

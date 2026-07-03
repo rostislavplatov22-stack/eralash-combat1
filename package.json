@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-visual-4-ready",
-  "version": "2.0.0",
+  "name": "eralash-combat-dark-cinematic-v1",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Visual 4.0 Cinematic Overhaul for Telegram Mini App."
+  "description": "EraLash Combat Dark Cinematic Variant 1 visual overhaul for Telegram Mini App."
 }
