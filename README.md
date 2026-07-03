@@ -236,3 +236,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Dark Cinematic V4.1 Active Buttons
 
 Кнопки painted main menu теперь активны: Start Fight, left menu, right cards, bottom icons. Для разделов открывается premium modal panel поверх арт-экрана.
+
+
+## Dark Cinematic Clickmap Fix
+
+Добавлена fail-safe click-map система для активных кнопок painted-меню.

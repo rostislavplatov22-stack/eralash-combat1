@@ -2149,6 +2149,24 @@ body.real-art-v4 #menu .dc-real-hotzones{
   .dcv4-panel{max-height:82vh;border-radius:20px}
 }
 
+
+/* Dark Cinematic V4.2 click-map feedback */
+@media (min-width: 900px){
+  body.real-art-v4 #menu .dc-v3-lobby[data-pressed-zone]::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:94;
+    pointer-events:none;
+    background:radial-gradient(circle at 45% 76%, rgba(255,50,34,.14), transparent 22%);
+    animation:dcClickPulse .18s ease-out both;
+  }
+  @keyframes dcClickPulse{
+    from{opacity:.75;filter:brightness(1.2)}
+    to{opacity:0;filter:brightness(1)}
+  }
+}
+
 </style>
 </head>
 <body class="dc-ref-ready dc-reference-v3 real-art-v4">
@@ -5355,6 +5373,92 @@ function sessionId(){
   }
 
 
+  /* Dark Cinematic Real Art V4.2 — forced click-map.
+     This is a fail-safe layer: even if transparent buttons are blocked by
+     browser/Vercel rendering, desktop clicks are mapped by coordinates and
+     routed directly to game actions. */
+  function bindRealArtClickMap(){
+    const lobby = document.querySelector('#menu .dc-v3-lobby');
+    if (!lobby) return;
+
+    const run = (fn) => {
+      try { audio.ui(); } catch(_) {}
+      try { fn(); } catch (err) { console.error('RealArt click action failed', err); }
+    };
+
+    const zones = [
+      // Left command deck
+      { id:'daily',        x1:1.6,  y1:10.7, x2:21.5, y2:16.9, fn:()=>claimDaily() },
+      { id:'shop',         x1:1.6,  y1:16.1, x2:21.5, y2:22.3, fn:()=>loadShop() },
+      { id:'content',      x1:1.6,  y1:21.5, x2:21.5, y2:27.7, fn:()=>loadContentPanel() },
+      { id:'missions',     x1:1.6,  y1:26.9, x2:21.5, y2:33.1, fn:()=>loadMissions() },
+      { id:'boss',         x1:1.6,  y1:32.3, x2:21.5, y2:38.5, fn:()=>loadBossRush() },
+      { id:'season',       x1:1.6,  y1:37.7, x2:21.5, y2:43.9, fn:()=>loadSeason() },
+      { id:'weekly',       x1:1.6,  y1:43.1, x2:21.5, y2:49.3, fn:()=>loadWeeklyLeaderboard() },
+      { id:'invite',       x1:1.6,  y1:48.5, x2:21.5, y2:54.7, fn:()=>loadReferral() },
+      { id:'promo',        x1:1.6,  y1:53.9, x2:21.5, y2:60.1, fn:()=>promoForm() },
+      { id:'achievements', x1:1.6,  y1:59.3, x2:21.5, y2:65.5, fn:()=>loadAchievements() },
+      { id:'launch',       x1:1.6,  y1:64.7, x2:21.5, y2:70.9, fn:()=>loadLaunch() },
+      { id:'news',         x1:1.6,  y1:70.1, x2:21.5, y2:76.3, fn:()=>loadNews() },
+      { id:'founder',      x1:1.6,  y1:75.5, x2:21.5, y2:81.7, fn:()=>claimFounderBonus() },
+      { id:'feedback',     x1:1.6,  y1:80.9, x2:21.5, y2:87.1, fn:()=>feedbackForm() },
+      { id:'analytics',    x1:1.6,  y1:86.3, x2:21.5, y2:93.3, fn:()=>loadAnalytics() },
+
+      // Main and top zones
+      { id:'start',        x1:30.0, y1:72.3, x2:66.4, y2:84.9, fn:()=>{ trackEvent('fight_start',{source:'real_art_clickmap'}); audio.ensure(); newMatch(); } },
+      { id:'profileTop',   x1:23.0, y1:1.4,  x2:48.0, y2:7.8,  fn:()=>loadProfilePanel() },
+      { id:'settingsTop',  x1:92.0, y1:1.0,  x2:97.7, y2:8.0,  fn:()=>loadSettingsPanel() },
+
+      // Right rail
+      { id:'seasonCard',   x1:75.1, y1:11.2, x2:97.2, y2:30.6, fn:()=>loadSeason() },
+      { id:'dailyCard',    x1:75.1, y1:31.1, x2:97.2, y2:50.8, fn:()=>claimDaily() },
+      { id:'missionCard',  x1:75.1, y1:50.9, x2:97.2, y2:64.9, fn:()=>loadMissions() },
+      { id:'starsCard',    x1:75.1, y1:64.8, x2:97.2, y2:84.4, fn:()=>loadShop() },
+
+      // Bottom navigation
+      { id:'inventory',    x1:23.0, y1:84.8, x2:33.2, y2:96.2, fn:()=>loadInventoryPanel() },
+      { id:'profile',      x1:33.2, y1:84.8, x2:43.4, y2:96.2, fn:()=>loadProfilePanel() },
+      { id:'achBottom',    x1:43.4, y1:84.8, x2:53.7, y2:96.2, fn:()=>loadAchievements() },
+      { id:'refsBottom',   x1:53.7, y1:84.8, x2:63.9, y2:96.2, fn:()=>loadReferral() },
+      { id:'settings',     x1:63.9, y1:84.8, x2:74.1, y2:96.2, fn:()=>loadSettingsPanel() }
+    ];
+
+    let lastTouchAt = 0;
+
+    const handle = (event) => {
+      if (!document.body.classList.contains('real-art-v4')) return;
+      if (ui.menu.style.display === 'none' || gameState === 'fight') return;
+      if (event.target?.closest?.('.dcv4-modal')) return;
+
+      const isTouch = event.type === 'touchend';
+      if (!isTouch && Date.now() - lastTouchAt < 650) return;
+      const p = isTouch ? event.changedTouches?.[0] : event;
+      if (!p) return;
+
+      const r = lobby.getBoundingClientRect();
+      if (r.width < 100 || r.height < 100) return;
+      if (p.clientX < r.left || p.clientX > r.right || p.clientY < r.top || p.clientY > r.bottom) return;
+
+      const x = ((p.clientX - r.left) / r.width) * 100;
+      const y = ((p.clientY - r.top) / r.height) * 100;
+      const z = zones.find(a => x >= a.x1 && x <= a.x2 && y >= a.y1 && y <= a.y2);
+      if (!z) return;
+
+      if (isTouch) lastTouchAt = Date.now();
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+
+      lobby.dataset.pressedZone = z.id;
+      setTimeout(() => { if (lobby.dataset.pressedZone === z.id) delete lobby.dataset.pressedZone; }, 180);
+      run(z.fn);
+    };
+
+    document.addEventListener('click', handle, true);
+    document.addEventListener('touchend', handle, { capture:true, passive:false });
+  }
+
+
   function initTelegram(){
     try {
       const tg = window.Telegram?.WebApp;
@@ -5420,6 +5524,7 @@ function sessionId(){
   resize();
   bindControls();
   bindEconomyControls();
+  bindRealArtClickMap();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
