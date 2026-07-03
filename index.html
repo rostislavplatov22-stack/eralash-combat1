@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Visual 4.0 cinematic overhaul, Combat 2.1, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Visual 4.1 cinematic combat framing polish, Combat 2.1, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Visual 4.0</title>
+  <title>EraLash Combat — Visual 4.1</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -577,6 +577,28 @@
       .economy-actions button{font-size:10.5px;padding:9px 10px}
     }
 
+  
+    /* =========================
+       VISUAL 4.1 — Cinematic Combat Framing Fix
+       Fixes: tiny fighters, left-side drift, mirrored enemy nameplate, weak stage focus.
+       ========================= */
+    .hud{
+      filter: drop-shadow(0 18px 38px rgba(0,0,0,.52));
+    }
+    .fighter-card{
+      backdrop-filter: blur(14px) saturate(1.15);
+    }
+    .controls{
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,.55));
+    }
+    .control-btn{
+      backdrop-filter: blur(12px) saturate(1.2);
+    }
+    @media (min-width:900px){
+      .control-btn{width:62px;height:62px;border-radius:22px}
+      .control-btn.big{width:72px;height:72px}
+    }
+
   </style>
 </head>
 <body>
@@ -970,8 +992,8 @@
     player = makeFighter('player');
     enemy = makeFighter('enemy');
     const mobileArena = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
-    player.x = w * (mobileArena ? .34 : .28);
-    enemy.x = w * (mobileArena ? .66 : .72);
+    player.x = w * (mobileArena ? .34 : .38);
+    enemy.x = w * (mobileArena ? .66 : .62);
     player.y = enemy.y = groundY;
     player.dir = 1;
     enemy.dir = -1;
@@ -1730,7 +1752,7 @@
     ctx.restore();
 
     // Layered back architecture with parallax drift.
-    const layerColors = ['rgba(18,22,33,.22)','rgba(12,16,25,.38)','rgba(6,8,14,.68)'];
+    const layerColors = ['rgba(18,22,33,.16)','rgba(12,16,25,.28)','rgba(6,8,14,.48)'];
     for(let layer=0; layer<3; layer++){
       ctx.save();
       const base = h*(.36 + layer*.055);
@@ -1894,6 +1916,30 @@
     }
     ctx.restore();
 
+    // VISUAL 4.1 — center stage focus beams and premium floor contact contrast.
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    const beam = ctx.createLinearGradient(w*.50,horizon,w*.50,h);
+    beam.addColorStop(0,'rgba(255,236,178,.00)');
+    beam.addColorStop(.34,hexA(arenaAccent,'18'));
+    beam.addColorStop(.72,'rgba(255,255,255,.045)');
+    beam.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=beam;
+    ctx.beginPath();
+    ctx.moveTo(w*.42,horizon);
+    ctx.lineTo(w*.58,horizon);
+    ctx.lineTo(w*.88,h);
+    ctx.lineTo(w*.12,h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha=.18;
+    ctx.strokeStyle=hexA(arenaAccent,'88');
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.ellipse(w*.5,floorY+4,w*.24,42,0,0,Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
     // Player/enemy spotlight zones.
     ctx.save();
     ctx.globalCompositeOperation='lighter';
@@ -1936,7 +1982,7 @@
     const dodging = f.state === 'dodge';
     const grounded = isGrounded(f);
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
-    const visualScale = coarse ? 1.18 : 1.08;
+    const visualScale = coarse ? (h < 650 ? 1.16 : 1.30) : clamp(w / 1080, 1.38, 1.78);
     const hexA = (c,a)=> (typeof c === 'string' && c[0] === '#' && c.length === 7) ? c + a : c;
     const coreA = hurt ? '#ff5161' : (f.colorA || '#11151d');
     const coreB = hurt ? '#ffd5d8' : (f.colorB || '#c92832');
@@ -1957,6 +2003,20 @@
     ctx.translate(x,y);
     ctx.scale(dir * visualScale, visualScale);
     ctx.rotate(speedLean + hurtLean + dodgeLean);
+
+    // VISUAL 4.1 — silhouette rim aura so armored characters read at gameplay distance.
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    ctx.globalAlpha = isEnemy ? .16 : .18;
+    const silhouetteAura = ctx.createRadialGradient(0,-bodyH*.58,10,0,-bodyH*.58,bodyW*1.75);
+    silhouetteAura.addColorStop(0,hexA(coreB,'55'));
+    silhouetteAura.addColorStop(.45,hexA(accent,'22'));
+    silhouetteAura.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = silhouetteAura;
+    ctx.beginPath();
+    ctx.ellipse(0,-bodyH*.58,bodyW*1.38,bodyH*.72,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.restore();
 
     // Top-tier ground contact shadow.
     ctx.save();
@@ -2275,7 +2335,10 @@
     ctx.font='950 9px Inter, Arial';
     ctx.textAlign='center';
     ctx.textBaseline='middle';
+    ctx.save();
+    if (dir < 0) ctx.scale(-1,1);
     ctx.fillText((f.name || (isEnemy?'WARDEN':'RAVEN')).slice(0,14).toUpperCase(),0,25);
+    ctx.restore();
     ctx.restore();
 
     ctx.restore();
@@ -2401,9 +2464,14 @@
       ctx.translate(-w*.5, -h*.52);
     }
 
-    // Premium camera parallax based on fighters midpoint.
-    const mid = player && enemy ? ((player.x + enemy.x) * .5 - w*.5) / Math.max(1,w) : 0;
-    ctx.translate(-mid * 18, 0);
+    // VISUAL 4.1 — premium combat camera: keeps action framed in the center instead of drifting left/right.
+    if (player && enemy) {
+      const actionMid = (player.x + enemy.x) * 0.5;
+      const desiredShift = w * 0.5 - actionMid;
+      const maxShift = w * ((window.matchMedia && window.matchMedia('(pointer:coarse)').matches) ? 0.16 : 0.26);
+      const cameraShift = clamp(desiredShift, -maxShift, maxShift);
+      ctx.translate(cameraShift, 0);
+    }
 
     drawArena();
     const first = player.x < enemy.x ? player : enemy;
