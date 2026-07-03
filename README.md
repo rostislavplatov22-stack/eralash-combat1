@@ -217,3 +217,8 @@ ADMIN_API_SECRET
 ## Visual 4.2 AAA Presentation Rebuild
 
 Добавлен широкий premium hero-screen, cinematic showcase и Command Deck вместо дешёвой узкой панели.
+
+
+## Dark Cinematic Reference V3
+
+Fullscreen lobby rebuild: крупный hero-art, левое меню, правые reward widgets, меньше ощущения веб-панели.
