@@ -1,3 +1,5 @@
+# EraLash Combat — Sprite Combat 9.3 Freeze Fix
+
 # EraLash Combat — Premium Fighters 6.1 Physics Fix
 
 Добавлен physics layer для больших premium-персонажей: движение, дистанция, hitbox/hurtbox, AI spacing, attack lunge и dust.

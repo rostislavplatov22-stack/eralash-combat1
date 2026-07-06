@@ -3228,7 +3228,10 @@ body.result-entering #result{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '9.2 DAMAGE';
+  const REAL_PHYSICS_PATCH = '9.3 FREEZE FIX';
+  let hudDelayTimer = 0;
+  let lastHudSnapshot = { pHp:null, eHp:null, pEnergy:null, eEnergy:null, timer:null, rounds:null };
+  let loopCrashCount = 0;
 
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
@@ -3490,7 +3493,7 @@ body.result-entering #result{
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.2 · REAL SHEET ANIMATIONS');
+    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.3 · DAMAGE + FREEZE FIX');
     updateHUD(true);
   }
 
@@ -4391,24 +4394,41 @@ body.result-entering #result{
   }
 
   function updateHUD(force=false){
-    ui.pHp.style.width = player.hp + '%';
-    ui.eHp.style.width = enemy.hp + '%';
-    ui.pEnergy.style.width = player.energy + '%';
-    ui.eEnergy.style.width = enemy.energy + '%';
-    ui.timer.textContent = Math.ceil(roundTime);
-    ui.rounds.textContent = playerRounds + ' : ' + enemyRounds;
+    if (!player || !enemy || !ui.pHp || !ui.eHp) return;
 
+    const pHp = Math.round(clamp(player.hp, 0, player.maxHp || 100));
+    const eHp = Math.round(clamp(enemy.hp, 0, enemy.maxHp || 110));
+    const pEnergy = Math.round(clamp(player.energy, 0, 100));
+    const eEnergy = Math.round(clamp(enemy.energy, 0, 100));
+    const timerValue = Math.ceil(Math.max(0, roundTime));
+    const roundsValue = playerRounds + ' : ' + enemyRounds;
+
+    if (force || lastHudSnapshot.pHp !== pHp) ui.pHp.style.width = pHp + '%';
+    if (force || lastHudSnapshot.eHp !== eHp) ui.eHp.style.width = eHp + '%';
+    if (force || lastHudSnapshot.pEnergy !== pEnergy) ui.pEnergy.style.width = pEnergy + '%';
+    if (force || lastHudSnapshot.eEnergy !== eEnergy) ui.eEnergy.style.width = eEnergy + '%';
+    if (force || lastHudSnapshot.timer !== timerValue) ui.timer.textContent = timerValue;
+    if (force || lastHudSnapshot.rounds !== roundsValue) ui.rounds.textContent = roundsValue;
+
+    // 9.3 Freeze Fix:
+    // Old version created a new setTimeout every frame. After a few seconds the browser
+    // could queue hundreds of delayed HP updates and the fight looked frozen.
+    // Now the delayed damage bar is updated only when HP actually changes.
+    const hpChanged = force || lastHudSnapshot.pHp !== pHp || lastHudSnapshot.eHp !== eHp;
     if (force) {
-      player.hpDelay = player.hp;
-      enemy.hpDelay = enemy.hp;
-      ui.pDelay.style.width = player.hpDelay + '%';
-      ui.eDelay.style.width = enemy.hpDelay + '%';
-    } else {
-      setTimeout(()=>{
-        ui.pDelay.style.width = player.hp + '%';
-        ui.eDelay.style.width = enemy.hp + '%';
-      }, 260);
+      player.hpDelay = pHp;
+      enemy.hpDelay = eHp;
+      if (ui.pDelay) ui.pDelay.style.width = pHp + '%';
+      if (ui.eDelay) ui.eDelay.style.width = eHp + '%';
+    } else if (hpChanged && !hudDelayTimer) {
+      hudDelayTimer = window.setTimeout(()=>{
+        hudDelayTimer = 0;
+        if (ui.pDelay && player) ui.pDelay.style.width = Math.round(clamp(player.hp, 0, player.maxHp || 100)) + '%';
+        if (ui.eDelay && enemy) ui.eDelay.style.width = Math.round(clamp(enemy.hp, 0, enemy.maxHp || 110)) + '%';
+      }, 220);
     }
+
+    lastHudSnapshot = { pHp, eHp, pEnergy, eEnergy, timer: timerValue, rounds: roundsValue };
   }
 
   function updateParticles(dt){
@@ -4429,11 +4449,21 @@ body.result-entering #result{
   }
 
   function update(dt){
+    if (!Number.isFinite(dt) || dt <= 0) dt = .016;
+    dt = Math.min(.033, dt);
+
     if (gameState === 'menu' || gameState === 'result') return;
 
+    // 9.3 Freeze Fix: never let hitStop/slowMo/camera values become NaN or permanent.
+    if (!Number.isFinite(hitStop)) hitStop = 0;
+    if (!Number.isFinite(slowMo) || slowMo <= 0) slowMo = 1;
+    if (!Number.isFinite(cameraZoom) || cameraZoom <= 0) cameraZoom = 1;
+    if (!Number.isFinite(roundFreeze)) roundFreeze = 0;
+
     if (hitStop > 0) {
-      hitStop -= dt;
+      hitStop = Math.max(0, hitStop - dt);
       updateParticles(dt*.45);
+      updateHUD();
       return;
     }
 
@@ -5642,8 +5672,21 @@ body.result-entering #result{
   function loop(t){
     const raw = Math.min(.033, (t - last) / 1000 || .016);
     last = t;
-    update(raw);
-    render();
+    try {
+      update(raw);
+      render();
+    } catch (err) {
+      loopCrashCount += 1;
+      console.error('[EraLash Combat] recovered game loop error', err);
+      hitStop = 0;
+      slowMo = 1;
+      cameraZoom = 1;
+      roundFreeze = 0;
+      if (ui && ui.debug) {
+        ui.debug.style.display = 'block';
+        ui.debug.innerHTML = 'SPRITE COMBAT 9.3<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+      }
+    }
     raf = requestAnimationFrame(loop);
   }
 
@@ -5695,6 +5738,16 @@ body.result-entering #result{
 
     window.addEventListener('keydown', e=>key(e,true), {passive:false});
     window.addEventListener('keyup', e=>key(e,false), {passive:false});
+    function resetLiveInput(){
+      input.left = input.right = input.jump = input.dodge = input.block = false;
+      input.light = input.heavy = input.special = input.ultimate = false;
+      input.pressed = Object.create(null);
+      document.querySelectorAll('.control-btn.active').forEach(btn=>btn.classList.remove('active'));
+    }
+    window.addEventListener('blur', resetLiveInput);
+    document.addEventListener('visibilitychange', ()=>{ if (document.hidden) resetLiveInput(); });
+    window.addEventListener('pointercancel', resetLiveInput);
+
 
     ui.startBtn.addEventListener('click',()=>{trackEvent('fight_start');audio.ui();audio.ensure();newMatch();});
     ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
