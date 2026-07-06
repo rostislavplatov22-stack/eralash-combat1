@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-sprite-combat-9-ready",
-  "version": "2.7.0",
+  "name": "eralash-combat-combat-feel-10-ready",
+  "version": "2.8.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Sprite Combat 9.0: real uploaded sprite sheets for idle, walk, attack and block, replacing static PNG fighter visuals."
+  "description": "EraLash Combat Combat Feel 10.0: cinematic hit sparks, hit stop, damage numbers, KO burst, combo feedback and premium combat polish."
 }

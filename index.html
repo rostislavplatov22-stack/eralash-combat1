@@ -2735,9 +2735,39 @@ body.result-entering #result{
   to{opacity:1;filter:blur(0);transform:scale(1)}
 }
 
+
+/* Combat Feel 10.0 — premium hit feedback, KO drama and readable damage feedback */
+body.combat-feel-10 #comboTag{
+  border-color:rgba(255,65,76,.62);
+  box-shadow:0 0 28px rgba(213,49,61,.28), inset 0 0 18px rgba(217,183,106,.12);
+  background:linear-gradient(180deg,rgba(55,9,13,.72),rgba(0,0,0,.54));
+}
+body.combat-feel-10.hp-pulse-player #pHp,
+body.combat-feel-10.hp-pulse-enemy #eHp{
+  animation:hpImpact10 .28s cubic-bezier(.18,.9,.18,1) both;
+}
+body.combat-feel-10.hp-pulse-player #pDelay,
+body.combat-feel-10.hp-pulse-enemy #eDelay{
+  filter:drop-shadow(0 0 16px rgba(255,70,70,.65));
+}
+@keyframes hpImpact10{
+  0%{filter:brightness(2.25) saturate(1.7); transform:scaleY(1.5)}
+  48%{filter:brightness(1.4) saturate(1.25); transform:scaleY(1.16)}
+  100%{filter:brightness(1) saturate(1); transform:scaleY(1)}
+}
+body.combat-feel-10 .center-callout .big{
+  text-shadow:0 0 32px rgba(255,57,70,.45),0 14px 44px rgba(0,0,0,.9);
+}
+body.combat-feel-10 .center-callout .small{
+  color:#f4d59a;
+}
+body.combat-feel-10 .pause-btn{
+  box-shadow:0 0 22px rgba(217,183,106,.18), inset 0 0 18px rgba(255,255,255,.05);
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -3234,6 +3264,8 @@ body.result-entering #result{
   let comboDamage = 0;
   let matchMaxCombo = 0;
   let lastHitAt = 0;
+  let roundIntroTimer = 0;
+  let combatFeel10T = 0;
   let telegramContext = { insideTelegram:false, user:null, initData:'' };
   let pendingStarsItemId = '';
   let appProfile = loadProfile();
@@ -3310,6 +3342,15 @@ body.result-entering #result{
       this.tone(180,.07,'square',.055,.55);
     }
     ui(){ this.tone(620,.045,'triangle',.04,1.25); }
+    ko(){
+      this.tone(55,.32,'sawtooth',.18,.22);
+      this.tone(440,.18,'triangle',.08,.62);
+      this.tone(1180,.06,'square',.035,.8);
+    }
+    round(){
+      this.tone(180,.08,'triangle',.045,1.45);
+      this.tone(520,.08,'triangle',.035,1.2);
+    }
   }
   const audio = new AudioLite();
 
@@ -3531,7 +3572,11 @@ body.result-entering #result{
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.4 · ROUND + PAUSE FIX');
+    showCallout('ROUND ' + roundIndex, 'COMBAT FEEL 10.0 · CINEMATIC IMPACT');
+    if (roundIntroTimer) clearTimeout(roundIntroTimer);
+    roundIntroTimer = window.setTimeout(()=>{
+      if (gameState === 'fight' && !roundResolving) { showCallout('FIGHT', 'Make every hit count'); audio.round(); }
+    }, 760);
     updateHUD(true);
   }
 
@@ -3908,8 +3953,10 @@ body.result-entering #result{
       shake = Math.max(shake, 10);
       flash = Math.max(flash, .16);
       audio.tone(120,.11,'sawtooth',.075,.55);
+      particles.push({kind:'shockwave', x:f.x + f.dir*34, y:f.y-96, vx:0, vy:0, life:.28, max:.28, size:60, color:f.colorB});
     } else {
       audio.tone(type==='heavy'?160:250,.045,'square',.025,.9);
+      if (type === 'heavy') particles.push({kind:'shockwave', x:f.x + f.dir*28, y:f.y-110, vx:0, vy:0, life:.22, max:.22, size:44, color:f.colorB});
     }
 
     f.state = 'attack';
@@ -4037,7 +4084,7 @@ body.result-entering #result{
     defender.stateT = 0;
 
     attacker.energy = clamp(attacker.energy + atk.energyGain, 0, 100);
-    hitStop = Math.max(hitStop, atk.hitStop);
+    hitStop = Math.max(hitStop, (atk.hitStop || .06) * (blocked ? .75 : 1.22));
     if (!blocked) {
       if (performance.now() - lastHitAt < 1500) comboCount += 1;
       else comboCount = 1;
@@ -4050,12 +4097,16 @@ body.result-entering #result{
 
     shake = Math.max(shake, blocked ? 6 : atk.name === 'ultimate' ? 30 : atk.name === 'special' ? 21 : atk.name === 'heavy' ? 16 : 9);
     flash = Math.max(flash, blocked ? .08 : atk.name === 'ultimate' ? .34 : atk.name === 'special' ? .21 : .12);
-    if (atk.name === 'ultimate') { cinematic = .65; cameraZoom = 1.12; }
+    if (atk.name === 'ultimate') { cinematic = .82; cameraZoom = 1.16; }
+    else if (!blocked && atk.name === 'special') { cinematic = Math.max(cinematic,.38); cameraZoom = Math.max(cameraZoom,1.075); }
+    else if (!blocked && atk.name === 'heavy') { cameraZoom = Math.max(cameraZoom,1.045); }
 
     spawnHitSpark(defender.x - facing*28, defender.y - (defender.collisionH || defender.h)*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
+    spawnPremiumImpact(attacker, defender, atk, blocked);
     spawnSlashWave(attacker, defender, atk.name);
     spawnFootDust(defender, blocked ? 4 : atk.name === 'ultimate' ? 16 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5, blocked ? '#8edcff' : attacker.colorB);
-    floatingText(blocked ? 'BLOCK' : '-' + dmg, defender.x, defender.y - defender.h*.88, blocked ? '#8edcff' : '#fff3d1');
+    floatingDamage(blocked ? 'BLOCK' : '-' + dmg, defender.x, defender.y - defender.h*.88, blocked ? '#8edcff' : '#fff3d1', atk.name);
+    pulseCombatUi(defender, blocked);
     audio.hit(blocked ? 'block' : atk.name);
     tryHaptic(blocked ? 'light' : atk.name);
     updateHUD();
@@ -4108,6 +4159,9 @@ body.result-entering #result{
       enemyRounds++;
     }
 
+    spawnKOBurst(winner);
+    audio.ko();
+    combatFeel10T = 1.15;
     showCallout(winner === 'player' ? 'K.O.' : 'DOWN', winner === 'player' ? player.name + ' wins the round' : enemy.name + ' wins the round');
     updateHUD(true);
     trackEvent('round_end', { winner, playerRounds, enemyRounds, roundIndex });
@@ -4143,7 +4197,7 @@ body.result-entering #result{
     else if (pDead && eDead) winner = player.hp >= enemy.hp ? 'player' : 'enemy';
     if (ui.debug) {
       ui.debug.style.display = 'block';
-      ui.debug.innerHTML = 'SPRITE COMBAT 9.4<br>ROUND END CHECK<br>' + reason + '<br>Raven HP ' + Math.round(player.hp) + ' · Warden HP ' + Math.round(enemy.hp);
+      ui.debug.innerHTML = 'COMBAT FEEL 10.0<br>ROUND END CHECK<br>' + reason + '<br>Raven HP ' + Math.round(player.hp) + ' · Warden HP ' + Math.round(enemy.hp);
     }
     finishRound(winner);
   }
@@ -4273,6 +4327,99 @@ body.result-entering #result{
 
   function floatingText(text,x,y,color){
     texts.push({text,x,y,vy:-58,life:.72,max:.72,color});
+  }
+
+  function pulseCombatUi(defender, blocked=false){
+    try {
+      const cls = defender && defender.id === 'player' ? 'hp-pulse-player' : 'hp-pulse-enemy';
+      document.body.classList.remove(cls);
+      void document.body.offsetWidth;
+      document.body.classList.add(cls);
+      window.setTimeout(() => document.body.classList.remove(cls), blocked ? 170 : 310);
+    } catch (_) {}
+  }
+
+  function floatingDamage(text,x,y,color,type='light'){
+    const scale = type === 'ultimate' ? 1.38 : type === 'special' ? 1.22 : type === 'heavy' ? 1.12 : 1;
+    texts.push({
+      text,
+      x:x + (Math.random()-.5)*26,
+      y:y + (Math.random()-.5)*18,
+      vy: type === 'ultimate' ? -92 : -72,
+      life: type === 'ultimate' ? 1.05 : .88,
+      max: type === 'ultimate' ? 1.05 : .88,
+      color,
+      scale
+    });
+  }
+
+  function spawnPremiumImpact(attacker, defender, atk, blocked=false){
+    const type = atk?.name || 'light';
+    const facing = Math.sign(defender.x - attacker.x) || attacker.dir || 1;
+    const color = blocked ? '#8edcff' : (type === 'ultimate' ? '#fff0b7' : attacker.colorB || '#ff3946');
+    const cx = defender.x - facing * (blocked ? 18 : 36);
+    const cy = defender.y - (defender.collisionH || defender.h || 190) * (type === 'ultimate' ? .70 : .60);
+    const power = type === 'ultimate' ? 1.9 : type === 'special' ? 1.45 : type === 'heavy' ? 1.22 : .9;
+
+    // cinematic radial burst
+    particles.push({kind:'shockwave', x:cx, y:cy, vx:0, vy:0, life:.38*power, max:.38*power, size:54*power, color});
+    particles.push({kind:'shockwave', x:cx, y:defender.y-18, vx:0, vy:0, life:.46*power, max:.46*power, size:82*power, color:'rgba(217,183,106,.85)'});
+
+    const lines = blocked ? 10 : Math.round(12 + power*12);
+    for(let i=0;i<lines;i++){
+      const a = (-facing * 0.08) + (Math.random()-.5)*1.25 + (facing > 0 ? Math.PI : 0);
+      const len = (36 + Math.random()*75) * power;
+      const speed = (220 + Math.random()*560) * power;
+      particles.push({
+        kind:'impactLine',
+        x:cx + (Math.random()-.5)*20,
+        y:cy + (Math.random()-.5)*38,
+        vx:Math.cos(a)*speed,
+        vy:Math.sin(a)*speed*.42 - Math.random()*90,
+        life:.22 + Math.random()*.16,
+        max:.36,
+        size:len,
+        color,
+        angle:a
+      });
+    }
+
+    const chunks = blocked ? 8 : Math.round(8 + power*8);
+    for(let i=0;i<chunks;i++){
+      particles.push({
+        kind:'ember',
+        x:cx + (Math.random()-.5)*34,
+        y:cy + (Math.random()-.5)*30,
+        vx:(Math.random()-.5)*380*power,
+        vy:-80-Math.random()*340*power,
+        life:.42+Math.random()*.28,
+        max:.72,
+        size:2+Math.random()*5*power,
+        color: i%3===0 ? '#fff3d1' : color
+      });
+    }
+
+    if (!blocked && (type === 'heavy' || type === 'special' || type === 'ultimate')) {
+      showCombatWord(type === 'ultimate' ? 'DEVASTATING' : type === 'special' ? 'RIFT STRIKE' : 'CRUSH', cx, cy - 72, color);
+    }
+  }
+
+  function showCombatWord(word,x,y,color){
+    texts.push({text:word,x,y,vy:-42,life:.72,max:.72,color,scale:1.28});
+  }
+
+  function spawnKOBurst(winner){
+    const loser = winner === 'player' ? enemy : player;
+    const color = winner === 'player' ? '#ff3946' : '#55c7ff';
+    const x = loser ? loser.x : w*.5;
+    const y = loser ? loser.y - (loser.collisionH || loser.h || 180)*.58 : h*.52;
+    particles.push({kind:'shockwave', x, y, vx:0, vy:0, life:.92, max:.92, size:150, color:'#fff0b7'});
+    particles.push({kind:'shockwave', x, y:groundY-16, vx:0, vy:0, life:1.1, max:1.1, size:220, color});
+    for(let i=0;i<54;i++){
+      const a = Math.random()*Math.PI*2;
+      const s = 180 + Math.random()*720;
+      particles.push({kind:i%2?'impactLine':'ember', x, y, vx:Math.cos(a)*s, vy:Math.sin(a)*s*.55-120, life:.52+Math.random()*.48, max:1, size:10+Math.random()*54, color:i%3 ? color : '#fff3d1', angle:a});
+    }
   }
 
   function stageBounds(){
@@ -4609,6 +4756,7 @@ body.result-entering #result{
       updateComboTag();
     }
     cinematic = Math.max(0, cinematic - dt);
+    combatFeel10T = Math.max(0, combatFeel10T - dt);
     cameraZoom = lerp(cameraZoom, 1, dt*2.6);
 
     const sdt = dt * slowMo;
@@ -5684,6 +5832,42 @@ body.result-entering #result{
         g.addColorStop(1,'rgba(0,0,0,0)');
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.ellipse(p.x,p.y,p.size*1.0*a,p.size*2.1*a,0,0,Math.PI*2); ctx.fill();
+      } else if (p.kind === 'impactLine') {
+        ctx.globalCompositeOperation='lighter';
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(2, 5*a);
+        ctx.lineCap = 'round';
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 20*a;
+        const ang = p.angle || 0;
+        const len = Math.max(10, p.size) * a;
+        ctx.beginPath();
+        ctx.moveTo(p.x - Math.cos(ang)*len*.42, p.y - Math.sin(ang)*len*.42);
+        ctx.lineTo(p.x + Math.cos(ang)*len*.58, p.y + Math.sin(ang)*len*.58);
+        ctx.stroke();
+      } else if (p.kind === 'shockwave') {
+        ctx.globalCompositeOperation='lighter';
+        const age = 1 - a;
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(1, 5*a);
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 18*a;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, p.size*(.30+age*1.15), p.size*(.10+age*.42), 0, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.globalAlpha *= .25*a;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, p.size*(.24+age*.65), p.size*(.08+age*.25), 0, 0, Math.PI*2);
+        ctx.fill();
+      } else if (p.kind === 'ember') {
+        ctx.globalCompositeOperation='lighter';
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 12*a;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,Math.max(1,p.size*a),0,Math.PI*2);
+        ctx.fill();
       } else {
         ctx.globalCompositeOperation='lighter';
         const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,Math.max(2,p.size*3));
@@ -5699,7 +5883,7 @@ body.result-entering #result{
       const a=clamp(t.life/t.max,0,1);
       ctx.save();
       ctx.globalAlpha=a;
-      ctx.font='950 19px Inter, Arial';
+      ctx.font='950 ' + Math.round(19 * (t.scale || 1)) + 'px Inter, Arial';
       ctx.textAlign='center';
       ctx.textBaseline='middle';
       ctx.shadowColor='rgba(0,0,0,.95)';
@@ -5733,6 +5917,19 @@ body.result-entering #result{
     ctx.fillStyle=side;
     ctx.fillRect(0,0,w,h);
     ctx.restore();
+
+    if (combatFeel10T > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha = Math.min(.24, combatFeel10T*.22);
+      const k = ctx.createRadialGradient(w*.5,h*.52,w*.08,w*.5,h*.52,w*.70);
+      k.addColorStop(0,'rgba(255,240,183,.22)');
+      k.addColorStop(.42,'rgba(214,43,52,.13)');
+      k.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = k;
+      ctx.fillRect(0,0,w,h);
+      ctx.restore();
+    }
 
     if (flash > 0) {
       ctx.save();
@@ -5824,7 +6021,7 @@ body.result-entering #result{
       roundFreeze = 0;
       if (ui && ui.debug) {
         ui.debug.style.display = 'block';
-        ui.debug.innerHTML = 'SPRITE COMBAT 9.4<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+        ui.debug.innerHTML = 'COMBAT FEEL 10.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
       }
     }
     raf = requestAnimationFrame(loop);

@@ -295,3 +295,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Sprite Combat 9.4
 
 Fixed round completion at 0 HP and added in-game pause menu.
+
+
+## Combat Feel 10.0
+
+Добавлены hit sparks, shockwaves, damage numbers, KO burst, усиленный hit stop, camera shake и premium feedback боя.
