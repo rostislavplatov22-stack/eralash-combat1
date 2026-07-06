@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Sprite Combat 9.1 Visible Fix</title>
+  <title>EraLash Combat — Sprite Combat 9.4 Round + Pause Fix</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -89,6 +89,17 @@
     .combo-tag{position:absolute;z-index:31;right:calc(18px + env(safe-area-inset-right));top:calc(104px + env(safe-area-inset-top));padding:8px 12px;border:1px solid rgba(217,183,106,.35);border-radius:999px;background:linear-gradient(180deg,rgba(10,12,16,.76),rgba(0,0,0,.46));box-shadow:0 14px 40px rgba(0,0,0,.35);font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:#fff;pointer-events:none;display:none}
     .combo-tag b{color:var(--gold);font-size:18px;margin-right:6px}
     .debug{position:absolute;left:12px;bottom:100px;z-index:60;color:#fff;background:rgba(0,0,0,.45);font-size:11px;padding:7px 9px;border-radius:10px;display:none}
+    .pause-btn{position:absolute;right:calc(18px + env(safe-area-inset-right));top:calc(94px + env(safe-area-inset-top));z-index:66;width:46px;height:46px;border-radius:16px;border:1px solid rgba(217,183,106,.42);background:linear-gradient(180deg,rgba(20,18,14,.82),rgba(0,0,0,.58));color:#ffe7ad;font-weight:1000;letter-spacing:.06em;box-shadow:0 16px 34px rgba(0,0,0,.38),inset 0 0 0 1px rgba(255,255,255,.04);display:none;place-items:center;pointer-events:auto;touch-action:manipulation}
+    body.is-fighting .pause-btn{display:grid}
+    .pause-btn:active{transform:translateY(2px) scale(.96)}
+    .pause-overlay{position:absolute;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 42%,rgba(30,18,12,.64),rgba(0,0,0,.82) 58%,rgba(0,0,0,.92));backdrop-filter:blur(8px);pointer-events:auto}
+    .pause-overlay.show{display:flex}
+    .pause-card{width:min(420px,calc(100vw - 32px));border:1px solid rgba(217,183,106,.34);border-radius:28px;background:linear-gradient(180deg,rgba(12,12,14,.92),rgba(0,0,0,.78));box-shadow:0 30px 90px rgba(0,0,0,.62),inset 0 0 0 1px rgba(255,255,255,.045);padding:26px 22px;text-align:center}
+    .pause-card .kicker{color:var(--gold);font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:900}
+    .pause-card h2{margin:8px 0 8px;font-size:clamp(34px,8vw,58px);letter-spacing:.12em;text-transform:uppercase;color:#fff;font-family:Cinzel,Georgia,serif}
+    .pause-card p{margin:0 0 18px;color:rgba(255,244,220,.72);font-size:14px;line-height:1.45}
+    .pause-card .btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
     @media (max-width:700px){
       .menu,.result{padding:calc(12px + env(safe-area-inset-top)) 0 calc(96px + env(safe-area-inset-bottom));align-items:flex-start}
       .menu-panel{width:calc(100% - 22px);margin:0;padding:22px 16px;border-radius:24px}
@@ -2966,6 +2977,22 @@ body.result-entering #result{
     </div>
   </div>
 
+
+  <button id="pauseBtn" class="pause-btn" type="button" aria-label="Pause">Ⅱ</button>
+
+  <div id="pauseOverlay" class="pause-overlay" aria-hidden="true">
+    <div class="pause-card">
+      <div class="kicker">Combat Paused</div>
+      <h2>PAUSE</h2>
+      <p>Бой остановлен. Таймер, AI, hitbox, input и урон заморожены до продолжения.</p>
+      <div class="btn-row">
+        <button id="resumeBtn" type="button">Продолжить</button>
+        <button id="pauseRestartBtn" class="secondary" type="button">Рестарт</button>
+        <button id="pauseMenuBtn" class="secondary" type="button">Меню</button>
+      </div>
+    </div>
+  </div>
+
   <div class="controls">
     <div class="pad">
       <div class="control-btn" data-input="left">◀</div>
@@ -3167,7 +3194,12 @@ body.result-entering #result{
     fight5PlayerStyle: document.getElementById('fight5PlayerStyle'),
     fight5EnemyName: document.getElementById('fight5EnemyName'),
     fight5EnemyStyle: document.getElementById('fight5EnemyStyle'),
-    fight5ArenaName: document.getElementById('fight5ArenaName')
+    fight5ArenaName: document.getElementById('fight5ArenaName'),
+    pauseBtn: document.getElementById('pauseBtn'),
+    pauseOverlay: document.getElementById('pauseOverlay'),
+    resumeBtn: document.getElementById('resumeBtn'),
+    pauseRestartBtn: document.getElementById('pauseRestartBtn'),
+    pauseMenuBtn: document.getElementById('pauseMenuBtn')
   };
 
   const DPR_MAX = 2;
@@ -3181,6 +3213,10 @@ body.result-entering #result{
   let last = 0;
   let raf = 0;
   let gameState = 'menu';
+  let pausedFromState = 'fight';
+  let roundResolving = false;
+  let matchFinalized = false;
+  let roundEndTimer = 0;
   let roundTime = ROUND_TIME;
   let roundFreeze = 0;
   let hitStop = 0;
@@ -3458,6 +3494,8 @@ body.result-entering #result{
   };
 
   function resetRoundPositions(){
+    roundResolving = false;
+    if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
     applyAbilityConfig();
     player = makeFighter('player');
     enemy = makeFighter('enemy');
@@ -3493,7 +3531,7 @@ body.result-entering #result{
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.3 · DAMAGE + FREEZE FIX');
+    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.4 · ROUND + PAUSE FIX');
     updateHUD(true);
   }
 
@@ -3542,6 +3580,10 @@ body.result-entering #result{
 
 
   function newMatch(){
+    matchFinalized = false;
+    roundResolving = false;
+    if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
+    setPaused(false, true);
     playerRounds = 0;
     enemyRounds = 0;
     roundIndex = 1;
@@ -4020,6 +4062,8 @@ body.result-entering #result{
 
     if (defender.hp <= 0) {
       finishRound(attacker.id === 'player' ? 'player' : 'enemy');
+    } else {
+      forceRoundEndCheck('apply-hit');
     }
   }
 
@@ -4036,35 +4080,87 @@ body.result-entering #result{
   }
 
   function finishRound(winner){
-    if (gameState !== 'fight') return;
+    // 9.4 Round Fix: round resolution is now guarded and deterministic.
+    // Previous builds could leave the game in fight/roundEnd with HP at 0 because
+    // multiple states/timers competed after sprite combat changes.
+    if (gameState !== 'fight' || roundResolving || matchFinalized) return;
+    if (!player || !enemy) return;
+
+    winner = winner === 'enemy' ? 'enemy' : 'player';
+    roundResolving = true;
     gameState = 'roundEnd';
-    roundFreeze = 1.4;
+    roundFreeze = 1.55;
+    hitStop = 0;
     slowMo = .42;
     shake = Math.max(shake, 18);
     flash = Math.max(flash, .28);
-    if (winner === 'player') playerRounds++; else enemyRounds++;
+
+    // Freeze combat input during the K.O. beat.
+    input.left = input.right = input.jump = input.dodge = input.block = false;
+    input.light = input.heavy = input.special = input.ultimate = false;
+    input.pressed = Object.create(null);
+
+    if (winner === 'player') {
+      enemy.hp = 0;
+      playerRounds++;
+    } else {
+      player.hp = 0;
+      enemyRounds++;
+    }
+
     showCallout(winner === 'player' ? 'K.O.' : 'DOWN', winner === 'player' ? player.name + ' wins the round' : enemy.name + ' wins the round');
     updateHUD(true);
+    trackEvent('round_end', { winner, playerRounds, enemyRounds, roundIndex });
 
-    setTimeout(() => {
+    if (roundEndTimer) clearTimeout(roundEndTimer);
+    roundEndTimer = window.setTimeout(() => {
+      roundEndTimer = 0;
+      if (matchFinalized) return;
+
       if (playerRounds >= ROUND_WINS || enemyRounds >= ROUND_WINS) {
         endMatch(playerRounds > enemyRounds);
-      } else {
-        roundIndex++;
-        gameState = 'fight';
-        resetRoundPositions();
+        return;
       }
-    }, 1500);
+
+      roundIndex++;
+      resetRoundPositions();
+      gameState = 'fight';
+      roundFreeze = 1.35;
+      roundResolving = false;
+      showCallout('ROUND ' + roundIndex, 'Fight continues');
+      updateHUD(true);
+    }, 1450);
+  }
+
+  function forceRoundEndCheck(reason=''){
+    if (gameState !== 'fight' || roundResolving || matchFinalized || !player || !enemy) return;
+    const pDead = Number(player.hp) <= 0;
+    const eDead = Number(enemy.hp) <= 0;
+    if (!pDead && !eDead) return;
+
+    let winner = 'player';
+    if (pDead && !eDead) winner = 'enemy';
+    else if (pDead && eDead) winner = player.hp >= enemy.hp ? 'player' : 'enemy';
+    if (ui.debug) {
+      ui.debug.style.display = 'block';
+      ui.debug.innerHTML = 'SPRITE COMBAT 9.4<br>ROUND END CHECK<br>' + reason + '<br>Raven HP ' + Math.round(player.hp) + ' · Warden HP ' + Math.round(enemy.hp);
+    }
+    finishRound(winner);
   }
 
   function endMatch(victory){
+    if (matchFinalized) return;
+    matchFinalized = true;
+    roundResolving = false;
+    if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
+    setPaused(false, true);
     gameState = 'result';
     document.body.classList.remove('is-fighting','fight-entering');
     document.body.classList.add('result-entering');
     window.setTimeout(()=>document.body.classList.remove('result-entering'), 520);
     hideTelegramMainButton();
     const rewards = grantRewards(victory);
-    trackEvent('fight_finish', { result:victory ? 'win' : 'loss', rewards, playerRounds, enemyRounds, duration:Math.max(0, Math.round(99 - timer)) });
+    trackEvent('fight_finish', { result:victory ? 'win' : 'loss', rewards, playerRounds, enemyRounds, duration:Math.max(0, Math.round(ROUND_TIME - roundTime)) });
     ui.result.style.display = 'flex';
     ui.resultTitle.textContent = victory ? 'VICTORY' : 'DEFEAT';
     ui.resultKicker.textContent = victory ? 'ARENA CLAIMED' : 'MATCH LOST';
@@ -4081,6 +4177,41 @@ body.result-entering #result{
       `;
     }
     sendBattleResult(victory, rewards);
+  }
+
+  function setPaused(paused, silent=false){
+    if (paused) {
+      if (gameState !== 'fight') return;
+      pausedFromState = gameState;
+      gameState = 'paused';
+      hitStop = 0;
+      input.left = input.right = input.jump = input.dodge = input.block = false;
+      input.light = input.heavy = input.special = input.ultimate = false;
+      input.pressed = Object.create(null);
+      document.querySelectorAll('.control-btn.active').forEach(btn=>btn.classList.remove('active'));
+      if (ui.pauseOverlay) {
+        ui.pauseOverlay.classList.add('show');
+        ui.pauseOverlay.setAttribute('aria-hidden','false');
+      }
+      if (!silent) { audio.ui(); showCallout('PAUSED', 'Combat suspended'); }
+      return;
+    }
+
+    if (gameState === 'paused') gameState = pausedFromState || 'fight';
+    if (ui.pauseOverlay) {
+      ui.pauseOverlay.classList.remove('show');
+      ui.pauseOverlay.setAttribute('aria-hidden','true');
+    }
+    if (!silent && gameState === 'fight') {
+      roundFreeze = Math.max(roundFreeze, .18);
+      showCallout('FIGHT', 'Round ' + roundIndex);
+      audio.ui();
+    }
+  }
+
+  function togglePause(){
+    if (gameState === 'paused') setPaused(false);
+    else if (gameState === 'fight') setPaused(true);
   }
 
   function spawnHitSpark(x,y,color,type){
@@ -4453,6 +4584,10 @@ body.result-entering #result{
     dt = Math.min(.033, dt);
 
     if (gameState === 'menu' || gameState === 'result') return;
+    if (gameState === 'paused') {
+      updateHUD();
+      return;
+    }
 
     // 9.3 Freeze Fix: never let hitStop/slowMo/camera values become NaN or permanent.
     if (!Number.isFinite(hitStop)) hitStop = 0;
@@ -4483,12 +4618,17 @@ body.result-entering #result{
     enemy.dir = player.x > enemy.x ? 1 : -1;
 
     updateRound(sdt);
-    if (gameState === 'fight' || gameState === 'roundEnd') {
+    if (gameState === 'fight') {
       updateFighter(player, enemy, sdt);
       updateFighter(enemy, player, sdt);
       resolveFighterCollision();
       clampToStage(player);
       clampToStage(enemy);
+      forceRoundEndCheck('post-update');
+    } else if (gameState === 'roundEnd') {
+      updateParticles(sdt);
+      updateHUD();
+      return;
     }
     updateParticles(sdt);
 
@@ -5684,7 +5824,7 @@ body.result-entering #result{
       roundFreeze = 0;
       if (ui && ui.debug) {
         ui.debug.style.display = 'block';
-        ui.debug.innerHTML = 'SPRITE COMBAT 9.3<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+        ui.debug.innerHTML = 'SPRITE COMBAT 9.4<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
       }
     }
     raf = requestAnimationFrame(loop);
@@ -5700,7 +5840,8 @@ body.result-entering #result{
       KeyJ:'light',
       KeyK:'heavy',
       KeyL:'special',
-      KeyO:'ultimate'
+      KeyO:'ultimate',
+      KeyP:'pause', Escape:'pause'
     };
     const k = map[e.code];
     if(!k) return;
@@ -5708,6 +5849,7 @@ body.result-entering #result{
     input[k] = down;
     if (down && !input.pressed[k]) {
       input.pressed[k] = true;
+      if(k === 'pause') { togglePause(); return; }
       if(k === 'dodge') performDodge(player);
       if(k === 'light' || k === 'heavy' || k === 'special' || k === 'ultimate') startAttack(player, k);
     }
@@ -5749,9 +5891,15 @@ body.result-entering #result{
     window.addEventListener('pointercancel', resetLiveInput);
 
 
+    if (ui.pauseBtn) ui.pauseBtn.addEventListener('click',()=>togglePause());
+    if (ui.resumeBtn) ui.resumeBtn.addEventListener('click',()=>setPaused(false));
+    if (ui.pauseRestartBtn) ui.pauseRestartBtn.addEventListener('click',()=>{ trackEvent('fight_start',{source:'pause_restart'}); audio.ui(); newMatch(); });
+    if (ui.pauseMenuBtn) ui.pauseMenuBtn.addEventListener('click',()=>{ audio.ui(); setPaused(false, true); ui.result.style.display='none'; document.body.classList.remove('is-fighting','fight-entering','menu-leaving'); document.body.classList.add('menu-returning'); ui.menu.removeAttribute('aria-hidden'); ui.menu.style.removeProperty('display'); gameState='menu'; hideTelegramMainButton(); window.setTimeout(()=>document.body.classList.remove('menu-returning'),460); });
+
+
     ui.startBtn.addEventListener('click',()=>{trackEvent('fight_start');audio.ui();audio.ensure();newMatch();});
     ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
-    ui.menuBtn.addEventListener('click',()=>{audio.ui();ui.result.style.display='none';document.body.classList.remove('is-fighting','menu-leaving');document.body.classList.add('menu-returning');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();window.setTimeout(()=>document.body.classList.remove('menu-returning'),460);});
+    ui.menuBtn.addEventListener('click',()=>{audio.ui();setPaused(false,true);if(roundEndTimer){clearTimeout(roundEndTimer);roundEndTimer=0;}ui.result.style.display='none';document.body.classList.remove('is-fighting','menu-leaving');document.body.classList.add('menu-returning');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();window.setTimeout(()=>document.body.classList.remove('menu-returning'),460);});
     ui.muteBtn.addEventListener('click',()=>{
       muted = !muted;
       ui.muteBtn.textContent = 'Звук: ' + (muted ? 'OFF' : 'ON');
@@ -7142,6 +7290,8 @@ function sessionId(){
   }
 
   function resetRoundPositions(){
+    roundResolving = false;
+    if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
     applyAbilityConfig();
     player = makeFighter('player');
     enemy = makeFighter('enemy');

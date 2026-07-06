@@ -290,3 +290,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Sprite Combat 9.2
 
 Исправлен урон и hitbox/active frames для sprite sheet бойцов.
+
+
+## Sprite Combat 9.4
+
+Fixed round completion at 0 HP and added in-game pause menu.
