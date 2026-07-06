@@ -283,3 +283,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 
 ## Sprite Combat 9.1 Visible Fix
 Исправлен renderer спрайтов: бойцы снова видимы, старый Fighter Rig больше не перекрывает sprite-sheet rendering.
+
+
+## Sprite Combat 9.2
+
+Исправлен урон и hitbox/active frames для sprite sheet бойцов.

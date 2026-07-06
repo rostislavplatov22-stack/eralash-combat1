@@ -3012,14 +3012,14 @@ body.result-entering #result{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '9.1 VISIBLE';
+  const SPRITE_COMBAT_PATCH = '9.2 DAMAGE';
 
   function loadSpriteSheet(src){
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
     // 9.1: cache-bust sprite sheets so Vercel/browser cannot show an older invisible asset.
-    img.src = src + '?v=sprite-combat-9-1-visible';
+    img.src = src + '?v=sprite-combat-9-2-damage';
     return img;
   }
 
@@ -3228,7 +3228,7 @@ body.result-entering #result{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '9.1 VISIBLE';
+  const REAL_PHYSICS_PATCH = '9.2 DAMAGE';
 
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
@@ -3490,7 +3490,7 @@ body.result-entering #result{
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.0 · REAL SHEET ANIMATIONS');
+    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.2 · REAL SHEET ANIMATIONS');
     updateHUD(true);
   }
 
@@ -3869,7 +3869,7 @@ body.result-entering #result{
 
     f.state = 'attack';
     f.stateT = 0;
-    f.attack = { ...data, total: data.startup + data.active + data.recovery };
+    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type };
     f.attackHasHit = false;
     f.lastAttackType = type;
     f.comboT = .42;
@@ -3914,11 +3914,12 @@ body.result-entering #result{
 
     if (USE_PREMIUM_FIGHTER_ART) {
       const vh = fighterVisualHeight(f);
-      const reachBoost = f.attack.name === 'ultimate' ? 1.22 : f.attack.name === 'special' ? 1.13 : f.attack.name === 'heavy' ? 1.06 : 1.0;
-      const range = f.attack.range * premiumFighterScaleFactor() * reachBoost;
-      const boxH = f.attack.height * premiumFighterScaleFactor();
-      const y = f.y - vh * (f.attack.name === 'ultimate' ? .80 : f.attack.name === 'special' ? .74 : .70);
-      const base = fighterBodyRadius(f) * .30;
+      const reachBoost = f.attack.name === 'ultimate' ? 1.45 : f.attack.name === 'special' ? 1.32 : f.attack.name === 'heavy' ? 1.22 : 1.10;
+      const minRange = f.attack.name === 'ultimate' ? 430 : f.attack.name === 'special' ? 360 : f.attack.name === 'heavy' ? 330 : 270;
+      const range = Math.max(minRange, f.attack.range * premiumFighterScaleFactor() * reachBoost);
+      const boxH = Math.max(170, f.attack.height * premiumFighterScaleFactor() * 1.20);
+      const y = f.y - vh * (f.attack.name === 'ultimate' ? .82 : f.attack.name === 'special' ? .77 : .74);
+      const base = fighterBodyRadius(f) * .42;
       return {
         x: f.dir > 0 ? f.x + base : f.x - base - range,
         y,
@@ -7137,7 +7138,7 @@ function sessionId(){
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 8.0;
-    showCallout('SPRITE COMBAT 9.1', 'VISIBLE SPRITES · REAL ANIMATION FRAMES · ATTACK/BLOCK/WALK');
+    showCallout('SPRITE COMBAT 9.2', 'VISIBLE SPRITES · DAMAGE/HITBOX FIX · ACTIVE FRAMES');
     updateHUD(true);
   }
 
@@ -7166,12 +7167,13 @@ function sessionId(){
     if (USE_PREMIUM_FIGHTER_ART) {
       const scale = premiumFighterScaleFactor();
       const rangeBoost = f.attack.name === 'ultimate' ? 1.35 : f.attack.name === 'special' ? 1.22 : f.attack.name === 'heavy' ? 1.15 : 1.0;
-      const range = Math.max(150, f.attack.range * scale * rangeBoost);
-      const boxH = Math.max(110, f.attack.height * scale * 1.05);
-      const base = fighterBodyRadius(f) * .50;
+      const minRange = f.attack.name === 'ultimate' ? 430 : f.attack.name === 'special' ? 360 : f.attack.name === 'heavy' ? 330 : 270;
+      const range = Math.max(minRange, f.attack.range * scale * rangeBoost);
+      const boxH = Math.max(170, f.attack.height * scale * 1.20);
+      const base = fighterBodyRadius(f) * .42;
       return {
         x: f.dir > 0 ? f.x + base : f.x - base - range,
-        y: f.y - fighterVisualHeight(f) * (f.attack.name === 'ultimate' ? .78 : .68),
+        y: f.y - fighterVisualHeight(f) * (f.attack.name === 'ultimate' ? .82 : .74),
         w: range,
         h: boxH
       };
@@ -7230,7 +7232,7 @@ function sessionId(){
     }
 
     if (type === 'special' || type === 'ultimate') f.energy = clamp(f.energy - data.cost, 0, 100);
-    f.attack = data;
+    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type };
     f.attackHasHit = false;
     f.lastAttackType = type;
     f.comboT = .55;
@@ -7397,8 +7399,17 @@ function sessionId(){
 
     if (f.state === 'attack' && f.attack) {
       const ab = attackBox(f);
-      if (ab && !f.attackHasHit && rectsOverlap(ab, hurtBox(opponent))) {
-        applyHit(f, opponent, f.attack);
+      if (!f.attackHasHit) {
+        const hb = hurtBox(opponent);
+        const facingTarget = (opponent.x - f.x) * (f.dir || 1) > -18;
+        const scale = premiumFighterScaleFactor ? premiumFighterScaleFactor() : 1;
+        const reachBoost = f.attack.name === 'ultimate' ? 1.45 : f.attack.name === 'special' ? 1.32 : f.attack.name === 'heavy' ? 1.22 : 1.10;
+        const centerReach = fighterBodyRadius(f) + fighterBodyRadius(opponent) + Math.max(180, f.attack.range * scale * reachBoost);
+        const centerClose = Math.abs(opponent.x - f.x) <= centerReach;
+        const verticalClose = Math.abs((opponent.y || groundY) - (f.y || groundY)) <= Math.max(130, fighterVisualHeight(f) * .42);
+        if ((ab && rectsOverlap(ab, hb)) || (facingTarget && centerClose && verticalClose)) {
+          applyHit(f, opponent, f.attack);
+        }
       }
 
       const activeEnd = f.attack.startup + f.attack.active;
@@ -7479,7 +7490,7 @@ function sessionId(){
     ui.debug.style.background = 'linear-gradient(180deg,rgba(8,9,12,.82),rgba(0,0,0,.58))';
     ui.debug.style.boxShadow = '0 18px 48px rgba(0,0,0,.40)';
     const dist = Math.round(Math.abs(enemy.x - player.x));
-    ui.debug.innerHTML = `FIGHTER RIG 8.0<br>` +
+    ui.debug.innerHTML = `SPRITE COMBAT 9.2<br>` +
       `Raven: ${player.state} · vx ${Math.round(player.vx)} · HP ${Math.round(player.hp)}<br>` +
       `Warden: ${enemy.state} · vx ${Math.round(enemy.vx)} · HP ${Math.round(enemy.hp)}<br>` +
       `DISTANCE: ${dist}px`;
