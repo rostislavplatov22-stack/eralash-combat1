@@ -3011,6 +3011,36 @@ body.result-entering #result{
   // the old procedural stick/robot bodies are only a fallback now.
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
+  const USE_SPRITE_FIGHTERS = true;
+  const SPRITE_COMBAT_PATCH = '9.0';
+
+  function loadSpriteSheet(src){
+    const img = new Image();
+    img.decoding = 'async';
+    img.loading = 'eager';
+    img.src = src;
+    return img;
+  }
+
+  const spriteFighterSheets = {
+    player: {
+      idle:  { img: loadSpriteSheet('assets/sprites/raven_idle.png'),  frames: 6, fps: 7,  loop: true,  scale: .96 },
+      walk:  { img: loadSpriteSheet('assets/sprites/raven_walk.png'),  frames: 8, fps: 12, loop: true,  scale: .96 },
+      light: { img: loadSpriteSheet('assets/sprites/raven_light.png'), frames: 6, fps: 18, loop: false, scale: 1.03 },
+      heavy: { img: loadSpriteSheet('assets/sprites/raven_heavy.png'), frames: 6, fps: 13, loop: false, scale: 1.00 },
+      block: { img: loadSpriteSheet('assets/sprites/raven_block.png'), frames: 6, fps: 8,  loop: true,  scale: .97 },
+      hit:   { img: loadSpriteSheet('assets/sprites/raven_idle.png'),  frames: 6, fps: 10, loop: false, scale: .96 }
+    },
+    enemy: {
+      idle:  { img: loadSpriteSheet('assets/sprites/warden_idle.png'),  frames: 6, fps: 6,  loop: true,  scale: 1.04 },
+      walk:  { img: loadSpriteSheet('assets/sprites/warden_walk.png'),  frames: 5, fps: 9,  loop: true,  scale: 1.08 },
+      light: { img: loadSpriteSheet('assets/sprites/warden_light.png'), frames: 4, fps: 12, loop: false, scale: 1.08 },
+      heavy: { img: loadSpriteSheet('assets/sprites/warden_light.png'), frames: 4, fps: 10, loop: false, scale: 1.10 },
+      block: { img: loadSpriteSheet('assets/sprites/warden_block.png'), frames: 6, fps: 7,  loop: true,  scale: 1.06 },
+      hit:   { img: loadSpriteSheet('assets/sprites/warden_idle.png'),  frames: 6, fps: 9,  loop: false, scale: 1.04 }
+    }
+  };
+
 
   // Exact user-provided arena mode:
   // the fight background must be the uploaded Black Citadel image itself,
@@ -3083,7 +3113,7 @@ body.result-entering #result{
 
   function fighterPreferredDistance(a,b){
     if (!USE_PREMIUM_FIGHTER_ART) return (a.w + b.w) * .45;
-    return fighterBodyRadius(a) + fighterBodyRadius(b) + Math.max(44, w * .035);
+    return fighterBodyRadius(a) + fighterBodyRadius(b) + Math.max(92, w * .065);
   }
 
 
@@ -3097,7 +3127,7 @@ body.result-entering #result{
     ui.debug.style.border = '1px solid rgba(217,183,106,.35)';
     ui.debug.style.background = 'linear-gradient(180deg,rgba(8,9,12,.72),rgba(0,0,0,.50))';
     ui.debug.style.boxShadow = '0 14px 40px rgba(0,0,0,.35)';
-    ui.debug.innerHTML = `REAL PHYSICS ${REAL_PHYSICS_PATCH}<br>` +
+    ui.debug.innerHTML = `SPRITE COMBAT ${REAL_PHYSICS_PATCH}<br>` +
       `Raven: ${player.state} · vx ${Math.round(player.vx)} · stamina ${Math.round(player.stamina)}<br>` +
       `Warden: ${enemy.state} · vx ${Math.round(enemy.vx)} · stamina ${Math.round(enemy.stamina)}`;
   }
@@ -3197,7 +3227,7 @@ body.result-entering #result{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '7.2';
+  const REAL_PHYSICS_PATCH = '9.0';
 
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
@@ -3314,17 +3344,17 @@ body.result-entering #result{
       contentId: cfg.id || kind,
       name: cfg.name || (isPlayer ? 'Raven' : 'Iron Warden'),
       archetype: cfg.archetype || '',
-      x: isPlayer ? 350 : 930,
+      x: isPlayer ? 410 : 870,
       y: groundY,
       vx: 0,
       vy: 0,
 
       // Combat Physics 7.2:
       // visual art can be huge, but collision is a stable combat capsule.
-      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 126 : 154) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 330 : 362) : Number(cfg.height || (isPlayer ? 172 : 188)),
-      collisionW: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 108 : 136) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      collisionH: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 275 : 306) : Number(cfg.height || (isPlayer ? 172 : 188)),
+      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 108 : 142) : Number(cfg.width || (isPlayer ? 78 : 90)),
+      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 300 : 330) : Number(cfg.height || (isPlayer ? 172 : 188)),
+      collisionW: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 88 : 120) : Number(cfg.width || (isPlayer ? 78 : 90)),
+      collisionH: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 245 : 275) : Number(cfg.height || (isPlayer ? 172 : 188)),
       mass: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 1.08 : 1.34) : 1,
       dir: isPlayer ? 1 : -1,
 
@@ -3437,8 +3467,8 @@ body.result-entering #result{
       player.x = bounds.center - halfStage * spread;
       enemy.x = bounds.center + halfStage * spread;
     } else {
-      player.x = w * (mobileArena ? .36 : .40);
-      enemy.x = w * (mobileArena ? .64 : .60);
+      player.x = w * (mobileArena ? .36 : .38);
+      enemy.x = w * (mobileArena ? .64 : .62);
     }
     player.y = enemy.y = groundY;
     player.dir = 1;
@@ -3459,7 +3489,7 @@ body.result-entering #result{
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'FIGHTER RIG 8.0 · MOVE / HIT / BLOCK');
+    showCallout('ROUND ' + roundIndex, 'SPRITE COMBAT 9.0 · REAL SHEET ANIMATIONS');
     updateHUD(true);
   }
 
@@ -4695,7 +4725,185 @@ body.result-entering #result{
 
 
 
+  
+  function spriteAnimForFighter(f){
+    const bank = f.id === 'player' ? spriteFighterSheets.player : spriteFighterSheets.enemy;
+    if (!bank) return null;
+
+    if (f.state === 'attack' && f.attack) {
+      const n = f.attack.name || 'light';
+      if (n === 'heavy' || n === 'special' || n === 'ultimate') return bank.heavy || bank.light || bank.idle;
+      return bank.light || bank.idle;
+    }
+    if (f.state === 'block') return bank.block || bank.idle;
+    if (f.state === 'hitstun' || f.state === 'knockdown') return bank.hit || bank.idle;
+    if (f.state === 'walk' || Math.abs(f.vx || 0) > 48) return bank.walk || bank.idle;
+    return bank.idle;
+  }
+
+  function spriteFrameIndex(f, anim){
+    const frames = Math.max(1, anim.frames || 1);
+    if (f.state === 'attack' && f.attack) {
+      const total = Math.max(.001, f.attack.total || .35);
+      const p = clamp(f.stateT / total, 0, .999);
+      return Math.min(frames - 1, Math.floor(p * frames));
+    }
+    if (f.state === 'hitstun' || f.state === 'knockdown') {
+      return Math.min(frames - 1, Math.floor(clamp(f.stateT / .28, 0, .999) * frames));
+    }
+    if (f.state === 'block') {
+      return Math.min(frames - 1, Math.floor(((performance.now()/1000) * (anim.fps || 6)) % frames));
+    }
+    return Math.floor(((performance.now()/1000 + (f.id === 'enemy' ? .23 : 0)) * (anim.fps || 8)) % frames);
+  }
+
+  function drawSpriteSheetFighter(f){
+    if (!USE_SPRITE_FIGHTERS) return false;
+    const anim = spriteAnimForFighter(f);
+    if (!anim || !anim.img || !anim.img.complete || !anim.img.naturalWidth || !anim.img.naturalHeight) return false;
+
+    const img = anim.img;
+    const frames = Math.max(1, anim.frames || 1);
+    const frame = spriteFrameIndex(f, anim);
+    const fw = img.naturalWidth / frames;
+    const fh = img.naturalHeight;
+    const isEnemy = f.id !== 'player';
+    const dir = f.dir || (isEnemy ? -1 : 1);
+    const attacking = f.state === 'attack';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown';
+    const blocking = f.state === 'block';
+    const moving = f.state === 'walk' || Math.abs(f.vx || 0) > 58;
+    const atkName = f.attack?.name || '';
+    const active = attacking && f.attack && f.stateT >= f.attack.startup && f.stateT <= f.attack.startup + f.attack.active;
+    const attackP = attacking && f.attack ? clamp(f.stateT / Math.max(.001, f.attack.total), 0, 1) : 0;
+    const attackPunch = attacking ? Math.sin(attackP * Math.PI) : 0;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+
+    let spriteH = coarse ? clamp(h * .36, 250, 360) : clamp(h * (isEnemy ? .42 : .40), 300, isEnemy ? 430 : 400);
+    spriteH *= anim.scale || 1;
+    if (attacking) spriteH *= atkName === 'ultimate' ? 1.04 : 1.015;
+    let spriteW = spriteH * (fw / Math.max(1, fh));
+
+    // Large frames from generated sheets can contain extra horizontal padding.
+    // Keep visible size stable so the fighters do not become giant pasted posters.
+    const maxW = coarse ? w * .30 : w * (isEnemy ? .25 : .24);
+    if (spriteW > maxW) {
+      const k = maxW / spriteW;
+      spriteW *= k;
+      spriteH *= k;
+    }
+
+    const walkBob = moving ? Math.sin(performance.now()/80) * 4 : Math.sin(performance.now()/230) * 1.8;
+    const hitRecoil = hurt ? -dir * (16 + Math.min(16, f.stateT * 55)) : 0;
+    const blockBrace = blocking ? -dir * 8 : 0;
+    const lungeVisual = attacking ? dir * attackPunch * (atkName === 'ultimate' ? 34 : atkName === 'special' ? 26 : atkName === 'heavy' ? 22 : 14) : 0;
+    const x = f.x + lungeVisual + hitRecoil + blockBrace;
+    const y = f.y + walkBob;
+    const lean = clamp((f.vx || 0) / 900, -0.10, 0.10) + (hurt ? -dir * .09 : 0) + (attacking ? dir * .035 * attackPunch : 0);
+    const squashX = moving ? 1 + Math.abs(Math.sin(performance.now()/85))*.018 : 1;
+    const squashY = moving ? 1 - Math.abs(Math.sin(performance.now()/85))*.010 : 1;
+
+    // Ground contact shadow.
+    ctx.save();
+    const shW = Math.max(82, spriteW * (isEnemy ? .42 : .38));
+    const shadow = ctx.createRadialGradient(x, y + 6, 6, x, y + 6, shW);
+    shadow.addColorStop(0,'rgba(0,0,0,.88)');
+    shadow.addColorStop(.44,'rgba(0,0,0,.42)');
+    shadow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 8, shW, 20, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Attack and dodge afterimage.
+    if (attacking || f.afterImage > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = attacking ? .14 + attackPunch*.12 : .12;
+      ctx.translate(x - dir * 22, y);
+      ctx.scale(dir * squashX, squashY);
+      ctx.rotate(lean * .5);
+      ctx.filter = isEnemy ? 'brightness(1.1) saturate(1.2) hue-rotate(10deg)' : 'brightness(1.1) saturate(1.25)';
+      ctx.drawImage(img, frame * fw, 0, fw, fh, -spriteW*.5, -spriteH, spriteW, spriteH);
+      ctx.restore();
+    }
+
+    // Sprite body.
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir * squashX, squashY);
+    ctx.rotate(lean);
+    if (hurt) ctx.filter = 'brightness(1.35) saturate(1.15)';
+    if (blocking) ctx.filter = 'brightness(1.08) saturate(1.15)';
+    ctx.drawImage(img, frame * fw, 0, fw, fh, -spriteW*.5, -spriteH, spriteW, spriteH);
+    ctx.filter = 'none';
+
+    if (blocking) {
+      const shieldColor = isEnemy ? 'rgba(80,190,255,.95)' : 'rgba(255,65,80,.85)';
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = shieldColor;
+      ctx.lineWidth = 5;
+      ctx.shadowColor = shieldColor;
+      ctx.shadowBlur = 28;
+      ctx.beginPath();
+      ctx.ellipse(spriteW*.20, -spriteH*.52, spriteW*.13, spriteH*.27, -.08, 0, Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Active hit frame: draw a clear slash/impact arc that follows attack frames.
+    if (attacking) {
+      const c = isEnemy ? '#4bc6ff' : '#ff2636';
+      const reach = atkName === 'ultimate' ? spriteW*.62 : atkName === 'special' ? spriteW*.52 : atkName === 'heavy' ? spriteW*.47 : spriteW*.36;
+      const baseX = x + dir * spriteW*.18;
+      const baseY = y - spriteH*.55;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = active ? .95 : .48;
+      ctx.strokeStyle = active ? '#fff5df' : c;
+      ctx.shadowColor = active ? '#fff5df' : c;
+      ctx.shadowBlur = active ? 30 : 18;
+      ctx.lineWidth = atkName === 'ultimate' ? 18 : atkName === 'heavy' ? 13 : 9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(baseX - dir*20, baseY + attackPunch*20);
+      ctx.quadraticCurveTo(baseX + dir*reach*.45, baseY - spriteH*.22, baseX + dir*reach, baseY + spriteH*.03);
+      ctx.stroke();
+      ctx.globalAlpha *= .32;
+      ctx.lineWidth *= 2.2;
+      ctx.beginPath();
+      ctx.moveTo(baseX - dir*14, baseY + attackPunch*26);
+      ctx.quadraticCurveTo(baseX + dir*reach*.52, baseY - spriteH*.32, baseX + dir*reach*1.12, baseY + spriteH*.01);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Nameplate.
+    ctx.save();
+    const plateW = clamp(spriteW*.45, 110, 170);
+    const plateGrad = ctx.createLinearGradient(x-plateW*.5, y+14, x+plateW*.5, y+38);
+    plateGrad.addColorStop(0,'rgba(0,0,0,.70)');
+    plateGrad.addColorStop(.5, isEnemy ? 'rgba(42,160,255,.22)' : 'rgba(255,35,50,.20)');
+    plateGrad.addColorStop(1,'rgba(0,0,0,.70)');
+    ctx.fillStyle = plateGrad;
+    ctx.strokeStyle = isEnemy ? 'rgba(125,220,255,.58)' : 'rgba(255,60,76,.50)';
+    roundRect(ctx, x-plateW*.5, y+13, plateW, 25, 12, true, true);
+    ctx.font = '950 13px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = isEnemy ? '#c8f2ff' : '#ffd06e';
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = 7;
+    ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), x, y+26);
+    ctx.restore();
+
+    return true;
+  }
+
+
   function drawPremiumFighterArt(f){
+    if (drawSpriteSheetFighter(f)) return true;
     if (!USE_PREMIUM_FIGHTER_ART) return false;
     const img = f.id === 'player' ? premiumFighterArt.player : premiumFighterArt.enemy;
     if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;

@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-fighter-rig-8-ready",
-  "version": "2.6.0",
+  "name": "eralash-combat-sprite-combat-9-ready",
+  "version": "2.7.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Fighter Rig 8.0: visible combat movement, stronger state animation, readable fighter spacing, hit reactions, slash arcs and collision fixes."
+  "description": "EraLash Combat Sprite Combat 9.0: real uploaded sprite sheets for idle, walk, attack and block, replacing static PNG fighter visuals."
 }
