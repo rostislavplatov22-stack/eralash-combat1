@@ -1,3 +1,7 @@
+# EraLash Combat — Premium Fighters 6.0
+
+Добавлены новые full-body персонажи Shadow Raven и Iron Warden. Старые фигурки заменены на premium character art.
+
 # EraLash Combat — Dark Cinematic Real Art V4 FIXED
 
 Исправлена проблема пустого экрана: арт встроен в index.html и assets копируются в dist.
@@ -256,3 +260,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Exact Arena Framing Fix
 
 Фикс убирает красный левый прямоугольник и закрепляет exact Black Citadel арт на фоне боя.
+
+
+## Exact Arena Stage Fit Fix 5.2
+
+Исправлена посадка точной Black Citadel арены: 16:9 stage plate, центрирование, ограничение combat zone и отключение движения фона камерой.

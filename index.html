@@ -2996,10 +2996,63 @@ body.result-entering #result{
   blackCitadelArenaArt.loading = 'eager';
   blackCitadelArenaArt.src = 'assets/arena-black-citadel-courtyard.png';
 
+  const premiumFighterArt = {
+    player: new Image(),
+    enemy: new Image()
+  };
+  premiumFighterArt.player.decoding = 'async';
+  premiumFighterArt.player.loading = 'eager';
+  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png';
+  premiumFighterArt.enemy.decoding = 'async';
+  premiumFighterArt.enemy.loading = 'eager';
+  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png';
+
+  // Premium Fighters 6.0:
+  // the old procedural stick/robot bodies are only a fallback now.
+  // Primary combat visuals use the two uploaded full-body armored fighters.
+  const USE_PREMIUM_FIGHTER_ART = true;
+
   // Exact user-provided arena mode:
   // the fight background must be the uploaded Black Citadel image itself,
   // without extra painted fallback geometry, debug grid, artificial light panels or fake overlays.
   const EXACT_BLACK_CITADEL_ARENA = true;
+
+  // Exact Arena Stage Fit 5.2:
+  // The user-provided 16:9 Black Citadel image is treated as a locked stage plate,
+  // not as a scrolling background. On ultra-wide desktop screens the stage is
+  // centered in a 16:9 safe frame so the left/right edge art does not turn into
+  // ugly stretched panels.
+  const EXACT_ARENA_ASPECT = 16 / 9;
+  const EXACT_ARENA_COMBAT_LEFT = 0.23;
+  const EXACT_ARENA_COMBAT_RIGHT = 0.77;
+
+  function getExactArenaStageRect(){
+    const viewportAspect = w / Math.max(1, h);
+    let sw = w;
+    let sh = h;
+    if (viewportAspect > EXACT_ARENA_ASPECT) {
+      sh = h;
+      sw = sh * EXACT_ARENA_ASPECT;
+    } else {
+      sw = w;
+      sh = sw / EXACT_ARENA_ASPECT;
+    }
+    return {
+      x: Math.floor((w - sw) * 0.5),
+      y: Math.floor((h - sh) * 0.5),
+      w: Math.ceil(sw),
+      h: Math.ceil(sh)
+    };
+  }
+
+  function getExactArenaCombatBounds(){
+    const r = getExactArenaStageRect();
+    return {
+      left: r.x + r.w * EXACT_ARENA_COMBAT_LEFT,
+      right: r.x + r.w * EXACT_ARENA_COMBAT_RIGHT,
+      center: r.x + r.w * 0.5
+    };
+  }
 
 
   const ui = {
@@ -3260,8 +3313,15 @@ body.result-entering #result{
     player = makeFighter('player');
     enemy = makeFighter('enemy');
     const mobileArena = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
-    player.x = w * (mobileArena ? .34 : .38);
-    enemy.x = w * (mobileArena ? .66 : .62);
+    if (EXACT_BLACK_CITADEL_ARENA) {
+      const bounds = getExactArenaCombatBounds();
+      const spread = mobileArena ? .26 : .28;
+      player.x = bounds.center - (bounds.right - bounds.left) * spread;
+      enemy.x = bounds.center + (bounds.right - bounds.left) * spread;
+    } else {
+      player.x = w * (mobileArena ? .34 : .38);
+      enemy.x = w * (mobileArena ? .66 : .62);
+    }
     player.y = enemy.y = groundY;
     player.dir = 1;
     enemy.dir = -1;
@@ -3849,7 +3909,8 @@ body.result-entering #result{
     }
 
     f.vx *= Math.pow(FRICTION, dt*60);
-    f.x = clamp(f.x, f.w*.65, w - f.w*.65);
+    const bounds = EXACT_BLACK_CITADEL_ARENA ? getExactArenaCombatBounds() : { left: f.w*.65, right: w - f.w*.65 };
+    f.x = clamp(f.x, bounds.left + f.w*.20, bounds.right - f.w*.20);
 
     const dist = Math.abs(player.x - enemy.x);
     const minDist = (player.w + enemy.w)*.45;
@@ -3857,8 +3918,9 @@ body.result-entering #result{
       const push = (minDist - dist)*.5;
       if (player.x < enemy.x) { player.x -= push; enemy.x += push; }
       else { player.x += push; enemy.x -= push; }
-      player.x = clamp(player.x, player.w*.65, w - player.w*.65);
-      enemy.x = clamp(enemy.x, enemy.w*.65, w - enemy.w*.65);
+      const b = EXACT_BLACK_CITADEL_ARENA ? getExactArenaCombatBounds() : { left: player.w*.65, right: w - player.w*.65 };
+      player.x = clamp(player.x, b.left + player.w*.20, b.right - player.w*.20);
+      enemy.x = clamp(enemy.x, b.left + enemy.w*.20, b.right - enemy.w*.20);
     }
 
     if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'block' && f.state !== 'dodge') {
@@ -4047,23 +4109,88 @@ body.result-entering #result{
     // Dark Cinematic Arena 5.1 — Black Citadel Courtyard.
     // This version uses a real painted arena asset as the base layer,
     // then adds live smoke, embers, lighting, shadows and subtle rune VFX.
-    function drawCoverImage(img, dx, dy, dw, dh){
+    function drawCoverImage(img, dx, dy, dw, dh, focusX=.5, focusY=.5){
       const iw = img.naturalWidth || img.width;
       const ih = img.naturalHeight || img.height;
       if (!iw || !ih) return false;
       const scale = Math.max(dw / iw, dh / ih);
       const sw = dw / scale;
       const sh = dh / scale;
-      const sx = (iw - sw) * .5;
-      const sy = (ih - sh) * .5;
+      const sx = clamp((iw - sw) * focusX, 0, Math.max(0, iw - sw));
+      const sy = clamp((ih - sh) * focusY, 0, Math.max(0, ih - sh));
       ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+      return true;
+    }
+
+    function drawExactStagePlate(img){
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      if (!iw || !ih) return false;
+
+      // Dark blurred fill behind the real 16:9 plate. It removes ugly empty sides
+      // on desktop without pretending to be playable arena space.
+      ctx.save();
+      ctx.globalAlpha = .34;
+      ctx.filter = 'blur(14px) brightness(.48) saturate(.86)';
+      drawCoverImage(img, -24, -24, w + 48, h + 48, .5, .5);
+      ctx.filter = 'none';
+      ctx.restore();
+
+      const r = getExactArenaStageRect();
+
+      // Letterbox/side framing so the uploaded art keeps its native cinematic ratio.
+      ctx.save();
+      ctx.fillStyle = '#020202';
+      ctx.fillRect(0,0,w,h);
+
+      // Soft background bleed outside the stage frame.
+      ctx.globalAlpha = .26;
+      ctx.filter = 'blur(18px) brightness(.38)';
+      drawCoverImage(img, 0, 0, w, h, .5, .5);
+      ctx.filter = 'none';
+      ctx.globalAlpha = 1;
+
+      // Exact image, no procedural replacement, no grid, no fake map.
+      ctx.drawImage(img, 0, 0, iw, ih, r.x, r.y, r.w, r.h);
+
+      // Premium edge mask: hides any browser-aspect mismatch and focuses the arena.
+      const leftFade = ctx.createLinearGradient(0,0,Math.max(1,r.x + r.w*.08),0);
+      leftFade.addColorStop(0,'rgba(0,0,0,.82)');
+      leftFade.addColorStop(.55,'rgba(0,0,0,.22)');
+      leftFade.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = leftFade;
+      ctx.fillRect(0,0,Math.max(1,r.x + r.w*.08),h);
+
+      const rightFade = ctx.createLinearGradient(w,0,Math.min(w-1,r.x + r.w*.92),0);
+      rightFade.addColorStop(0,'rgba(0,0,0,.82)');
+      rightFade.addColorStop(.55,'rgba(0,0,0,.22)');
+      rightFade.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = rightFade;
+      ctx.fillRect(Math.min(w-1,r.x + r.w*.92),0,w,h);
+
+      const topFade = ctx.createLinearGradient(0,0,0,h*.22);
+      topFade.addColorStop(0,'rgba(0,0,0,.42)');
+      topFade.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = topFade;
+      ctx.fillRect(0,0,w,h*.24);
+
+      const bottomFade = ctx.createLinearGradient(0,h,0,h*.70);
+      bottomFade.addColorStop(0,'rgba(0,0,0,.38)');
+      bottomFade.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = bottomFade;
+      ctx.fillRect(0,h*.70,w,h*.30);
+
+      ctx.restore();
       return true;
     }
 
     const artReady = blackCitadelArenaArt && blackCitadelArenaArt.complete && blackCitadelArenaArt.naturalWidth > 0;
     if (artReady) {
+      if (EXACT_BLACK_CITADEL_ARENA) {
+        drawExactStagePlate(blackCitadelArenaArt);
+        return;
+      }
       drawCoverImage(blackCitadelArenaArt, 0, 0, w, h);
-      if (EXACT_BLACK_CITADEL_ARENA) return;
     } else {
       const sky = ctx.createLinearGradient(0,0,0,h);
       sky.addColorStop(0, '#030406');
@@ -4226,7 +4353,180 @@ body.result-entering #result{
   }
 
 
+
+  function drawPremiumFighterArt(f){
+    if (!USE_PREMIUM_FIGHTER_ART) return false;
+    const img = f.id === 'player' ? premiumFighterArt.player : premiumFighterArt.enemy;
+    if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
+
+    const time = performance.now();
+    const isEnemy = f.id !== 'player';
+    const dir = f.dir || (isEnemy ? -1 : 1);
+    const hurt = f.state === 'hitstun';
+    const blocking = f.state === 'block';
+    const attacking = f.state === 'attack';
+    const dodging = f.state === 'dodge';
+    const atkName = f.attack?.name || '';
+    const active = attacking && f.attack && f.stateT >= f.attack.startup && f.stateT <= f.attack.startup + f.attack.active;
+    const tAttack = attacking && f.attack ? clamp(f.stateT / Math.max(.001, f.attack.total),0,1) : 0;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+    const hexA = (c,a)=> (typeof c === 'string' && c[0] === '#' && c.length === 7) ? c + a : c;
+    const coreB = hurt ? '#ff5161' : (f.colorB || (isEnemy ? '#3eb6ff' : '#c92832'));
+    const accent = f.accent || (isEnemy ? '#d7dff0' : '#d9b76a');
+
+    const bob = f.state === 'idle' ? Math.sin(time/260)*3.5 : f.state === 'walk' ? Math.sin(time/90)*2.0 : 0;
+    const lean = clamp((f.vx || 0) / 700, -0.075, 0.075) + (hurt ? -0.10 : 0) + (dodging ? -0.16 : 0);
+
+    let spriteH = coarse ? clamp(h * .40, 245, 405) : clamp(h * .47, 350, 490);
+    if (isEnemy) spriteH *= coarse ? 1.06 : 1.09;
+    if (atkName === 'ultimate') spriteH *= 1.018;
+    const spriteW = spriteH * aspect;
+
+    // Keep both full-body fighters readable on narrow/mobile screens.
+    const maxSpriteW = coarse ? w * .36 : w * .235;
+    if (spriteW > maxSpriteW) {
+      const k = maxSpriteW / spriteW;
+      spriteH *= k;
+    }
+    const finalW = spriteH * aspect;
+    const finalH = spriteH;
+
+    const x = f.x;
+    const y = f.y + bob + (isEnemy ? 3 : 6);
+    const xOffset = isEnemy ? 8 : -6;
+
+    // Heavy grounded contact shadow, drawn in world space.
+    ctx.save();
+    const shadowW = finalW * (isEnemy ? .64 : .58);
+    const shadow = ctx.createRadialGradient(x, y + 7, 8, x, y + 7, shadowW);
+    shadow.addColorStop(0,'rgba(0,0,0,.86)');
+    shadow.addColorStop(.42,'rgba(0,0,0,.42)');
+    shadow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 9, shadowW, 24, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Premium colored back aura for readability on the dark arena.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = hurt ? .34 : (isEnemy ? .18 : .20);
+    const aura = ctx.createRadialGradient(x, y - finalH*.58, 10, x, y - finalH*.58, finalW*.72);
+    aura.addColorStop(0, hexA(coreB,'72'));
+    aura.addColorStop(.48, hexA(accent,'20'));
+    aura.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = aura;
+    ctx.beginPath();
+    ctx.ellipse(x, y - finalH*.56, finalW*.60, finalH*.45, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Attack trail behind/around the sprite.
+    if (attacking) {
+      const reach = atkName === 'ultimate' ? finalW*.62 : atkName === 'special' ? finalW*.50 : atkName === 'heavy' ? finalW*.42 : finalW*.34;
+      const baseX = x + dir * finalW*.22;
+      const baseY = y - finalH*.53;
+      const sweep = Math.sin(tAttack * Math.PI);
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = (active ? 1 : .62) * (atkName === 'ultimate' ? .95 : atkName === 'special' ? .78 : atkName === 'heavy' ? .62 : .45);
+      ctx.strokeStyle = active ? '#fff2d0' : hexA(coreB,'cc');
+      ctx.shadowColor = active ? '#fff2d0' : hexA(coreB,'cc');
+      ctx.shadowBlur = active ? 24 : 16;
+      ctx.lineWidth = atkName === 'ultimate' ? 18 : atkName === 'heavy' ? 12 : 8;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(baseX - dir*finalW*.10, baseY + sweep*18);
+      ctx.quadraticCurveTo(baseX + dir*reach*.42, baseY - finalH*.18, baseX + dir*reach, baseY + finalH*.04);
+      ctx.stroke();
+      ctx.globalAlpha *= .36;
+      ctx.lineWidth *= 2.2;
+      ctx.beginPath();
+      ctx.moveTo(baseX - dir*finalW*.05, baseY + sweep*24);
+      ctx.quadraticCurveTo(baseX + dir*reach*.50, baseY - finalH*.25, baseX + dir*reach*1.10, baseY + finalH*.02);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Draw full body character art.
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir, 1);
+    ctx.rotate(lean);
+    if (hurt) {
+      ctx.filter = 'brightness(1.35) saturate(1.2)';
+    }
+    const drawX = -finalW*.5 + xOffset;
+    const drawY = -finalH;
+    ctx.drawImage(img, drawX, drawY, finalW, finalH);
+    ctx.filter = 'none';
+
+    // Soft hit flash directly on top of sprite.
+    if (hurt) {
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = .22;
+      ctx.fillStyle = '#fff3ec';
+      ctx.beginPath();
+      ctx.ellipse(xOffset, -finalH*.54, finalW*.42, finalH*.42, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // Block shield around guard side.
+    if (blocking) {
+      const shieldColor = isEnemy ? 'rgba(85,200,255,.90)' : 'rgba(220,55,68,.82)';
+      ctx.globalCompositeOperation='lighter';
+      ctx.strokeStyle = shieldColor;
+      ctx.fillStyle = shieldColor;
+      ctx.lineWidth = 5;
+      ctx.shadowColor = shieldColor;
+      ctx.shadowBlur = 26;
+      ctx.beginPath();
+      ctx.ellipse(finalW*.28, -finalH*.55, finalW*.16, finalH*.24, -.10, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.globalAlpha = .11;
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Energy nodes / visor pulse on top for gameplay readability.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = .52 + Math.sin(time/190)*.12;
+    ctx.fillStyle = hexA(coreB,'dd');
+    ctx.shadowColor = hexA(coreB,'cc');
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.ellipse(x + dir*finalW*.02, y - finalH*.76, finalW*.045, finalH*.014, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Premium nameplate in world space, not mirrored.
+    ctx.save();
+    ctx.globalAlpha = .92;
+    const plateW = Math.max(118, Math.min(174, finalW*.46));
+    const plateGrad = ctx.createLinearGradient(x-plateW*.5, y+16, x+plateW*.5, y+39);
+    plateGrad.addColorStop(0,'rgba(0,0,0,.66)');
+    plateGrad.addColorStop(.50, hexA(coreB,'33'));
+    plateGrad.addColorStop(1,'rgba(0,0,0,.66)');
+    ctx.fillStyle = plateGrad;
+    ctx.strokeStyle = hexA(accent,'66');
+    roundRect(ctx, x-plateW*.5, y+14, plateW, 25, 12, true, true);
+    ctx.fillStyle = isEnemy ? '#bdeeff' : '#ffd06e';
+    ctx.font = '950 13px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = 8;
+    ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'SHADOW RAVEN')).slice(0,16).toUpperCase(), x, y+27);
+    ctx.restore();
+
+    return true;
+  }
+
   function drawFighter(f){
+    if (drawPremiumFighterArt(f)) return;
     const time = performance.now();
     const bob = f.state === 'idle' ? Math.sin(time/235)*2.8 : f.state === 'walk' ? Math.sin(time/80)*1.6 : 0;
     const x=f.x, y=f.y + bob, dir=f.dir;
@@ -4724,7 +5024,9 @@ body.result-entering #result{
     // background image. This keeps the citadel centered and removes the red left block.
     ctx.save();
     ctx.translate(sx,sy);
-    if (cameraZoom > 1.002) {
+    // Exact art stays locked. Zoom/shake belongs to fighters and impact VFX,
+    // otherwise the left architecture becomes a broken-looking moving panel.
+    if (!EXACT_BLACK_CITADEL_ARENA && cameraZoom > 1.002) {
       ctx.translate(w*.5, h*.52);
       ctx.scale(cameraZoom, cameraZoom);
       ctx.translate(-w*.5, -h*.52);
@@ -4733,7 +5035,7 @@ body.result-entering #result{
     ctx.restore();
 
     let cameraShift = 0;
-    if (player && enemy) {
+    if (!EXACT_BLACK_CITADEL_ARENA && player && enemy) {
       const actionMid = (player.x + enemy.x) * 0.5;
       const desiredShift = w * 0.5 - actionMid;
       const maxShift = w * ((window.matchMedia && window.matchMedia('(pointer:coarse)').matches) ? 0.10 : 0.14);
