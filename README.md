@@ -269,3 +269,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Exact Arena Stage Fit Fix 5.2
 
 Исправлена посадка точной Black Citadel арены: 16:9 stage plate, центрирование, ограничение combat zone и отключение движения фона камерой.
+
+
+## Combat Physics 7.0
+
+Добавлена новая физика боя: movement acceleration, body collision, input buffer, combo cancel, hitstun/knockdown, guard stamina, AI spacing и stage bounds для exact Black Citadel arena.

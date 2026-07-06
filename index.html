@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Exact Black Citadel Arena Framing Fixed</title>
+  <title>EraLash Combat — Combat Physics 7.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3284,6 +3284,11 @@ body.result-entering #result{
     const isPlayer = kind === 'player';
     const cfg = contentFighter(kind);
     const hp = Number(cfg.hp || 100);
+    const heavy = !isPlayer;
+    const baseSpeed = Number(cfg.speed || (isPlayer ? 86 : 62));
+    const baseDefense = Number(cfg.defense || (isPlayer ? 72 : 84));
+    const basePower = Number(cfg.power || (isPlayer ? 78 : 88));
+
     return {
       id: kind,
       contentId: cfg.id || kind,
@@ -3293,42 +3298,67 @@ body.result-entering #result{
       y: groundY,
       vx: 0,
       vy: 0,
-      // Larger logical body size for real character art. Visual sprite is even
-      // bigger, but these values keep old systems stable.
-      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 118 : 142) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 315 : 340) : Number(cfg.height || (isPlayer ? 172 : 188)),
+
+      // Combat Physics 7.0:
+      // visual art can be huge, but collision is a stable combat capsule.
+      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 138 : 168) : Number(cfg.width || (isPlayer ? 78 : 90)),
+      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 350 : 382) : Number(cfg.height || (isPlayer ? 172 : 188)),
+      collisionW: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 122 : 148) : Number(cfg.width || (isPlayer ? 78 : 90)),
+      collisionH: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 295 : 328) : Number(cfg.height || (isPlayer ? 172 : 188)),
+      mass: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 1.08 : 1.34) : 1,
       dir: isPlayer ? 1 : -1,
+
       hp,
       hpDelay: hp,
       maxHp: hp,
       energy: Number(cfg.energy || (isPlayer ? 35 : 30)),
       stamina: 100,
+
       state: 'idle',
       stateT: 0,
+      hitstunTime: 0,
+      knockdownTime: 0,
+      groundLock: 0,
       invuln: 0,
       canHit: true,
+
       attack: null,
       attackHasHit: false,
+      lastAttackType: '',
+      bufferedAttack: '',
+      bufferedAttackT: 0,
+      comboStep: 0,
+      comboT: 0,
       dodgeCd: 0,
       afterImage: 0,
-      armor: 0,
+      armor: heavy ? .12 : 0,
+      contactPressure: 0,
+      walkIntent: 0,
+      landingFx: false,
+
       colorA: cfg.colorA || (isPlayer ? '#14171e' : '#17191c'),
       colorB: cfg.colorB || (isPlayer ? '#c92832' : '#3eb6ff'),
       accent: cfg.accent || (isPlayer ? '#d9b76a' : '#d9f2ff'),
       specialName: cfg.specialName || 'Special',
       ultimateName: cfg.ultimateName || 'Ultimate',
+
       stats: {
-        // Premium art needs visibly stronger movement so it does not feel frozen.
-        speed: Math.round((USE_PREMIUM_FIGHTER_ART ? 430 : 360) + Number(cfg.speed || 75) * (USE_PREMIUM_FIGHTER_ART ? 3.05 : 2.35)),
-        jump: Number(cfg.jump || (isPlayer ? 960 : 850)),
-        hp
+        // These are real physics values now: acceleration uses speed, not direct teleporting.
+        speed: Math.round((USE_PREMIUM_FIGHTER_ART ? 360 : 330) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.55 : 2.15)),
+        accel: Math.round((USE_PREMIUM_FIGHTER_ART ? 2100 : 1800) + baseSpeed * 10),
+        airAccel: Math.round((USE_PREMIUM_FIGHTER_ART ? 930 : 760) + baseSpeed * 4),
+        jump: Number(cfg.jump || (isPlayer ? 940 : 820)),
+        hp,
+        power: basePower,
+        defense: baseDefense
       },
       ai: {
         think: 0,
         next: 0,
         aggression: clamp(Number(contentBundle.balance?.aiDifficulty || .62), .2, .95),
-        blockChance: isPlayer ? .32 : clamp(.22 + Number(cfg.defense || 70) / 300, .22, .52),
-        mistake: isPlayer ? .22 : clamp(.36 - Number(cfg.speed || 70) / 500, .12, .34)
+        blockChance: isPlayer ? .32 : clamp(.24 + baseDefense / 260, .28, .62),
+        mistake: isPlayer ? .22 : clamp(.34 - baseSpeed / 520, .10, .30),
+        patience: .25 + Math.random() * .35
       }
     };
   }
@@ -3337,11 +3367,40 @@ body.result-entering #result{
   let enemy = makeFighter('enemy');
 
   const attacks = {
-    // Premium Fighters 6.1: ranges are tuned for the new large painted sprites.
-    light:   { name:'light', startup:.070, active:.090, recovery:.145, damage:7,  blockDamage:2, range:148, height:132, y:-245, kb:255, hitStop:.060, energyGain:8 },
-    heavy:   { name:'heavy', startup:.155, active:.110, recovery:.250, damage:15, blockDamage:4, range:196, height:154, y:-260, kb:470, hitStop:.115, energyGain:13 },
-    special: { name:'special', startup:.190, active:.150, recovery:.340, damage:22, blockDamage:7, range:260, height:178, y:-278, kb:700, hitStop:.170, energyGain:0, cost:42 },
-    ultimate:{ name:'ultimate', startup:.360, active:.210, recovery:.500, damage:38, blockDamage:12, range:340, height:220, y:-310, kb:980, hitStop:.300, energyGain:0, cost:100 }
+    // Combat Physics 7.0 — tuned for big full-body fighters.
+    // startup / active / recovery create real timing. lunge and pushback create weight.
+    light: {
+      name:'light', startup:.075, active:.085, recovery:.145,
+      damage:7, blockDamage:2, guardDamage:10,
+      range:178, height:145, y:-255,
+      kb:310, lift:-45, pushback:70, attackerBrake:.70,
+      hitStop:.065, hitstun:.28, energyGain:9, cost:0,
+      lunge:140, cancelWindow:[.16,.28], chain:['light','heavy','special']
+    },
+    heavy: {
+      name:'heavy', startup:.165, active:.110, recovery:.275,
+      damage:16, blockDamage:5, guardDamage:20,
+      range:232, height:170, y:-275,
+      kb:560, lift:-130, pushback:105, attackerBrake:.56,
+      hitStop:.120, hitstun:.42, energyGain:14, cost:0,
+      lunge:210, cancelWindow:[.22,.39], chain:['special']
+    },
+    special: {
+      name:'special', startup:.205, active:.155, recovery:.355,
+      damage:24, blockDamage:8, guardDamage:30,
+      range:308, height:195, y:-292,
+      kb:780, lift:-210, pushback:135, attackerBrake:.46,
+      hitStop:.175, hitstun:.56, energyGain:0, cost:42,
+      lunge:285, cancelWindow:[.30,.52], chain:[]
+    },
+    ultimate: {
+      name:'ultimate', startup:.380, active:.220, recovery:.540,
+      damage:40, blockDamage:13, guardDamage:45,
+      range:400, height:240, y:-330,
+      kb:1080, lift:-285, pushback:175, attackerBrake:.34,
+      hitStop:.315, hitstun:.78, energyGain:0, cost:100,
+      lunge:360, cancelWindow:[.42,.70], chain:[]
+    }
   };
 
   function resetRoundPositions(){
@@ -3351,13 +3410,14 @@ body.result-entering #result{
     const mobileArena = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
     if (EXACT_BLACK_CITADEL_ARENA) {
       const bounds = getExactArenaCombatBounds();
-      // Premium Fighters 6.1: start wide enough for large full-body art.
-      const spread = mobileArena ? .31 : .35;
+      // Combat Physics 7.0: fighters spawn on the actual central combat plane,
+      // not on the decorative left/right edges of the background.
+      const spread = mobileArena ? .245 : .285;
       player.x = bounds.center - (bounds.right - bounds.left) * spread;
       enemy.x = bounds.center + (bounds.right - bounds.left) * spread;
     } else {
-      player.x = w * (mobileArena ? .34 : .38);
-      enemy.x = w * (mobileArena ? .66 : .62);
+      player.x = w * (mobileArena ? .36 : .40);
+      enemy.x = w * (mobileArena ? .64 : .60);
     }
     player.y = enemy.y = groundY;
     player.dir = 1;
@@ -3377,7 +3437,7 @@ body.result-entering #result{
     comboTimer = 0;
     comboDamage = 0;
     updateComboTag();
-    showCallout('ROUND ' + roundIndex, 'Touch, dodge and combo ready');
+    showCallout('ROUND ' + roundIndex, 'Physics 7.0 combat ready');
     updateHUD(true);
   }
 
@@ -3633,55 +3693,112 @@ body.result-entering #result{
   }
 
 
+  function isActionLocked(f){
+    return f.state === 'hitstun' || f.state === 'knockdown' || f.state === 'dodge';
+  }
+
+  function canAttackCancel(f, type){
+    if (f.state !== 'attack' || !f.attack) return false;
+    if (f.attackHasHit !== true) return false;
+    if (!f.attack.chain || !f.attack.chain.includes(type)) return false;
+    const t = f.stateT;
+    const win = f.attack.cancelWindow || [999, 999];
+    return t >= win[0] && t <= win[1];
+  }
+
+  function bufferAttack(f, type){
+    f.bufferedAttack = type;
+    f.bufferedAttackT = .22;
+  }
+
+  function consumeBufferedAttack(f){
+    if (!f.bufferedAttack || f.bufferedAttackT <= 0) return false;
+    const type = f.bufferedAttack;
+    f.bufferedAttack = '';
+    f.bufferedAttackT = 0;
+    startAttack(f, type, true);
+    return true;
+  }
+
   function performDodge(f){
     if (gameState !== 'fight' || roundFreeze > 0) return;
     if (!isGrounded(f) || f.dodgeCd > 0) return;
     if (f.state === 'attack' || f.state === 'hitstun' || f.state === 'knockdown') return;
-    f.dodgeCd = .72;
-    f.invuln = .34;
-    f.afterImage = .34;
+    f.dodgeCd = USE_PREMIUM_FIGHTER_ART ? .58 : .72;
+    f.invuln = .28;
+    f.afterImage = .32;
+    f.groundLock = .12;
     f.state = 'dodge';
     f.stateT = 0;
     const away = f.id === 'player' ? (input.left ? -1 : input.right ? 1 : -f.dir) : -f.dir;
-    f.vx = away * Math.max(520, f.stats.speed * 1.25);
+    f.vx = away * Math.max(USE_PREMIUM_FIGHTER_ART ? 640 : 520, f.stats.speed * 1.38);
+    f.vy = 0;
     spawnAfterImage(f);
-    floatingText('DODGE', f.x, f.y - f.h - 18, '#bde8ff');
+    spawnFootDust(f, 8, f.colorB);
+    floatingText('DODGE', f.x, f.y - f.h*.78, '#bde8ff');
     audio.tone(520,.045,'triangle',.035,.82);
     tryHaptic('light');
   }
 
   function spawnAfterImage(f){
-    for(let i=0;i<7;i++){
+    for(let i=0;i<8;i++){
       particles.push({
-        x:f.x - f.dir * (i*10 + 10),
-        y:f.y - f.h*.5,
-        vx:-f.dir*(80+i*18),
-        vy:-20 + Math.random()*40,
-        life:.22 + i*.025,
-        max:.22 + i*.025,
-        size:22 - i*1.5,
+        x:f.x - f.dir * (i*12 + 12),
+        y:f.y - f.collisionH*.52,
+        vx:-f.dir*(90+i*22),
+        vy:-24 + Math.random()*42,
+        life:.20 + i*.026,
+        max:.20 + i*.026,
+        size:24 - i*1.35,
         color:f.colorB + '88',
         kind:'after'
       });
     }
   }
 
-  function startAttack(f, type){
+  function spawnFootDust(f, count=5, color='rgba(210,170,120,.34)'){
+    for(let i=0;i<count;i++){
+      particles.push({
+        kind:'dust',
+        x:f.x + (Math.random()-.5)*50,
+        y:f.y + 4,
+        vx:(Math.random()-.5)*120 - f.vx*.10,
+        vy:-26-Math.random()*48,
+        life:.32 + Math.random()*.18,
+        max:.46,
+        color: typeof color === 'string' && color[0] === '#' ? color + '55' : color,
+        size:10+Math.random()*18
+      });
+    }
+  }
+
+  function startAttack(f, type, fromBuffer=false){
     if (gameState !== 'fight') return;
     if (roundFreeze > 0) return;
-    if (f.state === 'hitstun' || f.state === 'knockdown' || f.state === 'attack' || f.state === 'dodge') return;
-    const data = attacks[type];
-    if (!data) return;
-    if ((type === 'special' || type === 'ultimate') && f.energy < data.cost) {
-      floatingText('NO ENERGY', f.x, f.y - f.h - 22, '#d9b76a');
+    if (isActionLocked(f)) {
+      if (!fromBuffer) bufferAttack(f, type);
       return;
     }
+
+    if (f.state === 'attack' && !canAttackCancel(f, type)) {
+      if (!fromBuffer) bufferAttack(f, type);
+      return;
+    }
+
+    const data = attacks[type];
+    if (!data) return;
+
+    if ((type === 'special' || type === 'ultimate') && f.energy < data.cost) {
+      if (f.id === 'player') floatingText('NO ENERGY', f.x, f.y - f.h*.86, '#d9b76a');
+      return;
+    }
+
     if (type === 'ultimate') {
       f.energy = clamp(f.energy - data.cost, 0, 100);
       spawnAura(f, '#fff0b7');
       spawnAura(f, f.colorB);
       cinematic = .75;
-      cameraZoom = 1.08;
+      cameraZoom = 1.09;
       shake = Math.max(shake, 18);
       flash = Math.max(flash, .32);
       showCallout('ULTIMATE', f.ultimateName || 'Final Strike');
@@ -3696,10 +3813,19 @@ body.result-entering #result{
     } else {
       audio.tone(type==='heavy'?160:250,.045,'square',.025,.9);
     }
+
     f.state = 'attack';
     f.stateT = 0;
     f.attack = { ...data, total: data.startup + data.active + data.recovery };
     f.attackHasHit = false;
+    f.lastAttackType = type;
+    f.comboT = .42;
+    f.comboStep = type === 'light' ? Math.min(2, (f.comboStep || 0) + 1) : 0;
+
+    // Real attack momentum: sprite and hitbox move together.
+    f.vx += f.dir * (data.lunge || 0);
+    f.vx = clamp(f.vx, -f.stats.speed*1.55, f.stats.speed*1.55);
+    spawnFootDust(f, type === 'ultimate' ? 12 : type === 'special' ? 9 : type === 'heavy' ? 7 : 4, f.colorB);
   }
 
   function setState(f, s){
@@ -3712,8 +3838,8 @@ body.result-entering #result{
 
   function bodyBox(f){
     if (USE_PREMIUM_FIGHTER_ART) {
-      const bw = fighterVisualWidth(f) * (f.id === 'enemy' ? .42 : .38);
-      const bh = fighterVisualHeight(f) * .84;
+      const bw = f.collisionW || fighterVisualWidth(f) * (f.id === 'enemy' ? .58 : .52);
+      const bh = f.collisionH || fighterVisualHeight(f) * .78;
       return { x:f.x - bw/2, y:f.y - bh, w:bw, h:bh };
     }
     return { x:f.x - f.w/2, y:f.y - f.h, w:f.w, h:f.h };
@@ -3721,9 +3847,9 @@ body.result-entering #result{
 
   function hurtBox(f){
     if (USE_PREMIUM_FIGHTER_ART) {
-      const bw = fighterVisualWidth(f) * (f.id === 'enemy' ? .48 : .42);
-      const bh = fighterVisualHeight(f) * .82;
-      return { x:f.x - bw/2, y:f.y - bh*.98, w:bw, h:bh };
+      const bw = (f.collisionW || f.w) * (f.id === 'enemy' ? .92 : .88);
+      const bh = (f.collisionH || f.h) * .94;
+      return { x:f.x - bw/2, y:f.y - bh*.99, w:bw, h:bh };
     }
     return { x:f.x - f.w*.42, y:f.y - f.h*.95, w:f.w*.84, h:f.h*.9 };
   }
@@ -3735,12 +3861,13 @@ body.result-entering #result{
 
     if (USE_PREMIUM_FIGHTER_ART) {
       const vh = fighterVisualHeight(f);
-      const reachBoost = f.attack.name === 'ultimate' ? 1.18 : f.attack.name === 'special' ? 1.10 : 1.0;
+      const reachBoost = f.attack.name === 'ultimate' ? 1.22 : f.attack.name === 'special' ? 1.13 : f.attack.name === 'heavy' ? 1.06 : 1.0;
       const range = f.attack.range * premiumFighterScaleFactor() * reachBoost;
       const boxH = f.attack.height * premiumFighterScaleFactor();
-      const y = f.y - vh * (f.attack.name === 'ultimate' ? .78 : .70);
+      const y = f.y - vh * (f.attack.name === 'ultimate' ? .80 : f.attack.name === 'special' ? .74 : .70);
+      const base = fighterBodyRadius(f) * .30;
       return {
-        x: f.dir > 0 ? f.x + fighterBodyRadius(f)*.22 : f.x - fighterBodyRadius(f)*.22 - range,
+        x: f.dir > 0 ? f.x + base : f.x - base - range,
         y,
         w: range,
         h: boxH
@@ -3762,7 +3889,8 @@ body.result-entering #result{
     if (defender.invuln > 0 || defender.hp <= 0) return;
 
     const facing = Math.sign(defender.x - attacker.x) || attacker.dir;
-    const defenderBlocking = defender.state === 'block' && defender.stamina > 0 && Math.sign(attacker.x - defender.x) !== defender.dir;
+    const defenderFacingAttacker = Math.sign(attacker.x - defender.x) === defender.dir;
+    const defenderBlocking = defender.state === 'block' && defender.stamina > 0 && defenderFacingAttacker;
 
     let dmg = atk.damage;
     let blocked = false;
@@ -3770,19 +3898,39 @@ body.result-entering #result{
     if (defenderBlocking) {
       blocked = true;
       dmg = atk.blockDamage;
-      defender.stamina = clamp(defender.stamina - (atk.name === 'special' ? 28 : atk.name === 'heavy' ? 18 : 10), 0, 100);
+      defender.stamina = clamp(defender.stamina - (atk.guardDamage || 14), 0, 100);
+      defender.vx += facing * Math.max(90, (atk.kb || 300) * .22);
       if (defender.stamina <= 0) {
         blocked = false;
-        dmg += 5;
-        floatingText('GUARD BREAK', defender.x, defender.y - defender.h - 28, '#d9b76a');
+        dmg += 6;
+        defender.invuln = 0;
+        floatingText('GUARD BREAK', defender.x, defender.y - defender.h*.88, '#d9b76a');
+        spawnAura(defender, '#d9b76a');
       }
     }
 
+    const armorReduce = (!blocked && defender.armor && atk.name !== 'ultimate') ? defender.armor : 0;
+    dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
+
     defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
-    defender.invuln = atk.name === 'ultimate' ? .18 : .11;
-    defender.vx = facing * (blocked ? atk.kb*.28 : atk.kb);
-    defender.vy = blocked ? -40 : (atk.name === 'ultimate' ? -250 : atk.name === 'heavy' ? -120 : atk.name === 'special' ? -190 : -55);
-    setState(defender, blocked ? 'block' : 'hitstun');
+    defender.invuln = atk.name === 'ultimate' ? .18 : .10;
+
+    const massScale = 1 / Math.max(.8, defender.mass || 1);
+    const effectiveKb = blocked ? (atk.kb*.30) : atk.kb;
+    defender.vx = facing * effectiveKb * massScale;
+    defender.vy = blocked ? -34 : (atk.lift || -70) * massScale;
+
+    attacker.vx -= facing * (atk.pushback || 60) / Math.max(.9, attacker.mass || 1);
+    attacker.vx *= atk.attackerBrake || .7;
+
+    const hardHit = !blocked && (atk.name === 'heavy' || atk.name === 'special' || atk.name === 'ultimate');
+    if (hardHit && atk.name !== 'heavy') {
+      defender.knockdownTime = atk.name === 'ultimate' ? .82 : .48;
+      setState(defender, 'knockdown');
+    } else {
+      defender.hitstunTime = blocked ? .16 : (atk.hitstun || .28);
+      setState(defender, blocked ? 'block' : 'hitstun');
+    }
     defender.stateT = 0;
 
     attacker.energy = clamp(attacker.energy + atk.energyGain, 0, 100);
@@ -3796,12 +3944,15 @@ body.result-entering #result{
       lastHitAt = performance.now();
       updateComboTag();
     }
-    shake = Math.max(shake, blocked ? 6 : atk.name === 'ultimate' ? 28 : atk.name === 'special' ? 20 : atk.name === 'heavy' ? 14 : 8);
-    flash = Math.max(flash, blocked ? .08 : atk.name === 'ultimate' ? .34 : atk.name === 'special' ? .20 : .11);
+
+    shake = Math.max(shake, blocked ? 6 : atk.name === 'ultimate' ? 30 : atk.name === 'special' ? 21 : atk.name === 'heavy' ? 16 : 9);
+    flash = Math.max(flash, blocked ? .08 : atk.name === 'ultimate' ? .34 : atk.name === 'special' ? .21 : .12);
     if (atk.name === 'ultimate') { cinematic = .65; cameraZoom = 1.12; }
-    spawnHitSpark(defender.x - facing*28, defender.y - defender.h*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
+
+    spawnHitSpark(defender.x - facing*28, defender.y - (defender.collisionH || defender.h)*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
     spawnSlashWave(attacker, defender, atk.name);
-    floatingText(blocked ? 'BLOCK' : '-' + dmg, defender.x, defender.y - defender.h - 22, blocked ? '#8edcff' : '#fff3d1');
+    spawnFootDust(defender, blocked ? 4 : atk.name === 'ultimate' ? 16 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5, blocked ? '#8edcff' : attacker.colorB);
+    floatingText(blocked ? 'BLOCK' : '-' + dmg, defender.x, defender.y - defender.h*.88, blocked ? '#8edcff' : '#fff3d1');
     audio.hit(blocked ? 'block' : atk.name);
     tryHaptic(blocked ? 'light' : atk.name);
     updateHUD();
@@ -3932,31 +4083,121 @@ body.result-entering #result{
     texts.push({text,x,y,vy:-58,life:.72,max:.72,color});
   }
 
+  function stageBounds(){
+    if (EXACT_BLACK_CITADEL_ARENA) {
+      const b = getExactArenaCombatBounds();
+      // Use the central floor zone. This keeps both fighters on the premium stage,
+      // not on the decorative left wall.
+      const inset = (b.right - b.left) * (window.matchMedia && window.matchMedia('(pointer:coarse)').matches ? .09 : .12);
+      return { left:b.left + inset, right:b.right - inset, center:b.center };
+    }
+    return { left: w * .08, right: w * .92, center: w * .5 };
+  }
+
+  function clampToStage(f){
+    const b = stageBounds();
+    const pad = USE_PREMIUM_FIGHTER_ART ? Math.max(48, fighterBodyRadius(f)*.70) : f.w*.35;
+    f.x = clamp(f.x, b.left + pad, b.right - pad);
+  }
+
+  function resolveFighterCollision(){
+    if (!player || !enemy) return;
+    const pb = bodyBox(player);
+    const eb = bodyBox(enemy);
+    const pCenter = pb.x + pb.w/2;
+    const eCenter = eb.x + eb.w/2;
+    const minDist = (pb.w + eb.w) * .50 + (USE_PREMIUM_FIGHTER_ART ? 38 : 8);
+    const dist = Math.abs(eCenter - pCenter);
+
+    if (dist < minDist) {
+      const dir = pCenter < eCenter ? -1 : 1;
+      const overlap = minDist - dist;
+      const pMass = player.mass || 1;
+      const eMass = enemy.mass || 1;
+      const total = pMass + eMass;
+      const pMove = overlap * (eMass / total);
+      const eMove = overlap * (pMass / total);
+
+      player.x += dir * pMove;
+      enemy.x -= dir * eMove;
+      player.vx = Math.min(player.vx, 0) * .42 + dir * 26;
+      enemy.vx = Math.max(enemy.vx, 0) * .42 - dir * 26;
+      player.contactPressure = Math.min(1, (player.contactPressure || 0) + .14);
+      enemy.contactPressure = Math.min(1, (enemy.contactPressure || 0) + .14);
+      clampToStage(player);
+      clampToStage(enemy);
+    } else {
+      player.contactPressure = Math.max(0, (player.contactPressure || 0) - .06);
+      enemy.contactPressure = Math.max(0, (enemy.contactPressure || 0) - .06);
+    }
+  }
+
+  function applyMovementInput(f, axis, dt){
+    f.walkIntent = axis;
+    if (!axis) return;
+    const grounded = isGrounded(f);
+    const accel = grounded ? f.stats.accel : f.stats.airAccel;
+    const blockPenalty = f.state === 'block' ? .32 : 1;
+    const attackPenalty = f.state === 'attack' ? .18 : 1;
+    f.vx += axis * accel * blockPenalty * attackPenalty * dt;
+    const max = f.stats.speed * (grounded ? 1 : .82) * (f.state === 'block' ? .42 : 1);
+    f.vx = clamp(f.vx, -max, max);
+  }
+
   function updateFighter(f, opponent, dt){
+    const wasGrounded = isGrounded(f);
     f.stateT += dt;
     f.invuln = Math.max(0, f.invuln - dt);
     f.dodgeCd = Math.max(0, (f.dodgeCd || 0) - dt);
     f.afterImage = Math.max(0, (f.afterImage || 0) - dt);
-    f.stamina = clamp(f.stamina + dt*18, 0, 100);
-    f.energy = clamp(f.energy + dt*2.2, 0, 100);
+    f.groundLock = Math.max(0, (f.groundLock || 0) - dt);
+    f.bufferedAttackT = Math.max(0, (f.bufferedAttackT || 0) - dt);
+    f.comboT = Math.max(0, (f.comboT || 0) - dt);
+    if (f.comboT <= 0) f.comboStep = 0;
+
+    const staminaRegen = f.state === 'block' ? 7 : 24;
+    f.stamina = clamp(f.stamina + dt*staminaRegen, 0, 100);
+    f.energy = clamp(f.energy + dt*(f.id === 'player' ? 2.8 : 2.3), 0, 100);
 
     if (f.state === 'attack' && f.attack) {
+      // Active hit check.
       const ab = attackBox(f);
       if (ab && !f.attackHasHit && rectsOverlap(ab, hurtBox(opponent))) {
         f.attackHasHit = true;
         applyHit(f, opponent, f.attack);
       }
+      // Attack has real forward commit during startup/active, then brakes on recovery.
+      const activeEnd = f.attack.startup + f.attack.active;
+      if (f.stateT < activeEnd) {
+        f.vx += f.dir * (f.attack.lunge || 0) * dt * 2.1;
+      } else {
+        f.vx *= Math.pow(.78, dt*60);
+      }
       if (f.stateT >= f.attack.total) {
         setState(f, 'idle');
+        consumeBufferedAttack(f);
       }
     }
 
-    if (f.state === 'hitstun' && f.stateT > .26) setState(f, 'idle');
-    if (f.state === 'dodge' && f.stateT > .26) setState(f, 'idle');
-    if (f.state === 'block' && f.id === 'enemy' && f.stateT > .42) setState(f, 'idle');
-    if (f.state === 'block' && f.id === 'player' && !input.block) setState(f, 'idle');
+    if (f.state === 'hitstun' && f.stateT > (f.hitstunTime || .28)) {
+      setState(f, 'idle');
+      consumeBufferedAttack(f);
+    }
+    if (f.state === 'knockdown' && f.stateT > (f.knockdownTime || .55) && isGrounded(f)) {
+      setState(f, 'idle');
+      f.invuln = .12;
+      spawnFootDust(f, 7, 'rgba(210,170,120,.34)');
+    }
+    if (f.state === 'dodge' && f.stateT > .24) {
+      setState(f, 'idle');
+      consumeBufferedAttack(f);
+    }
+    if (f.state === 'block') {
+      if (f.id === 'enemy' && f.stateT > .44) setState(f, 'idle');
+      if (f.id === 'player' && !input.block) setState(f, 'idle');
+    }
 
-    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'dodge') {
+    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'knockdown' && f.state !== 'dodge') {
       if (f.id === 'player') updatePlayerControl(f, dt);
       else updateAI(f, opponent, dt);
     }
@@ -3965,71 +4206,52 @@ body.result-entering #result{
     f.x += f.vx * dt;
     f.y += f.vy * dt;
 
-    if (USE_PREMIUM_FIGHTER_ART && gameState === 'fight' && isGrounded(f) && Math.abs(f.vx) > 120 && Math.random() < dt * 7) {
-      particles.push({
-        kind:'dust',
-        x:f.x - f.dir*18 + (Math.random()-.5)*26,
-        y:f.y + 2,
-        vx:-f.dir*(30+Math.random()*70),
-        vy:-22-Math.random()*22,
-        life:.38,
-        max:.38,
-        color:'rgba(210,170,120,.34)',
-        size:10+Math.random()*12
-      });
-    }
-
     if (f.y > groundY) {
       f.y = groundY;
+      if (!wasGrounded && Math.abs(f.vy) > 320) {
+        spawnFootDust(f, 8, 'rgba(210,170,120,.34)');
+        shake = Math.max(shake, 3.5);
+      }
       f.vy = 0;
     }
 
-    f.vx *= Math.pow(FRICTION, dt*60);
-    const bounds = EXACT_BLACK_CITADEL_ARENA ? getExactArenaCombatBounds() : { left: f.w*.65, right: w - f.w*.65 };
-    const pad = USE_PREMIUM_FIGHTER_ART ? fighterBodyRadius(f) : f.w*.20;
-    f.x = clamp(f.x, bounds.left + pad, bounds.right - pad);
+    const grounded = isGrounded(f);
+    const baseFriction = grounded ? (f.state === 'block' ? .70 : f.state === 'attack' ? .82 : .79) : .965;
+    f.vx *= Math.pow(baseFriction, dt*60);
+    if (Math.abs(f.vx) < 6) f.vx = 0;
+    clampToStage(f);
 
-    const dist = Math.abs(player.x - enemy.x);
-    const minDist = fighterPreferredDistance(player, enemy);
-    if (dist < minDist) {
-      const push = (minDist - dist)*.56;
-      if (player.x < enemy.x) { player.x -= push; enemy.x += push; }
-      else { player.x += push; enemy.x -= push; }
-      const b = EXACT_BLACK_CITADEL_ARENA ? getExactArenaCombatBounds() : { left: player.w*.65, right: w - player.w*.65 };
-      const pPad = USE_PREMIUM_FIGHTER_ART ? fighterBodyRadius(player) : player.w*.20;
-      const ePad = USE_PREMIUM_FIGHTER_ART ? fighterBodyRadius(enemy) : enemy.w*.20;
-      player.x = clamp(player.x, b.left + pPad, b.right - pPad);
-      enemy.x = clamp(enemy.x, b.left + ePad, b.right - ePad);
-      // Collision response — makes contact feel physical instead of overlapping.
-      player.vx *= .35;
-      enemy.vx *= .35;
+    if (USE_PREMIUM_FIGHTER_ART && gameState === 'fight' && grounded && Math.abs(f.vx) > 135 && Math.random() < dt * 11) {
+      spawnFootDust(f, 1, 'rgba(210,170,120,.28)');
     }
 
-    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'block' && f.state !== 'dodge') {
-      if (!isGrounded(f)) setState(f, 'jump');
-      else if (Math.abs(f.vx) > 35) setState(f, 'walk');
+    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'block' && f.state !== 'dodge' && f.state !== 'knockdown') {
+      if (!grounded) setState(f, 'jump');
+      else if (Math.abs(f.vx) > 42) setState(f, 'walk');
       else setState(f, 'idle');
     }
   }
 
   function updatePlayerControl(f, dt){
-    const speed = f.stats.speed;
     if (input.dodge) {
       input.dodge = false;
       performDodge(f);
       return;
     }
+
     if (input.block && isGrounded(f)) {
       setState(f, 'block');
-      f.vx *= .72;
+      f.vx *= Math.pow(.62, dt*60);
       return;
     }
-    if (input.left) f.vx -= speed * dt * (USE_PREMIUM_FIGHTER_ART ? 7.2 : 5.2);
-    if (input.right) f.vx += speed * dt * (USE_PREMIUM_FIGHTER_ART ? 7.2 : 5.2);
-    f.vx = clamp(f.vx, -speed, speed);
-    if (input.jump && isGrounded(f)) {
+
+    const axis = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    applyMovementInput(f, axis, dt);
+
+    if (input.jump && isGrounded(f) && f.groundLock <= 0) {
       f.vy = -f.stats.jump;
       setState(f, 'jump');
+      spawnFootDust(f, 5, 'rgba(210,170,120,.36)');
       audio.tone(320,.045,'triangle',.025,1.1);
     }
   }
@@ -4038,47 +4260,47 @@ body.result-entering #result{
     const ai = f.ai;
     ai.think -= dt;
     const dist = Math.abs(opponent.x - f.x);
-    const preferred = USE_PREMIUM_FIGHTER_ART ? fighterPreferredDistance(f, opponent) : 130;
-    const close = dist < preferred * .88;
-    const mid = dist < preferred + (USE_PREMIUM_FIGHTER_ART ? 190 : 140);
-    const playerThreat = opponent.state === 'attack' && dist < preferred + (USE_PREMIUM_FIGHTER_ART ? 120 : 60);
+    const preferred = USE_PREMIUM_FIGHTER_ART ? fighterPreferredDistance(f, opponent) + 58 : 150;
+    const attackReach = attacks.heavy.range * premiumFighterScaleFactor() + fighterBodyRadius(f) + fighterBodyRadius(opponent) * .30;
+    const close = dist < preferred * .82;
+    const inStrikeRange = dist < attackReach;
+    const playerThreat = opponent.state === 'attack' && dist < attackReach + 80;
     f.dir = opponent.x > f.x ? 1 : -1;
 
     if (ai.think <= 0) {
-      ai.think = .12 + Math.random()*.22;
+      ai.think = .10 + Math.random()*.20;
       ai.next = Math.random();
     }
 
     if (playerThreat && Math.random() < ai.blockChance && f.state !== 'attack') {
-      if (Math.random() < .28 && f.dodgeCd <= 0) {
+      if (Math.random() < .22 && f.dodgeCd <= 0) {
         performDodge(f);
         return;
       }
       setState(f, 'block');
-      f.vx *= .5;
+      f.vx *= .45;
       return;
     }
 
     if (f.state === 'block') return;
 
-    if (!close) {
-      const ideal = USE_PREMIUM_FIGHTER_ART ? preferred + 18 + Math.random()*52 : 120 + Math.random()*60;
-      if (dist > ideal) f.vx += f.dir * f.stats.speed * dt * (USE_PREMIUM_FIGHTER_ART ? 4.8 : 3.5);
-      else f.vx -= f.dir * f.stats.speed * dt * (USE_PREMIUM_FIGHTER_ART ? 3.0 : 2.2);
-    } else {
-      // Big painted sprites need a real personal space. The AI backs up instead
-      // of walking inside the player art.
-      f.vx -= f.dir * f.stats.speed * dt * (USE_PREMIUM_FIGHTER_ART ? 3.6 : .6);
+    let axis = 0;
+    if (dist > preferred + 44) axis = f.dir;
+    else if (close) axis = -f.dir;
+    else if (Math.random() < .012) axis = Math.random() < .5 ? -f.dir : f.dir;
+    applyMovementInput(f, axis, dt);
+
+    if (inStrikeRange && ai.think < .08 && Math.random() > ai.mistake) {
+      if (f.energy >= attacks.ultimate.cost && Math.random() < .045) startAttack(f, 'ultimate');
+      else if (f.energy >= attacks.special.cost && Math.random() < .24) startAttack(f, 'special');
+      else if (dist < preferred * .92 && Math.random() < .50) startAttack(f, Math.random() < .48 ? 'heavy' : 'light');
+      else if (Math.random() < .15) startAttack(f, 'heavy');
     }
 
-    if (mid && ai.think < .1 && Math.random() > ai.mistake) {
-      if (f.energy >= attacks.ultimate.cost && Math.random() < .08) startAttack(f, 'ultimate');
-      else if (f.energy >= attacks.special.cost && Math.random() < .34) startAttack(f, 'special');
-      else if (close && Math.random() < .55) startAttack(f, Math.random() < .44 ? 'heavy' : 'light');
-      else if (mid && Math.random() < .16) startAttack(f, 'heavy');
+    if (Math.random() < .0016 && isGrounded(f) && dist > preferred) {
+      f.vy = -f.stats.jump*.78;
+      spawnFootDust(f, 4, 'rgba(210,170,120,.26)');
     }
-
-    if (Math.random() < .0025 && isGrounded(f)) f.vy = -f.stats.jump*.88;
   }
 
   function updateRound(dt){
@@ -4174,6 +4396,9 @@ body.result-entering #result{
     if (gameState === 'fight' || gameState === 'roundEnd') {
       updateFighter(player, enemy, sdt);
       updateFighter(enemy, player, sdt);
+      resolveFighterCollision();
+      clampToStage(player);
+      clampToStage(enemy);
     }
     updateParticles(sdt);
 
@@ -4447,7 +4672,7 @@ body.result-entering #result{
     const time = performance.now();
     const isEnemy = f.id !== 'player';
     const dir = f.dir || (isEnemy ? -1 : 1);
-    const hurt = f.state === 'hitstun';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown';
     const blocking = f.state === 'block';
     const attacking = f.state === 'attack';
     const dodging = f.state === 'dodge';
@@ -4621,7 +4846,7 @@ body.result-entering #result{
     const time = performance.now();
     const bob = f.state === 'idle' ? Math.sin(time/235)*2.8 : f.state === 'walk' ? Math.sin(time/80)*1.6 : 0;
     const x=f.x, y=f.y + bob, dir=f.dir;
-    const hurt = f.state === 'hitstun';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown';
     const blocking = f.state === 'block';
     const attacking = f.state === 'attack';
     const dodging = f.state === 'dodge';
