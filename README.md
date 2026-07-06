@@ -279,3 +279,7 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Fighter Rig 8.0
 
 Добавлена заметная физика и псевдо-анимация персонажей: spacing, collision, lunge, hit recoil, slash arcs, afterimages, block shield.
+
+
+## Sprite Combat 9.1 Visible Fix
+Исправлен renderer спрайтов: бойцы снова видимы, старый Fighter Rig больше не перекрывает sprite-sheet rendering.

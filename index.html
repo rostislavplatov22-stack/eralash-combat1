@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Fighter Rig 8.0</title>
+  <title>EraLash Combat — Sprite Combat 9.1 Visible Fix</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3012,13 +3012,14 @@ body.result-entering #result{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '9.0';
+  const SPRITE_COMBAT_PATCH = '9.1 VISIBLE';
 
   function loadSpriteSheet(src){
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
-    img.src = src;
+    // 9.1: cache-bust sprite sheets so Vercel/browser cannot show an older invisible asset.
+    img.src = src + '?v=sprite-combat-9-1-visible';
     return img;
   }
 
@@ -3227,7 +3228,7 @@ body.result-entering #result{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '9.0';
+  const REAL_PHYSICS_PATCH = '9.1 VISIBLE';
 
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
@@ -4779,14 +4780,14 @@ body.result-entering #result{
     const attackPunch = attacking ? Math.sin(attackP * Math.PI) : 0;
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
 
-    let spriteH = coarse ? clamp(h * .36, 250, 360) : clamp(h * (isEnemy ? .42 : .40), 300, isEnemy ? 430 : 400);
+    let spriteH = coarse ? clamp(h * .44, 310, 455) : clamp(h * (isEnemy ? .54 : .50), 390, isEnemy ? 560 : 520);
     spriteH *= anim.scale || 1;
     if (attacking) spriteH *= atkName === 'ultimate' ? 1.04 : 1.015;
     let spriteW = spriteH * (fw / Math.max(1, fh));
 
     // Large frames from generated sheets can contain extra horizontal padding.
     // Keep visible size stable so the fighters do not become giant pasted posters.
-    const maxW = coarse ? w * .30 : w * (isEnemy ? .25 : .24);
+    const maxW = coarse ? w * .38 : w * (isEnemy ? .34 : .32);
     if (spriteW > maxW) {
       const k = maxW / spriteW;
       spriteW *= k;
@@ -4834,10 +4835,16 @@ body.result-entering #result{
     ctx.translate(x, y);
     ctx.scale(dir * squashX, squashY);
     ctx.rotate(lean);
-    if (hurt) ctx.filter = 'brightness(1.35) saturate(1.15)';
-    if (blocking) ctx.filter = 'brightness(1.08) saturate(1.15)';
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.shadowColor = isEnemy ? 'rgba(70,190,255,.45)' : 'rgba(255,45,60,.45)';
+    ctx.shadowBlur = 24;
+    if (hurt) ctx.filter = 'brightness(1.75) contrast(1.2) saturate(1.25)';
+    else if (blocking) ctx.filter = 'brightness(1.35) contrast(1.15) saturate(1.22)';
+    else ctx.filter = 'brightness(1.28) contrast(1.18) saturate(1.18)';
     ctx.drawImage(img, frame * fw, 0, fw, fh, -spriteW*.5, -spriteH, spriteW, spriteH);
     ctx.filter = 'none';
+    ctx.shadowBlur = 0;
 
     if (blocking) {
       const shieldColor = isEnemy ? 'rgba(80,190,255,.95)' : 'rgba(255,65,80,.85)';
@@ -7129,8 +7136,8 @@ function sessionId(){
     comboTimer = 0;
     comboDamage = 0;
     updateComboTag();
-    physicsDebugT = 7.0;
-    showCallout('FIGHTER RIG 8.0', 'REAL MOVEMENT · BIG HIT REACTIONS · NO OVERLAP');
+    physicsDebugT = 8.0;
+    showCallout('SPRITE COMBAT 9.1', 'VISIBLE SPRITES · REAL ANIMATION FRAMES · ATTACK/BLOCK/WALK');
     updateHUD(true);
   }
 
@@ -7508,6 +7515,9 @@ function sessionId(){
   }
 
   function drawPremiumFighterArt(f){
+    // Sprite Combat 9.1: final renderer must use sprite sheets first.
+    // Previous Fighter Rig 8.0 declaration was overriding the sprite renderer and causing invisible/static fighters.
+    if (typeof drawSpriteSheetFighter === 'function' && drawSpriteSheetFighter(f)) return true;
     if (!USE_PREMIUM_FIGHTER_ART) return false;
     const img = f.id === 'player' ? premiumFighterArt.player : premiumFighterArt.enemy;
     if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
