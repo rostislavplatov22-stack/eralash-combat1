@@ -274,3 +274,8 @@ Fullscreen lobby rebuild: крупный hero-art, левое меню, прав
 ## Combat Physics 7.0
 
 Добавлена новая физика боя: movement acceleration, body collision, input buffer, combo cancel, hitstun/knockdown, guard stamina, AI spacing и stage bounds для exact Black Citadel arena.
+
+
+## Fighter Rig 8.0
+
+Добавлена заметная физика и псевдо-анимация персонажей: spacing, collision, lunge, hit recoil, slash arcs, afterimages, block shield.

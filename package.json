@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-real-combat-physics-7-2-ready",
-  "version": "2.5.1",
+  "name": "eralash-combat-fighter-rig-8-ready",
+  "version": "2.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Real Combat Physics 7.2: visible fighter movement, root motion, stronger collision, knockback, hitstop and proof-of-patch debug marker."
+  "description": "EraLash Combat Fighter Rig 8.0: visible combat movement, stronger state animation, readable fighter spacing, hit reactions, slash arcs and collision fixes."
 }
