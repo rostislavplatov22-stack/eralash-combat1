@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-premium-fighters-6-ready",
-  "version": "2.4.0",
+  "name": "eralash-combat-premium-fighters-6-1-physics-ready",
+  "version": "2.4.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Premium Fighters 6.0: uploaded Shadow Raven and Iron Warden full-body character art integrated into combat screen."
+  "description": "EraLash Combat Premium Fighters 6.1: large character sprites now have real spacing, movement animation, collision physics and combat hitboxes."
 }

@@ -1,3 +1,7 @@
+# EraLash Combat — Premium Fighters 6.1 Physics Fix
+
+Добавлен physics layer для больших premium-персонажей: движение, дистанция, hitbox/hurtbox, AI spacing, attack lunge и dust.
+
 # EraLash Combat — Premium Fighters 6.0
 
 Добавлены новые full-body персонажи Shadow Raven и Iron Warden. Старые фигурки заменены на premium character art.
