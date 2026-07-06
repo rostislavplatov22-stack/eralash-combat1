@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Combat Physics 7.0</title>
+  <title>EraLash Combat — Combat Physics 7.2</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3023,8 +3023,8 @@ body.result-entering #result{
   // centered in a 16:9 safe frame so the left/right edge art does not turn into
   // ugly stretched panels.
   const EXACT_ARENA_ASPECT = 16 / 9;
-  const EXACT_ARENA_COMBAT_LEFT = 0.23;
-  const EXACT_ARENA_COMBAT_RIGHT = 0.77;
+  const EXACT_ARENA_COMBAT_LEFT = 0.29;
+  const EXACT_ARENA_COMBAT_RIGHT = 0.71;
 
   function getExactArenaStageRect(){
     const viewportAspect = w / Math.max(1, h);
@@ -3087,6 +3087,23 @@ body.result-entering #result{
   }
 
 
+  function physicsDebugLine(){
+    if (!ui.debug || gameState === 'menu') return;
+    if (physicsDebugT <= 0) {
+      ui.debug.style.display = 'none';
+      return;
+    }
+    ui.debug.style.display = 'block';
+    ui.debug.style.border = '1px solid rgba(217,183,106,.35)';
+    ui.debug.style.background = 'linear-gradient(180deg,rgba(8,9,12,.72),rgba(0,0,0,.50))';
+    ui.debug.style.boxShadow = '0 14px 40px rgba(0,0,0,.35)';
+    ui.debug.innerHTML = `REAL PHYSICS ${REAL_PHYSICS_PATCH}<br>` +
+      `Raven: ${player.state} · vx ${Math.round(player.vx)} · stamina ${Math.round(player.stamina)}<br>` +
+      `Warden: ${enemy.state} · vx ${Math.round(enemy.vx)} · stamina ${Math.round(enemy.stamina)}`;
+  }
+
+
+
   const ui = {
     menu: document.getElementById('menu'),
     result: document.getElementById('result'),
@@ -3107,6 +3124,7 @@ body.result-entering #result{
     calloutSmall: document.getElementById('calloutSmall'),
     comboTag: document.getElementById('comboTag'),
     comboCount: document.getElementById('comboCount'),
+    debug: document.getElementById('debug'),
     resultTitle: document.getElementById('resultTitle'),
     resultText: document.getElementById('resultText'),
     resultKicker: document.getElementById('resultKicker'),
@@ -3178,6 +3196,8 @@ body.result-entering #result{
   const particles = [];
   const texts = [];
   const projectiles = [];
+  let physicsDebugT = 0;
+  const REAL_PHYSICS_PATCH = '7.2';
 
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
@@ -3299,12 +3319,12 @@ body.result-entering #result{
       vx: 0,
       vy: 0,
 
-      // Combat Physics 7.0:
+      // Combat Physics 7.2:
       // visual art can be huge, but collision is a stable combat capsule.
-      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 138 : 168) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 350 : 382) : Number(cfg.height || (isPlayer ? 172 : 188)),
-      collisionW: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 122 : 148) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      collisionH: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 295 : 328) : Number(cfg.height || (isPlayer ? 172 : 188)),
+      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 126 : 154) : Number(cfg.width || (isPlayer ? 78 : 90)),
+      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 330 : 362) : Number(cfg.height || (isPlayer ? 172 : 188)),
+      collisionW: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 108 : 136) : Number(cfg.width || (isPlayer ? 78 : 90)),
+      collisionH: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 275 : 306) : Number(cfg.height || (isPlayer ? 172 : 188)),
       mass: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 1.08 : 1.34) : 1,
       dir: isPlayer ? 1 : -1,
 
@@ -3344,9 +3364,9 @@ body.result-entering #result{
 
       stats: {
         // These are real physics values now: acceleration uses speed, not direct teleporting.
-        speed: Math.round((USE_PREMIUM_FIGHTER_ART ? 360 : 330) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.55 : 2.15)),
-        accel: Math.round((USE_PREMIUM_FIGHTER_ART ? 2100 : 1800) + baseSpeed * 10),
-        airAccel: Math.round((USE_PREMIUM_FIGHTER_ART ? 930 : 760) + baseSpeed * 4),
+        speed: Math.round((USE_PREMIUM_FIGHTER_ART ? 470 : 340) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.9 : 2.15)),
+        accel: Math.round((USE_PREMIUM_FIGHTER_ART ? 3400 : 1850) + baseSpeed * 13),
+        airAccel: Math.round((USE_PREMIUM_FIGHTER_ART ? 1260 : 760) + baseSpeed * 4),
         jump: Number(cfg.jump || (isPlayer ? 940 : 820)),
         hp,
         power: basePower,
@@ -3367,23 +3387,23 @@ body.result-entering #result{
   let enemy = makeFighter('enemy');
 
   const attacks = {
-    // Combat Physics 7.0 — tuned for big full-body fighters.
+    // Combat Physics 7.2 — tuned for big full-body fighters.
     // startup / active / recovery create real timing. lunge and pushback create weight.
     light: {
       name:'light', startup:.075, active:.085, recovery:.145,
       damage:7, blockDamage:2, guardDamage:10,
-      range:178, height:145, y:-255,
-      kb:310, lift:-45, pushback:70, attackerBrake:.70,
+      range:210, height:160, y:-255,
+      kb:460, lift:-70, pushback:96, attackerBrake:.62,
       hitStop:.065, hitstun:.28, energyGain:9, cost:0,
-      lunge:140, cancelWindow:[.16,.28], chain:['light','heavy','special']
+      lunge:240, cancelWindow:[.14,.31], chain:['light','heavy','special']
     },
     heavy: {
       name:'heavy', startup:.165, active:.110, recovery:.275,
       damage:16, blockDamage:5, guardDamage:20,
-      range:232, height:170, y:-275,
-      kb:560, lift:-130, pushback:105, attackerBrake:.56,
+      range:285, height:190, y:-275,
+      kb:760, lift:-170, pushback:142, attackerBrake:.48,
       hitStop:.120, hitstun:.42, energyGain:14, cost:0,
-      lunge:210, cancelWindow:[.22,.39], chain:['special']
+      lunge:330, cancelWindow:[.20,.44], chain:['special']
     },
     special: {
       name:'special', startup:.205, active:.155, recovery:.355,
@@ -3410,11 +3430,12 @@ body.result-entering #result{
     const mobileArena = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
     if (EXACT_BLACK_CITADEL_ARENA) {
       const bounds = getExactArenaCombatBounds();
-      // Combat Physics 7.0: fighters spawn on the actual central combat plane,
+      // Combat Physics 7.2: fighters spawn on the actual central combat plane,
       // not on the decorative left/right edges of the background.
-      const spread = mobileArena ? .245 : .285;
-      player.x = bounds.center - (bounds.right - bounds.left) * spread;
-      enemy.x = bounds.center + (bounds.right - bounds.left) * spread;
+      const spread = mobileArena ? .31 : .34;
+      const halfStage = (bounds.right - bounds.left);
+      player.x = bounds.center - halfStage * spread;
+      enemy.x = bounds.center + halfStage * spread;
     } else {
       player.x = w * (mobileArena ? .36 : .40);
       enemy.x = w * (mobileArena ? .64 : .60);
@@ -3437,7 +3458,8 @@ body.result-entering #result{
     comboTimer = 0;
     comboDamage = 0;
     updateComboTag();
-    showCallout('ROUND ' + roundIndex, 'Physics 7.0 combat ready');
+    physicsDebugT = 5.5;
+    showCallout('ROUND ' + roundIndex, 'REAL PHYSICS 7.2 · MOVE / HIT / BLOCK');
     updateHUD(true);
   }
 
@@ -3919,8 +3941,12 @@ body.result-entering #result{
     const effectiveKb = blocked ? (atk.kb*.30) : atk.kb;
     defender.vx = facing * effectiveKb * massScale;
     defender.vy = blocked ? -34 : (atk.lift || -70) * massScale;
+    // Real Physics 7.2: impact displacement happens on the same frame as the hit.
+    // This makes hits visible immediately instead of feeling like static art.
+    defender.x += facing * (blocked ? 24 : atk.name === 'ultimate' ? 98 : atk.name === 'special' ? 74 : atk.name === 'heavy' ? 62 : 38) * massScale;
 
     attacker.vx -= facing * (atk.pushback || 60) / Math.max(.9, attacker.mass || 1);
+    attacker.x -= facing * Math.min(44, (atk.pushback || 60) * .28);
     attacker.vx *= atk.attackerBrake || .7;
 
     const hardHit = !blocked && (atk.name === 'heavy' || atk.name === 'special' || atk.name === 'ultimate');
@@ -4106,7 +4132,7 @@ body.result-entering #result{
     const eb = bodyBox(enemy);
     const pCenter = pb.x + pb.w/2;
     const eCenter = eb.x + eb.w/2;
-    const minDist = (pb.w + eb.w) * .50 + (USE_PREMIUM_FIGHTER_ART ? 38 : 8);
+    const minDist = (pb.w + eb.w) * .50 + (USE_PREMIUM_FIGHTER_ART ? 120 : 8);
     const dist = Math.abs(eCenter - pCenter);
 
     if (dist < minDist) {
@@ -4120,8 +4146,8 @@ body.result-entering #result{
 
       player.x += dir * pMove;
       enemy.x -= dir * eMove;
-      player.vx = Math.min(player.vx, 0) * .42 + dir * 26;
-      enemy.vx = Math.max(enemy.vx, 0) * .42 - dir * 26;
+      player.vx = Math.min(player.vx, 0) * .34 + dir * 95;
+      enemy.vx = Math.max(enemy.vx, 0) * .34 - dir * 95;
       player.contactPressure = Math.min(1, (player.contactPressure || 0) + .14);
       enemy.contactPressure = Math.min(1, (enemy.contactPressure || 0) + .14);
       clampToStage(player);
@@ -4169,9 +4195,11 @@ body.result-entering #result{
       // Attack has real forward commit during startup/active, then brakes on recovery.
       const activeEnd = f.attack.startup + f.attack.active;
       if (f.stateT < activeEnd) {
-        f.vx += f.dir * (f.attack.lunge || 0) * dt * 2.1;
+        const root = (f.attack.lunge || 0);
+        f.vx += f.dir * root * dt * 3.1;
+        if (USE_PREMIUM_FIGHTER_ART) f.x += f.dir * root * dt * .38;
       } else {
-        f.vx *= Math.pow(.78, dt*60);
+        f.vx *= Math.pow(.72, dt*60);
       }
       if (f.stateT >= f.attack.total) {
         setState(f, 'idle');
@@ -4401,6 +4429,9 @@ body.result-entering #result{
       clampToStage(enemy);
     }
     updateParticles(sdt);
+
+    physicsDebugT = Math.max(0, physicsDebugT - dt);
+    physicsDebugLine();
 
     shake = Math.max(0, shake - dt*35);
     flash = Math.max(0, flash - dt*1.9);
@@ -4685,14 +4716,18 @@ body.result-entering #result{
     const coreB = hurt ? '#ff5161' : (f.colorB || (isEnemy ? '#3eb6ff' : '#c92832'));
     const accent = f.accent || (isEnemy ? '#d7dff0' : '#d9b76a');
 
-    const walkCycle = Math.sin(time / 82);
-    const bob = f.state === 'idle' ? Math.sin(time/260)*3.5 : f.state === 'walk' ? walkCycle*5.0 : 0;
+    const walkCycle = Math.sin(time / 58);
+    const bob = f.state === 'idle' ? Math.sin(time/230)*4.2 : f.state === 'walk' ? Math.abs(walkCycle)*13.0 : 0;
     const attackPunch = attacking ? Math.sin(tAttack * Math.PI) : 0;
     const attackLunge = dir * attackPunch * (atkName === 'ultimate' ? 44 : atkName === 'special' ? 34 : atkName === 'heavy' ? 28 : 18);
     const dodgeSlide = dodging ? -dir * 34 * Math.max(0, 1 - f.stateT/.26) : 0;
-    const poseX = attackLunge + dodgeSlide + (f.state === 'walk' ? Math.sin(time/94) * 3.5 : 0);
-    const poseY = attacking ? -attackPunch * 7 : 0;
-    const lean = clamp((f.vx || 0) / 560, -0.12, 0.12) + (hurt ? -0.12 : 0) + (dodging ? -0.18 : 0) + (attacking ? dir*.055*attackPunch : 0);
+    const poseX = attackLunge + dodgeSlide + (f.state === 'walk' ? Math.sin(time/72) * 16 : 0);
+    const poseY = attacking ? -attackPunch * 13 : 0;
+    const lean = clamp((f.vx || 0) / 440, -0.24, 0.24) + (hurt ? -0.20 : 0) + (dodging ? -0.26 : 0) + (attacking ? dir*.095*attackPunch : 0);
+    const strideSquashX = f.state === 'walk' ? 1 + Math.abs(walkCycle) * .035 : 1;
+    const strideSquashY = f.state === 'walk' ? 1 - Math.abs(walkCycle) * .018 : 1;
+    const attackSquashX = attacking ? 1 + attackPunch * .075 : 1;
+    const attackSquashY = attacking ? 1 - attackPunch * .035 : 1;
 
     let spriteH = coarse ? clamp(h * .40, 245, 405) : clamp(h * .47, 350, 490);
     if (isEnemy) spriteH *= coarse ? 1.06 : 1.09;
@@ -4769,7 +4804,7 @@ body.result-entering #result{
     // Draw full body character art.
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(dir, 1);
+    ctx.scale(dir * strideSquashX * attackSquashX, strideSquashY * attackSquashY);
     ctx.rotate(lean);
     if (hurt) {
       ctx.filter = 'brightness(1.35) saturate(1.2)';
