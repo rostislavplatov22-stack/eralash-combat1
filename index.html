@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Premium Character Select 14.0</title>
+  <title>EraLash Combat — Arena Select 15.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3081,6 +3081,283 @@ body.combat-feel-10 .pause-btn{
   .cs-start,.cs-back{width:100%}
 }
 
+
+
+/* Premium Arena Select 15.0 */
+.arena-select{
+  position:fixed;
+  inset:0;
+  z-index:53;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(12px,2vw,30px);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255,92,46,.24), transparent 28%),
+    radial-gradient(circle at 80% 22%, rgba(90,180,255,.20), transparent 34%),
+    linear-gradient(180deg, rgba(2,3,6,.91), rgba(0,0,0,.97));
+  backdrop-filter: blur(13px) saturate(1.18);
+  color:var(--text);
+}
+.arena-select.show{display:flex;animation:csFadeIn .22s ease-out both}
+body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
+.as-shell{
+  width:min(1180px,96vw);
+  max-height:min(92vh,860px);
+  overflow:hidden;
+  border:1px solid rgba(217,183,106,.34);
+  border-radius:28px;
+  background:
+    linear-gradient(145deg,rgba(13,15,20,.86),rgba(5,5,7,.92)),
+    radial-gradient(circle at 50% -10%,rgba(217,183,106,.18),transparent 38%);
+  box-shadow:0 32px 110px rgba(0,0,0,.74), inset 0 0 0 1px rgba(255,255,255,.055);
+  position:relative;
+}
+.as-shell:before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,transparent,rgba(217,183,106,.17),transparent),
+    radial-gradient(circle at var(--mx,50%) var(--my,20%),rgba(255,255,255,.08),transparent 20%);
+  mix-blend-mode:screen;
+  opacity:.8;
+}
+.as-top{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:flex-start;
+  padding:24px 26px 14px;
+  position:relative;
+  z-index:2;
+}
+.as-kicker{
+  color:var(--gold);
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  font-size:12px;
+  font-weight:900;
+}
+.as-title{
+  margin:6px 0 4px;
+  font-size:clamp(28px,4.8vw,58px);
+  line-height:.92;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  text-shadow:0 0 28px rgba(217,183,106,.18),0 12px 42px rgba(0,0,0,.8);
+}
+.as-title span{color:#fff0bd}
+.as-subtitle{
+  margin:0;
+  max-width:760px;
+  color:#bfc3cc;
+  line-height:1.45;
+  font-size:14px;
+}
+.as-close{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  border:1px solid rgba(217,183,106,.30);
+  background:rgba(0,0,0,.32);
+  color:#fff5d2;
+  font-size:26px;
+  cursor:pointer;
+}
+.as-body{
+  display:grid;
+  grid-template-columns:1.35fr .85fr;
+  gap:18px;
+  padding:0 26px 24px;
+  position:relative;
+  z-index:2;
+}
+.as-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.as-card{
+  position:relative;
+  min-height:190px;
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.10);
+  overflow:hidden;
+  cursor:pointer;
+  background:#07080b;
+  box-shadow:0 20px 58px rgba(0,0,0,.48), inset 0 0 0 1px rgba(255,255,255,.04);
+  transform:translateZ(0);
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.as-card:hover{transform:translateY(-3px);border-color:rgba(217,183,106,.42);filter:brightness(1.08)}
+.as-card.active{
+  border-color:rgba(255,230,168,.86);
+  box-shadow:0 0 0 1px rgba(255,230,168,.30),0 26px 90px rgba(217,183,106,.18), inset 0 0 42px rgba(217,183,106,.10);
+}
+.as-card:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:var(--arena-img, url('assets/arena-black-citadel-courtyard.png'));
+  background-size:cover;
+  background-position:center;
+  filter:brightness(.58) saturate(.96);
+  transform:scale(1.05);
+}
+.as-card[data-as-arena="infernal_bridge"]:before{filter:brightness(.62) saturate(1.28) sepia(.25) hue-rotate(-18deg)}
+.as-card[data-as-arena="moon_ritual"]:before{filter:brightness(.68) saturate(1.10) hue-rotate(180deg)}
+.as-card[data-as-arena="frozen_throne"]:before{filter:brightness(.73) saturate(.78) hue-rotate(170deg)}
+.as-card:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 22%,var(--arena-glow,rgba(217,183,106,.24)),transparent 34%),
+    linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.78));
+}
+.as-card-content{
+  position:absolute;
+  inset:auto 16px 14px 16px;
+  z-index:2;
+}
+.as-tag{
+  display:inline-flex;
+  padding:6px 9px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  background:rgba(0,0,0,.42);
+  color:#fff3ce;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.as-card h3{
+  margin:10px 0 4px;
+  font-size:24px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.as-card p{
+  margin:0;
+  color:#d4d6dd;
+  line-height:1.35;
+  font-size:13px;
+}
+.as-panel{
+  border:1px solid rgba(217,183,106,.24);
+  border-radius:24px;
+  padding:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.035);
+}
+.as-preview{
+  position:relative;
+  height:220px;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  background:#050608;
+  margin-bottom:16px;
+}
+.as-preview:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:url('assets/arena-black-citadel-courtyard.png');
+  background-size:cover;
+  background-position:center;
+  filter:brightness(.56) saturate(1);
+  transform:scale(1.04);
+}
+.as-preview:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 25%,var(--as-glow,rgba(217,183,106,.30)),transparent 36%),
+    linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.62));
+}
+.as-preview.infernal:before{filter:brightness(.62) saturate(1.32) sepia(.25) hue-rotate(-18deg)}
+.as-preview.moon:before{filter:brightness(.70) saturate(1.12) hue-rotate(180deg)}
+.as-preview.frozen:before{filter:brightness(.75) saturate(.82) hue-rotate(170deg)}
+.as-preview-label{
+  position:absolute;
+  z-index:2;
+  left:16px;
+  bottom:14px;
+  right:16px;
+}
+.as-preview-label .small{
+  color:var(--gold);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.as-preview-label .big{
+  color:#fff;
+  font-size:26px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.as-stat-list{
+  display:grid;
+  gap:10px;
+  margin:14px 0;
+}
+.as-stat{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(0,0,0,.22);
+  color:#cfd2dc;
+  font-size:13px;
+}
+.as-stat b{color:#fff3bf}
+.as-actions{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+.as-back,.as-start{
+  flex:1;
+  min-height:48px;
+  border-radius:16px;
+  border:1px solid rgba(217,183,106,.28);
+  font-weight:950;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.as-back{background:rgba(255,255,255,.055);color:#eee}
+.as-start{
+  color:#130d05;
+  background:linear-gradient(180deg,#ffe8a1,#c99738);
+  box-shadow:0 18px 42px rgba(217,183,106,.22),inset 0 1px rgba(255,255,255,.55);
+}
+.as-note{
+  margin-top:12px;
+  color:#8e929c;
+  font-size:12px;
+  line-height:1.45;
+}
+@media(max-width:880px){
+  .as-shell{max-height:94vh;overflow:auto;border-radius:22px}
+  .as-top{padding:18px 16px 10px}
+  .as-body{grid-template-columns:1fr;padding:0 16px 16px}
+  .as-grid{grid-template-columns:1fr}
+  .as-card{min-height:158px}
+  .as-preview{height:160px}
+}
+
+
 </style>
 </head>
 <body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14">
@@ -3299,7 +3576,7 @@ body.combat-feel-10 .pause-btn{
       </div>
       <div>
         <div class="fight5-vs-mark">VS</div>
-        <div id="fight5ArenaName" class="fight5-vs-sub">Obsidian Ring</div>
+        <div id="fight5ArenaName" class="fight5-vs-sub">Black Citadel</div>
       </div>
       <div class="fight5-vs-card enemy">
         <div class="fight5-vs-label">Arena AI</div>
@@ -3391,11 +3668,82 @@ body.combat-feel-10 .pause-btn{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">14.0 добавляет рабочий premium character select. Следующие персонажи будут добавляться как отдельные sprite packs, чтобы не ломать боёвку.</div>
+          <div class="cs-locked-note">15.0 добавляет premium arena select. Выбери арену перед боем: свет, атмосфера и stage tone меняются без поломки боёвки.</div>
         </aside>
       </div>
     </div>
   </div>
+
+
+  <div id="arenaSelect" class="arena-select" aria-hidden="true">
+    <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
+      <div class="as-top">
+        <div>
+          <div class="as-kicker">Premium Arena Select · 15.0</div>
+          <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
+          <p class="as-subtitle">Арена меняет атмосферу боя: цвет света, фон, эффекты воздуха, настроение VS-screen и читаемость персонажей.</p>
+        </div>
+        <button id="asCloseBtn" class="as-close" type="button" aria-label="Закрыть выбор арены">×</button>
+      </div>
+
+      <div class="as-body">
+        <div class="as-grid">
+          <article class="as-card active" data-as-arena="black_citadel" style="--arena-glow:rgba(217,183,106,.30)">
+            <div class="as-card-content">
+              <span class="as-tag">Balanced</span>
+              <h3>Black Citadel</h3>
+              <p>Классическая готическая цитадель с луной, мокрым камнем и огненными чашами.</p>
+            </div>
+          </article>
+
+          <article class="as-card" data-as-arena="infernal_bridge" style="--arena-glow:rgba(255,74,34,.34)">
+            <div class="as-card-content">
+              <span class="as-tag">Aggressive</span>
+              <h3>Infernal Bridge</h3>
+              <p>Красный pressure-stage с жарким цветом, искрами и более злым визуальным ритмом.</p>
+            </div>
+          </article>
+
+          <article class="as-card" data-as-arena="moon_ritual" style="--arena-glow:rgba(94,185,255,.34)">
+            <div class="as-card-content">
+              <span class="as-tag">Technical</span>
+              <h3>Moon Ritual</h3>
+              <p>Холодный лунный двор с мистическим синим светом, туманом и чистыми силуэтами.</p>
+            </div>
+          </article>
+
+          <article class="as-card" data-as-arena="frozen_throne" style="--arena-glow:rgba(185,243,255,.34)">
+            <div class="as-card-content">
+              <span class="as-tag">Defensive</span>
+              <h3>Frozen Throne</h3>
+              <p>Ледяная версия цитадели с бледной дымкой, снежной пылью и дорогим холодным контрастом.</p>
+            </div>
+          </article>
+        </div>
+
+        <aside class="as-panel">
+          <div id="asPreview" class="as-preview">
+            <div class="as-preview-label">
+              <div class="small">Selected Arena</div>
+              <div id="asSelectedTitle" class="big">Black Citadel</div>
+            </div>
+          </div>
+          <div id="asSelectedDescription" class="as-subtitle">Gothic courtyard, moon gate, wet obsidian stone and ember braziers.</div>
+          <div class="as-stat-list">
+            <div class="as-stat"><span>Lighting</span><b id="asLighting">Gold / Ember</b></div>
+            <div class="as-stat"><span>Atmosphere</span><b id="asAtmosphere">Smoke + sparks</b></div>
+            <div class="as-stat"><span>Combat Read</span><b id="asReadability">Balanced</b></div>
+          </div>
+          <div class="as-actions">
+            <button id="asBackBtn" class="as-back" type="button">Назад</button>
+            <button id="asStartFightBtn" class="as-start" type="button">Start Fight</button>
+          </div>
+          <div class="as-note">15.0 меняет stage direction без риска сломать sprite combat, AI, ultimate, раунды и физику 11.0.</div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
 
 
   <div id="result" class="result fight5-result" style="display:none">
@@ -3687,10 +4035,13 @@ body.combat-feel-10 .pause-btn{
       { id:'iron_warden', name:'Iron Warden', archetype:'Heavy Punisher', role:'Armored Heavy Tank', power:88, speed:62, defense:84, hp:112, energy:30, jump:850, width:90, height:188, colorA:'#17191c', colorB:'#3eb6ff', accent:'#d9f2ff', specialName:'Steel Breaker', ultimateName:'TITAN JUDGEMENT', bio:'Heavy armor fighter with bigger punishment windows and stronger defense.' }
     ],
     arenas: [
-      { id:'obsidian_ring', title:'Obsidian Ring', description:'Dark brutal premium arena', accent:'#d9b76a', backgroundType:'obsidian-city' }
+      { id:'black_citadel', title:'Black Citadel', description:'Gothic courtyard, moon gate, wet obsidian stone and ember braziers.', accent:'#d9b76a', backgroundType:'black-citadel', difficulty:'Balanced', bonus:'Neutral footwork' },
+      { id:'infernal_bridge', title:'Infernal Bridge', description:'Hot red pressure arena with aggressive fire grading and heavier impact tone.', accent:'#ff5a35', backgroundType:'infernal-bridge', difficulty:'Aggressive', bonus:'More visual pressure' },
+      { id:'moon_ritual', title:'Moon Ritual', description:'Cold blue ritual court with mist, lunar bloom and cleaner silhouettes.', accent:'#86d8ff', backgroundType:'moon-ritual', difficulty:'Technical', bonus:'Clean reads' },
+      { id:'frozen_throne', title:'Frozen Throne', description:'Frozen gothic hall with pale haze, snow dust and icy blue edge light.', accent:'#b9f3ff', backgroundType:'frozen-throne', difficulty:'Defensive', bonus:'High contrast' }
     ],
     abilities: [],
-    balance: { activeFighterId:'raven', enemyFighterId:'iron_warden', activeArenaId:'obsidian_ring', damageMultiplier:1, aiDifficulty:.62 }
+    balance: { activeFighterId:'raven', enemyFighterId:'iron_warden', activeArenaId:'black_citadel', damageMultiplier:1, aiDifficulty:.62 }
   };
 
   let contentState = loadContentState();
@@ -3707,10 +4058,11 @@ body.combat-feel-10 .pause-btn{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '14.0 PREMIUM CHARACTER SELECT';
-  const AI_COMBOS_PATCH = '14.0 PREMIUM CHARACTER SELECT';
-  const ULTIMATE_FINISHER_PATCH = '14.0 PREMIUM CHARACTER SELECT';
-  const CHARACTER_SELECT_PATCH = '14.0 PREMIUM CHARACTER SELECT';
+  const REAL_PHYSICS_PATCH = '15.0 ARENA SELECT';
+  const AI_COMBOS_PATCH = '15.0 ARENA SELECT';
+  const ULTIMATE_FINISHER_PATCH = '15.0 ARENA SELECT';
+  const CHARACTER_SELECT_PATCH = '15.0 ARENA SELECT';
+  const ARENA_SELECT_PATCH = '15.0 PREMIUM ARENA SELECT';
 
   const AI_PROFILES = {
     easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
@@ -3917,10 +4269,10 @@ body.combat-feel-10 .pause-btn{
       return JSON.parse(localStorage.getItem('eralashCombatContentState') || 'null') || {
         fighterId: 'raven',
         enemyId: 'iron_warden',
-        arenaId: 'obsidian_ring'
+        arenaId: 'black_citadel'
       };
     } catch (_) {
-      return { fighterId: 'raven', enemyId: 'iron_warden', arenaId: 'obsidian_ring' };
+      return { fighterId: 'raven', enemyId: 'iron_warden', arenaId: 'black_citadel' };
     }
   }
 
@@ -3938,7 +4290,7 @@ body.combat-feel-10 .pause-btn{
 
   function contentArena(){
     const list = contentBundle.arenas?.length ? contentBundle.arenas : DEFAULT_CONTENT.arenas;
-    const id = contentState.arenaId || contentBundle.balance?.activeArenaId || 'obsidian_ring';
+    const id = contentState.arenaId || contentBundle.balance?.activeArenaId || 'black_citadel';
     return list.find(a => a.id === id) || list[0] || DEFAULT_CONTENT.arenas[0];
   }
 
@@ -4213,7 +4565,7 @@ body.combat-feel-10 .pause-btn{
     ui.fight5PlayerStyle.textContent = fight5Style('player');
     ui.fight5EnemyName.textContent = fight5Name('Iron Warden', 'enemy');
     ui.fight5EnemyStyle.textContent = fight5Style('enemy');
-    ui.fight5ArenaName.textContent = (arena?.title || 'Obsidian Ring').toUpperCase();
+    ui.fight5ArenaName.textContent = (arena?.title || 'Black Citadel').toUpperCase();
     ui.fight5Vs.setAttribute('aria-hidden', 'false');
     ui.fight5Vs.classList.remove('show');
     // restart CSS animation
@@ -4278,6 +4630,175 @@ body.combat-feel-10 .pause-btn{
 
   function fighterSelectMeta(id){
     return CHARACTER_SELECT_META[id] || CHARACTER_SELECT_META.raven;
+  }
+
+  const ARENA_SELECT_META = {
+    black_citadel: {
+      id:'black_citadel',
+      title:'Black Citadel',
+      description:'Gothic courtyard, moon gate, wet obsidian stone and ember braziers.',
+      accent:'#d9b76a',
+      tone:'gold',
+      lighting:'Gold / Ember',
+      atmosphere:'Smoke + sparks',
+      readability:'Balanced',
+      previewClass:'',
+      backgroundType:'black-citadel'
+    },
+    infernal_bridge: {
+      id:'infernal_bridge',
+      title:'Infernal Bridge',
+      description:'Hot red pressure arena with aggressive fire grading and heavier impact tone.',
+      accent:'#ff5a35',
+      tone:'infernal',
+      lighting:'Red / Furnace',
+      atmosphere:'Heat haze + embers',
+      readability:'Aggressive',
+      previewClass:'infernal',
+      backgroundType:'infernal-bridge'
+    },
+    moon_ritual: {
+      id:'moon_ritual',
+      title:'Moon Ritual',
+      description:'Cold blue ritual court with mist, lunar bloom and cleaner silhouettes.',
+      accent:'#86d8ff',
+      tone:'moon',
+      lighting:'Blue / Moon',
+      atmosphere:'Mist + lunar glow',
+      readability:'Technical',
+      previewClass:'moon',
+      backgroundType:'moon-ritual'
+    },
+    frozen_throne: {
+      id:'frozen_throne',
+      title:'Frozen Throne',
+      description:'Frozen gothic hall with pale haze, snow dust and icy blue edge light.',
+      accent:'#b9f3ff',
+      tone:'frozen',
+      lighting:'Ice / Pale blue',
+      atmosphere:'Snow dust + haze',
+      readability:'Defensive',
+      previewClass:'frozen',
+      backgroundType:'frozen-throne'
+    }
+  };
+
+  function arenaSelectMeta(id){
+    return ARENA_SELECT_META[id] || ARENA_SELECT_META.black_citadel;
+  }
+
+  function currentArena15(){
+    return contentState.arenaId || contentBundle?.balance?.activeArenaId || 'black_citadel';
+  }
+
+  function setSelectedArena15(id){
+    if (!ARENA_SELECT_META[id]) return;
+    contentBundle.balance = contentBundle.balance || {};
+    contentState.arenaId = id;
+    contentBundle.balance.activeArenaId = id;
+    saveContentState();
+    updateArenaSelectUI();
+    audio.ui();
+  }
+
+  function updateArenaSelectUI(){
+    const id = currentArena15();
+    const meta = arenaSelectMeta(id);
+    document.querySelectorAll('[data-as-arena]').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-as-arena') === id);
+    });
+    const title = document.getElementById('asSelectedTitle');
+    const desc = document.getElementById('asSelectedDescription');
+    const lighting = document.getElementById('asLighting');
+    const atmosphere = document.getElementById('asAtmosphere');
+    const readability = document.getElementById('asReadability');
+    const preview = document.getElementById('asPreview');
+    if (title) title.textContent = meta.title;
+    if (desc) desc.textContent = meta.description;
+    if (lighting) lighting.textContent = meta.lighting;
+    if (atmosphere) atmosphere.textContent = meta.atmosphere;
+    if (readability) readability.textContent = meta.readability;
+    if (preview) {
+      preview.className = 'as-preview ' + (meta.previewClass || '');
+      preview.style.setProperty('--as-glow', meta.accent + '55');
+    }
+    if (ui?.fight5ArenaName) ui.fight5ArenaName.textContent = meta.title.toUpperCase();
+  }
+
+  function openArenaSelect(source='character_select'){
+    if (gameState !== 'menu' && gameState !== 'result') return;
+    contentBundle.balance = contentBundle.balance || {};
+    contentState.arenaId = currentArena15();
+    contentBundle.balance.activeArenaId = contentState.arenaId;
+    saveContentState();
+    trackEvent('arena_select_open', { source, patch: ARENA_SELECT_PATCH });
+    const overlay = document.getElementById('arenaSelect');
+    if (!overlay) { newMatch(); return; }
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden','false');
+    requestAnimationFrame(()=>overlay.classList.add('show'));
+    document.body.classList.add('arena-select-open');
+    updateArenaSelectUI();
+  }
+
+  function closeArenaSelect(startingFight=false){
+    const overlay = document.getElementById('arenaSelect');
+    if (!overlay) return;
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden','true');
+    document.body.classList.remove('arena-select-open');
+    window.setTimeout(()=>{ if (!overlay.classList.contains('show')) overlay.style.display = 'none'; }, startingFight ? 90 : 180);
+  }
+
+  function startSelectedArenaMatch(){
+    contentBundle.balance = contentBundle.balance || {};
+    contentState.arenaId = currentArena15();
+    contentBundle.balance.activeArenaId = contentState.arenaId;
+    saveContentState();
+    trackEvent('fight_start', {
+      source:'arena_select_15',
+      fighter: contentState.fighterId,
+      enemy: contentState.enemyId,
+      arena: contentState.arenaId,
+      difficulty: currentDifficulty14()
+    });
+    closeArenaSelect(true);
+    audio.ensure();
+    audio.ui();
+    window.setTimeout(()=>newMatch(), 80);
+  }
+
+  function bindArenaSelect(){
+    document.querySelectorAll('[data-as-arena]').forEach(card => {
+      card.addEventListener('click', () => setSelectedArena15(card.getAttribute('data-as-arena')));
+      card.addEventListener('pointermove', (event) => {
+        const shell = card.closest('.as-shell');
+        if (!shell) return;
+        const r = shell.getBoundingClientRect();
+        shell.style.setProperty('--mx', ((event.clientX - r.left) / Math.max(1,r.width) * 100).toFixed(1) + '%');
+        shell.style.setProperty('--my', ((event.clientY - r.top) / Math.max(1,r.height) * 100).toFixed(1) + '%');
+      });
+    });
+    document.getElementById('asStartFightBtn')?.addEventListener('click', startSelectedArenaMatch);
+    document.getElementById('asCloseBtn')?.addEventListener('click', () => { audio.ui(); closeArenaSelect(false); openCharacterSelect('arena_back'); });
+    document.getElementById('asBackBtn')?.addEventListener('click', () => { audio.ui(); closeArenaSelect(false); openCharacterSelect('arena_back'); });
+
+    window.addEventListener('keydown', (event) => {
+      const overlay = document.getElementById('arenaSelect');
+      if (!overlay || !overlay.classList.contains('show')) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        audio.ui();
+        closeArenaSelect(false);
+        openCharacterSelect('arena_escape_back');
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        startSelectedArenaMatch();
+      }
+    });
+
+    updateArenaSelectUI();
   }
 
   function syncHudFighterNames(){
@@ -4392,7 +4913,7 @@ body.combat-feel-10 .pause-btn{
     closeCharacterSelect(true);
     audio.ensure();
     audio.ui();
-    window.setTimeout(()=>newMatch(), 80);
+    window.setTimeout(()=>openArenaSelect('character_select_14'), 90);
   }
 
   function bindCharacterSelect(){
@@ -5188,7 +5709,7 @@ body.combat-feel-10 .pause-btn{
     else if (pDead && eDead) winner = player.hp >= enemy.hp ? 'player' : 'enemy';
     if (ui.debug) {
       ui.debug.style.display = 'block';
-      ui.debug.innerHTML = 'PHYSICS 11.0<br>ROUND END CHECK<br>' + reason + '<br>Raven HP ' + Math.round(player.hp) + ' · Warden HP ' + Math.round(enemy.hp);
+      ui.debug.innerHTML = 'ARENA SELECT 15.0<br>ROUND END CHECK<br>' + reason + '<br>Raven HP ' + Math.round(player.hp) + ' · Warden HP ' + Math.round(enemy.hp);
     }
     finishRound(winner);
   }
@@ -6045,13 +6566,91 @@ body.combat-feel-10 .pause-btn{
       return true;
     }
 
+    function drawArena15VariantOverlay(kind, accent){
+      const selected = kind || 'black-citadel';
+      const selectedAccent = accent || '#d9b76a';
+      ctx.save();
+
+      // 15.0 color direction: one real stage plate, four premium lighting moods.
+      let washA = 'rgba(217,183,106,.12)';
+      let washB = 'rgba(255,80,40,.10)';
+      let fog = 'rgba(210,190,150,.045)';
+      let particle = selectedAccent;
+
+      if (selected === 'infernal-bridge') {
+        washA = 'rgba(255,58,22,.24)';
+        washB = 'rgba(255,134,38,.15)';
+        fog = 'rgba(255,85,38,.070)';
+        particle = '#ff6a2b';
+      } else if (selected === 'moon-ritual') {
+        washA = 'rgba(83,176,255,.22)';
+        washB = 'rgba(126,84,255,.13)';
+        fog = 'rgba(128,194,255,.060)';
+        particle = '#86d8ff';
+      } else if (selected === 'frozen-throne') {
+        washA = 'rgba(173,238,255,.24)';
+        washB = 'rgba(190,218,255,.15)';
+        fog = 'rgba(195,238,255,.070)';
+        particle = '#d8fbff';
+      }
+
+      ctx.globalCompositeOperation = 'screen';
+      const glow = ctx.createRadialGradient(w*.50,h*.28,0,w*.50,h*.30,w*.48);
+      glow.addColorStop(0, washA);
+      glow.addColorStop(.42, washB);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0,0,w,h);
+
+      const side = ctx.createLinearGradient(0,0,w,0);
+      side.addColorStop(0, selected === 'moon-ritual' || selected === 'frozen-throne' ? 'rgba(45,120,255,.16)' : 'rgba(255,64,28,.14)');
+      side.addColorStop(.46, 'rgba(0,0,0,0)');
+      side.addColorStop(1, selected === 'frozen-throne' ? 'rgba(185,243,255,.14)' : 'rgba(217,183,106,.10)');
+      ctx.fillStyle = side;
+      ctx.fillRect(0,0,w,h);
+
+      // Stage floor tone.
+      const floor = ctx.createLinearGradient(0,h*.58,0,h);
+      floor.addColorStop(0,'rgba(0,0,0,0)');
+      floor.addColorStop(.42, fog);
+      floor.addColorStop(1,'rgba(0,0,0,.30)');
+      ctx.fillStyle = floor;
+      ctx.fillRect(0,h*.52,w,h*.48);
+
+      // Air particles per arena.
+      for(let i=0;i<68;i++){
+        const seed = i*97;
+        const x = (seed + t*(selected === 'infernal-bridge' ? 34 : 18) + Math.sin(i)*40) % (w+120) - 60;
+        const y = h - ((seed*1.37 + t*(selected === 'frozen-throne' ? 18 : 34)) % h);
+        const size = selected === 'frozen-throne' ? (1.1 + (i%4)*.65) : (.75 + (i%5)*.44);
+        ctx.globalAlpha = selected === 'moon-ritual' ? .10 : selected === 'frozen-throne' ? .15 : .18;
+        ctx.fillStyle = selected === 'frozen-throne' ? 'rgba(225,250,255,.82)' : (i%3 ? particle : '#fff0b7');
+        ctx.beginPath();
+        ctx.arc(x,y,size,0,Math.PI*2);
+        ctx.fill();
+      }
+
+      // Premium selected arena title etched into stage.
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = .78;
+      ctx.font = '900 11px Inter, Arial';
+      ctx.textAlign = 'center';
+      ctx.letterSpacing = '2px';
+      ctx.fillStyle = 'rgba(255,240,190,.68)';
+      ctx.fillText((arena.title || 'BLACK CITADEL').toUpperCase(), w*.5, Math.max(90, h*.145));
+      ctx.restore();
+    }
+
     const artReady = blackCitadelArenaArt && blackCitadelArenaArt.complete && blackCitadelArenaArt.naturalWidth > 0;
     if (artReady) {
       if (EXACT_BLACK_CITADEL_ARENA) {
         drawExactStagePlate(blackCitadelArenaArt);
+        drawArena15VariantOverlay(arena.backgroundType || 'black-citadel', arenaAccent);
         return;
       }
       drawCoverImage(blackCitadelArenaArt, 0, 0, w, h);
+      drawArena15VariantOverlay(arena.backgroundType || 'black-citadel', arenaAccent);
+      return;
     } else {
       const sky = ctx.createLinearGradient(0,0,0,h);
       sky.addColorStop(0, '#030406');
@@ -7204,7 +7803,7 @@ body.combat-feel-10 .pause-btn{
       roundFreeze = 0;
       if (ui && ui.debug) {
         ui.debug.style.display = 'block';
-        ui.debug.innerHTML = 'PHYSICS 11.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+        ui.debug.innerHTML = 'ARENA SELECT 15.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
       }
     }
     raf = requestAnimationFrame(loop);
@@ -8224,7 +8823,7 @@ function sessionId(){
       };
       if (!contentState.fighterId) contentState.fighterId = contentBundle.balance.activeFighterId || 'raven';
       if (!contentState.enemyId) contentState.enemyId = contentBundle.balance.enemyFighterId || 'iron_warden';
-      if (!contentState.arenaId) contentState.arenaId = contentBundle.balance.activeArenaId || 'obsidian_ring';
+      if (!contentState.arenaId) contentState.arenaId = contentBundle.balance.activeArenaId || 'black_citadel';
       saveContentState();
       renderContentPanel(data.storage || 'supabase-postgres');
     } catch (error) {
@@ -9298,10 +9897,12 @@ function sessionId(){
   bindEconomyControls();
   bindRealArtClickMap();
   bindCharacterSelect();
+  bindArenaSelect();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
   window.eralashStartFight = () => openCharacterSelect('window_api');
+  window.eralashOpenArenaSelect = () => openArenaSelect('window_api');
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });
 })();

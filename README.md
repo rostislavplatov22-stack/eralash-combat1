@@ -370,3 +370,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## AI + Combos 12.0
 
 Добавлен умный AI, дистанции боя, punish logic, combo chains и bonus damage. Debug-метка: AI + COMBOS 12.0.
+
+
+## Arena Select 15.0
+
+Добавлен премиальный экран выбора арены после выбора персонажа. Состояние арены сохраняется, а фон/свет/частицы меняются в бою.

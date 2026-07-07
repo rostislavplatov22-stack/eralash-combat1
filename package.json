@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-character-select-14-ready",
-  "version": "14.0.0",
+  "name": "eralash-combat-arena-select-15-ready",
+  "version": "15.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Character Select 14.0: premium fighter selection, selected-vs-enemy preview, difficulty selector, content-state persistence and selected fighter stats."
+  "description": "EraLash Combat Arena Select 15.0: premium arena selection, four arena moods, arena state persistence, VS-screen arena sync and cinematic stage grading."
 }
