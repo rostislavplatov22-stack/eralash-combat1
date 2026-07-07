@@ -300,3 +300,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## Combat Feel 10.0
 
 Добавлены hit sparks, shockwaves, damage numbers, KO burst, усиленный hit stop, camera shake и premium feedback боя.
+
+
+## Combat Physics 11.0
+
+Добавлены footwork-физика, attack facing lock, counter hit, clash, wall impact, whiff recovery и более стабильная collision-система.

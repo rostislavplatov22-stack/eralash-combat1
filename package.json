@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-combat-feel-10-ready",
-  "version": "2.8.0",
+  "name": "eralash-combat-combat-physics-11-ready",
+  "version": "2.9.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Combat Feel 10.0: cinematic hit sparks, hit stop, damage numbers, KO burst, combo feedback and premium combat polish."
+  "description": "EraLash Combat Physics 11.0: locked attack facing, real footwork, counter hits, clash checks, better knockback and safer collision physics."
 }
