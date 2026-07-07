@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Sprite Combat 9.4 Round + Pause Fix</title>
+  <title>EraLash Combat — Premium Character Select 14.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -2767,15 +2767,329 @@ body.combat-feel-10 .pause-btn{
   box-shadow:0 0 22px rgba(217,183,106,.18), inset 0 0 18px rgba(255,255,255,.05);
 }
 
+
+/* Premium Character Select 14.0 */
+.character-select{
+  position:fixed;
+  inset:0;
+  z-index:52;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(14px,2.2vw,32px);
+  background:
+    radial-gradient(circle at 22% 18%, rgba(185,32,48,.30), transparent 30%),
+    radial-gradient(circle at 82% 26%, rgba(56,172,255,.22), transparent 32%),
+    linear-gradient(180deg, rgba(3,4,8,.88), rgba(0,0,0,.96));
+  backdrop-filter: blur(12px) saturate(1.2);
+  color:var(--text);
+}
+.character-select.show{display:flex;animation:csFadeIn .28s ease both}
+@keyframes csFadeIn{from{opacity:0;transform:scale(1.012)}to{opacity:1;transform:scale(1)}}
+.cs-shell{
+  width:min(1240px, 100%);
+  max-height:min(820px, calc(100vh - 24px));
+  overflow:hidden;
+  border:1px solid rgba(217,183,106,.34);
+  border-radius:30px;
+  background:
+    linear-gradient(145deg, rgba(15,16,22,.92), rgba(2,3,6,.90)),
+    radial-gradient(circle at 50% 0%, rgba(217,183,106,.16), transparent 48%);
+  box-shadow:0 38px 110px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.12);
+  position:relative;
+}
+.cs-shell:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(90deg, rgba(201,40,50,.11), transparent 34%, transparent 66%, rgba(62,182,255,.12));
+  mix-blend-mode:screen;
+}
+.cs-top{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:flex-start;
+  padding:22px 24px 16px;
+  border-bottom:1px solid rgba(217,183,106,.18);
+}
+.cs-kicker{
+  color:var(--gold);
+  font-size:11px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.cs-title{
+  margin:6px 0 0;
+  font-size:clamp(32px,4.2vw,58px);
+  line-height:.92;
+  letter-spacing:-.05em;
+  text-transform:uppercase;
+}
+.cs-title span{color:#fff0bd;text-shadow:0 0 28px rgba(217,183,106,.32)}
+.cs-subtitle{
+  max-width:650px;
+  color:#b9b1a1;
+  margin:10px 0 0;
+  font-size:14px;
+  line-height:1.45;
+}
+.cs-close{
+  width:46px;height:46px;border-radius:16px;
+  border:1px solid rgba(217,183,106,.32);
+  color:#fff4d4;
+  background:rgba(255,255,255,.06);
+  font-weight:900;
+  cursor:pointer;
+}
+.cs-body{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.06fr .94fr;
+  gap:18px;
+  padding:18px 24px 24px;
+}
+.cs-roster{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:16px;
+}
+.cs-card{
+  min-height:384px;
+  border-radius:26px;
+  border:1px solid rgba(255,255,255,.12);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+    radial-gradient(circle at 50% 10%, rgba(217,183,106,.13), transparent 42%);
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease, filter .22s ease;
+}
+.cs-card:hover{transform:translateY(-4px);border-color:rgba(217,183,106,.46);box-shadow:0 22px 60px rgba(0,0,0,.42)}
+.cs-card.active{border-color:rgba(255,224,145,.85);box-shadow:0 0 0 1px rgba(217,183,106,.36),0 30px 80px rgba(0,0,0,.55)}
+.cs-card.locked{opacity:.46;filter:grayscale(.75);cursor:not-allowed}
+.cs-card.raven{background:linear-gradient(180deg, rgba(96,8,20,.28), rgba(3,3,6,.90))}
+.cs-card.warden{background:linear-gradient(180deg, rgba(25,95,145,.24), rgba(3,3,6,.90))}
+.cs-card img{
+  position:absolute;
+  left:50%;
+  bottom:44px;
+  transform:translateX(-50%);
+  height:78%;
+  max-width:112%;
+  object-fit:contain;
+  filter:drop-shadow(0 24px 34px rgba(0,0,0,.92)) contrast(1.08) saturate(1.08);
+}
+.cs-card.raven img{height:76%}
+.cs-card.warden img{height:81%}
+.cs-card:after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:0;height:46%;
+  background:linear-gradient(0deg, rgba(0,0,0,.92), rgba(0,0,0,.15), transparent);
+  pointer-events:none;
+}
+.cs-card-top{
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 16px 0;
+}
+.cs-role{
+  font-size:10px;
+  letter-spacing:.18em;
+  color:#e4c678;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.cs-tag{
+  font-size:10px;
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,.40);
+  border:1px solid rgba(255,255,255,.12);
+  color:#e9dcc1;
+  font-weight:900;
+}
+.cs-card-info{
+  position:absolute;
+  z-index:3;
+  left:16px;
+  right:16px;
+  bottom:14px;
+}
+.cs-card-info h3{
+  margin:0;
+  font-size:24px;
+  letter-spacing:-.035em;
+  text-transform:uppercase;
+}
+.cs-card-info p{margin:5px 0 12px;color:#bcb5aa;font-size:12px;line-height:1.3}
+.cs-mini-stats{display:grid;gap:6px}
+.cs-mini-row{display:grid;grid-template-columns:52px 1fr 32px;align-items:center;gap:7px;font-size:10px;color:#d5cbb6;font-weight:900}
+.cs-mini-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden}
+.cs-mini-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#7b1d25,#e4bd69)}
+.cs-card.warden .cs-mini-bar i{background:linear-gradient(90deg,#245b85,#aeeeff)}
+.cs-preview{
+  border-radius:26px;
+  border:1px solid rgba(217,183,106,.24);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(217,183,106,.11), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.024));
+  padding:20px;
+  min-height:384px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+}
+.cs-versus{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:12px;
+  align-items:center;
+}
+.cs-face{
+  border-radius:22px;
+  min-height:178px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.42));
+  position:relative;
+  overflow:hidden;
+  padding:14px;
+}
+.cs-face img{
+  position:absolute;
+  bottom:-18px;
+  right:-28px;
+  height:205px;
+  max-width:80%;
+  object-fit:contain;
+  opacity:.94;
+  filter:drop-shadow(0 18px 26px rgba(0,0,0,.82));
+}
+.cs-face.enemy img{left:-24px;right:auto;transform:scaleX(-1)}
+.cs-face h3{position:relative;z-index:2;margin:4px 0 4px;text-transform:uppercase;font-size:22px;line-height:1}
+.cs-face p{position:relative;z-index:2;margin:0;color:#bdb6a9;font-size:12px;max-width:170px}
+.cs-vs{
+  color:#fff3c9;
+  font-weight:1000;
+  font-size:30px;
+  text-shadow:0 0 22px rgba(217,183,106,.5);
+}
+.cs-details{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.cs-panel{
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.11);
+  background:rgba(0,0,0,.24);
+  padding:14px;
+}
+.cs-panel b{display:block;color:#ffe3a0;text-transform:uppercase;font-size:12px;letter-spacing:.08em;margin-bottom:9px}
+.cs-panel span{display:block;color:#c9c1b0;font-size:12px;line-height:1.45}
+.cs-difficulty{margin-top:16px}
+.cs-difficulty-label{
+  font-size:11px;
+  color:#e7cf98;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+  font-weight:900;
+  margin-bottom:10px;
+}
+.cs-difficulty-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.cs-diff{
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.055);
+  color:#eee6d6;
+  min-height:42px;
+  font-weight:900;
+  cursor:pointer;
+}
+.cs-diff.active{border-color:rgba(217,183,106,.7);background:linear-gradient(180deg, rgba(217,183,106,.22), rgba(201,40,50,.10));color:#fff4c9}
+.cs-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:18px;
+}
+.cs-start{
+  flex:1;
+  min-height:56px;
+  border:none;
+  border-radius:18px;
+  background:linear-gradient(135deg,#fff0b8,#d1a64f 45%,#8d481d);
+  color:#080706;
+  font-weight:1000;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  box-shadow:0 16px 40px rgba(217,183,106,.28);
+  cursor:pointer;
+}
+.cs-back{
+  min-height:56px;
+  padding:0 16px;
+  border-radius:18px;
+  border:1px solid rgba(217,183,106,.24);
+  background:rgba(255,255,255,.055);
+  color:#f3e7c9;
+  font-weight:900;
+  cursor:pointer;
+}
+.cs-locked-note{
+  margin-top:10px;
+  color:#8f887a;
+  font-size:11px;
+  line-height:1.35;
+}
+@media (max-width: 900px){
+  .character-select{padding:10px}
+  .cs-shell{max-height:calc(100vh - 20px);overflow:auto;border-radius:24px}
+  .cs-top{padding:18px 16px 12px}
+  .cs-body{grid-template-columns:1fr;padding:14px 16px 18px}
+  .cs-roster{grid-template-columns:1fr 1fr;gap:10px}
+  .cs-card{min-height:292px;border-radius:20px}
+  .cs-card img{height:70%;bottom:52px}
+  .cs-card.warden img{height:74%}
+  .cs-card-info h3{font-size:17px}
+  .cs-card-info p{display:none}
+  .cs-mini-row{grid-template-columns:38px 1fr 24px;font-size:9px}
+  .cs-preview{min-height:auto;padding:14px;border-radius:20px}
+  .cs-face{min-height:132px}
+  .cs-face img{height:150px}
+  .cs-face h3{font-size:16px}
+  .cs-face p{font-size:10px;max-width:112px}
+  .cs-details{grid-template-columns:1fr}
+  .cs-title{font-size:34px}
+  .cs-subtitle{font-size:12px}
+}
+@media (max-width: 520px){
+  .cs-roster{grid-template-columns:1fr}
+  .cs-card{min-height:250px}
+  .cs-versus{grid-template-columns:1fr;gap:8px}
+  .cs-vs{text-align:center;font-size:18px}
+  .cs-face img{height:140px}
+  .cs-actions{flex-direction:column}
+  .cs-start,.cs-back{width:100%}
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14">
 <div id="app">
   <canvas id="game"></canvas>
 
   <div class="hud">
     <div class="fighter-card">
-      <div class="name-row"><span>ERALASH</span><span class="badge">COMBAT STYLE</span></div>
+      <div class="name-row"><span id="pNameHud">RAVEN</span><span class="badge">COMBAT STYLE</span></div>
       <div class="bar"><div id="pDelay" class="damage"></div><div id="pHp" class="fill"></div></div>
       <div class="bar meter"><div id="pEnergy" class="fill"></div></div>
     </div>
@@ -2784,7 +3098,7 @@ body.combat-feel-10 .pause-btn{
       <div id="rounds" class="rounds">0 : 0</div>
     </div>
     <div class="fighter-card right">
-      <div class="name-row"><span>DARK WARDEN</span><span class="badge">ARENA AI</span></div>
+      <div class="name-row"><span id="eNameHud">IRON WARDEN</span><span class="badge">ARENA AI</span></div>
       <div class="bar"><div id="eDelay" class="damage"></div><div id="eHp" class="fill"></div></div>
       <div class="bar meter"><div id="eEnergy" class="fill"></div></div>
     </div>
@@ -2995,6 +3309,95 @@ body.combat-feel-10 .pause-btn{
     </div>
   </div>
 
+
+  <div id="characterSelect" class="character-select" aria-hidden="true">
+    <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
+      <div class="cs-top">
+        <div>
+          <div class="cs-kicker">Premium Character Select · 14.0</div>
+          <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
+          <p class="cs-subtitle">Выбери стиль боя перед матчем: быстрый Raven или тяжёлый Iron Warden. Противник автоматически станет противоположным бойцом.</p>
+        </div>
+        <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
+      </div>
+
+      <div class="cs-body">
+        <div class="cs-roster">
+          <article class="cs-card raven active" data-cs-fighter="raven">
+            <img src="assets/fighter-shadow-raven.png" alt="Shadow Raven">
+            <div class="cs-card-top"><span class="cs-role">Assassin Duelist</span><span class="cs-tag">FAST</span></div>
+            <div class="cs-card-info">
+              <h3>Raven</h3>
+              <p>Быстрый дуэлянт: скорость, комбо, Rift Execution и давление на средней дистанции.</p>
+              <div class="cs-mini-stats">
+                <div class="cs-mini-row"><span>PWR</span><div class="cs-mini-bar"><i style="width:78%"></i></div><em>78</em></div>
+                <div class="cs-mini-row"><span>SPD</span><div class="cs-mini-bar"><i style="width:86%"></i></div><em>86</em></div>
+                <div class="cs-mini-row"><span>DEF</span><div class="cs-mini-bar"><i style="width:72%"></i></div><em>72</em></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="cs-card warden" data-cs-fighter="iron_warden">
+            <img src="assets/fighter-iron-warden.png" alt="Iron Warden">
+            <div class="cs-card-top"><span class="cs-role">Heavy Punisher</span><span class="cs-tag">TANK</span></div>
+            <div class="cs-card-info">
+              <h3>Iron Warden</h3>
+              <p>Тяжёлый каратель: броня, большой урон, блок, Titan Judgement и мощный knockback.</p>
+              <div class="cs-mini-stats">
+                <div class="cs-mini-row"><span>PWR</span><div class="cs-mini-bar"><i style="width:88%"></i></div><em>88</em></div>
+                <div class="cs-mini-row"><span>SPD</span><div class="cs-mini-bar"><i style="width:62%"></i></div><em>62</em></div>
+                <div class="cs-mini-row"><span>DEF</span><div class="cs-mini-bar"><i style="width:84%"></i></div><em>84</em></div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <aside class="cs-preview">
+          <div class="cs-versus">
+            <div class="cs-face player">
+              <img id="csPlayerImg" src="assets/fighter-shadow-raven.png" alt="">
+              <h3 id="csPlayerName">Raven</h3>
+              <p id="csPlayerRole">Balanced Duelist · Crimson Rift</p>
+            </div>
+            <div class="cs-vs">VS</div>
+            <div class="cs-face enemy">
+              <img id="csEnemyImg" src="assets/fighter-iron-warden.png" alt="">
+              <h3 id="csEnemyName">Iron Warden</h3>
+              <p id="csEnemyRole">Heavy Punisher · Steel Breaker</p>
+            </div>
+          </div>
+
+          <div class="cs-details">
+            <div class="cs-panel">
+              <b id="csSelectedSkill">RIFT EXECUTION</b>
+              <span id="csSelectedText">Быстрый персонаж с цепочками LIGHT → LIGHT → HEAVY и сильным финальным добиванием.</span>
+            </div>
+            <div class="cs-panel">
+              <b>Match Rules</b>
+              <span>Best of 3 · AI с выбранной сложностью · Ultimate активируется при 100 энергии.</span>
+            </div>
+          </div>
+
+          <div class="cs-difficulty">
+            <div class="cs-difficulty-label">AI Difficulty</div>
+            <div class="cs-difficulty-buttons">
+              <button class="cs-diff" data-cs-diff="easy" type="button">EASY</button>
+              <button class="cs-diff active" data-cs-diff="normal" type="button">NORMAL</button>
+              <button class="cs-diff" data-cs-diff="hard" type="button">HARD</button>
+            </div>
+          </div>
+
+          <div class="cs-actions">
+            <button id="csBackBtn" class="cs-back" type="button">Назад</button>
+            <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
+          </div>
+          <div class="cs-locked-note">14.0 добавляет рабочий premium character select. Следующие персонажи будут добавляться как отдельные sprite packs, чтобы не ломать боёвку.</div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+
   <div id="result" class="result fight5-result" style="display:none">
     <div class="menu-panel">
       <div id="resultKicker" class="kicker">MATCH COMPLETE</div>
@@ -3071,14 +3474,14 @@ body.combat-feel-10 .pause-btn{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '11.0 PHYSICS';
+  const SPRITE_COMBAT_PATCH = '14.0 PREMIUM CHARACTER SELECT';
 
   function loadSpriteSheet(src){
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
     // 9.1: cache-bust sprite sheets so Vercel/browser cannot show an older invisible asset.
-    img.src = src + '?v=physics-11-footwork';
+    img.src = src + '?v=character-select-14';
     return img;
   }
 
@@ -3157,18 +3560,18 @@ body.combat-feel-10 .pause-btn{
 
   function fighterVisualHeight(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.h;
-    const base = f.id === 'enemy' ? 420 : 390;
+    const base = fighterIsWarden(f) ? 420 : 390;
     return base * premiumFighterScaleFactor() * (window.matchMedia && window.matchMedia('(pointer:coarse)').matches ? .92 : 1);
   }
 
   function fighterVisualWidth(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.w;
-    return fighterVisualHeight(f) * (f.id === 'enemy' ? .50 : .44);
+    return fighterVisualHeight(f) * (fighterIsWarden(f) ? .50 : .44);
   }
 
   function fighterBodyRadius(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.w * .45;
-    return fighterVisualWidth(f) * (f.id === 'enemy' ? .44 : .40);
+    return fighterVisualWidth(f) * (fighterIsWarden(f) ? .44 : .40);
   }
 
   function fighterPreferredDistance(a,b){
@@ -3187,7 +3590,7 @@ body.combat-feel-10 .pause-btn{
     ui.debug.style.border = '1px solid rgba(217,183,106,.35)';
     ui.debug.style.background = 'linear-gradient(180deg,rgba(8,9,12,.72),rgba(0,0,0,.50))';
     ui.debug.style.boxShadow = '0 14px 40px rgba(0,0,0,.35)';
-    ui.debug.innerHTML = `AI + COMBOS ${AI_COMBOS_PATCH}<br>` +
+    ui.debug.innerHTML = `CHARACTER SELECT 14.0 · ${player?.name || 'Fighter'} vs ${enemy?.name || 'Enemy'}<br>` +
       `Raven: ${player.state} · combo ${(player.comboSeq||[]).join('>') || '—'} · stamina ${Math.round(player.stamina)}<br>` +
       `Warden: ${enemy.state} · AI ${enemy.ai?.difficulty || aiDifficultyName()} / ${enemy.ai?.intent || 'neutral'} / ${enemy.ai?.band || 'far'} · stamina ${Math.round(enemy.stamina)}`;
   }
@@ -3280,8 +3683,8 @@ body.combat-feel-10 .pause-btn{
 
   const DEFAULT_CONTENT = {
     fighters: [
-      { id:'raven', name:'Raven', archetype:'Balanced Duelist', power:78, speed:86, defense:72, hp:100, energy:35, jump:960, width:78, height:172, colorA:'#14171e', colorB:'#c92832', accent:'#d9b76a', specialName:'Crimson Rift', ultimateName:'Obsidian Verdict' },
-      { id:'iron_warden', name:'Iron Warden', archetype:'Heavy Punisher', power:88, speed:62, defense:84, hp:110, energy:30, jump:850, width:90, height:188, colorA:'#17191c', colorB:'#3eb6ff', accent:'#d9f2ff', specialName:'Steel Breaker', ultimateName:'Warden Execution' }
+      { id:'raven', name:'Raven', archetype:'Balanced Duelist', role:'Fast Combo Assassin', power:78, speed:86, defense:72, hp:100, energy:35, jump:960, width:78, height:172, colorA:'#14171e', colorB:'#c92832', accent:'#d9b76a', specialName:'Crimson Rift', ultimateName:'RIFT EXECUTION', bio:'Fast pressure fighter with clean chains and high mobility.' },
+      { id:'iron_warden', name:'Iron Warden', archetype:'Heavy Punisher', role:'Armored Heavy Tank', power:88, speed:62, defense:84, hp:112, energy:30, jump:850, width:90, height:188, colorA:'#17191c', colorB:'#3eb6ff', accent:'#d9f2ff', specialName:'Steel Breaker', ultimateName:'TITAN JUDGEMENT', bio:'Heavy armor fighter with bigger punishment windows and stronger defense.' }
     ],
     arenas: [
       { id:'obsidian_ring', title:'Obsidian Ring', description:'Dark brutal premium arena', accent:'#d9b76a', backgroundType:'obsidian-city' }
@@ -3304,9 +3707,10 @@ body.combat-feel-10 .pause-btn{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '13.0 ULTIMATE FINISHER';
-  const AI_COMBOS_PATCH = '13.0 ULTIMATE FINISHER';
-  const ULTIMATE_FINISHER_PATCH = '13.0 ULTIMATE FINISHER';
+  const REAL_PHYSICS_PATCH = '14.0 PREMIUM CHARACTER SELECT';
+  const AI_COMBOS_PATCH = '14.0 PREMIUM CHARACTER SELECT';
+  const ULTIMATE_FINISHER_PATCH = '14.0 PREMIUM CHARACTER SELECT';
+  const CHARACTER_SELECT_PATCH = '14.0 PREMIUM CHARACTER SELECT';
 
   const AI_PROFILES = {
     easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
@@ -3564,10 +3968,12 @@ body.combat-feel-10 .pause-btn{
     const isPlayer = kind === 'player';
     const cfg = contentFighter(kind);
     const hp = Number(cfg.hp || 100);
-    const heavy = !isPlayer;
-    const baseSpeed = Number(cfg.speed || (isPlayer ? 86 : 62));
-    const baseDefense = Number(cfg.defense || (isPlayer ? 72 : 84));
-    const basePower = Number(cfg.power || (isPlayer ? 78 : 88));
+    const fighterId = String(cfg.id || '').toLowerCase();
+    const isWarden = fighterId.includes('warden');
+    const heavy = isWarden;
+    const baseSpeed = Number(cfg.speed || (isWarden ? 62 : 86));
+    const baseDefense = Number(cfg.defense || (isWarden ? 84 : 72));
+    const basePower = Number(cfg.power || (isWarden ? 88 : 78));
 
     return {
       id: kind,
@@ -3581,19 +3987,19 @@ body.combat-feel-10 .pause-btn{
 
       // Combat Physics 7.2:
       // visual art can be huge, but collision is a stable combat capsule.
-      w: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 108 : 142) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      h: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 300 : 330) : Number(cfg.height || (isPlayer ? 172 : 188)),
-      collisionW: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 88 : 120) : Number(cfg.width || (isPlayer ? 78 : 90)),
-      collisionH: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 245 : 275) : Number(cfg.height || (isPlayer ? 172 : 188)),
-      mass: USE_PREMIUM_FIGHTER_ART ? (isPlayer ? 1.08 : 1.34) : 1,
+      w: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 142 : 108) : Number(cfg.width || (isWarden ? 90 : 78)),
+      h: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 330 : 300) : Number(cfg.height || (isWarden ? 188 : 172)),
+      collisionW: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 120 : 88) : Number(cfg.width || (isWarden ? 90 : 78)),
+      collisionH: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 275 : 245) : Number(cfg.height || (isWarden ? 188 : 172)),
+      mass: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 1.34 : 1.08) : 1,
       dir: isPlayer ? 1 : -1,
 
       hp,
       hpDelay: hp,
       maxHp: hp,
-      energy: Number(cfg.energy || (isPlayer ? 35 : 30)),
-      ultimateName: cfg.ultimateName || (isPlayer ? 'RIFT EXECUTION' : 'TITAN JUDGEMENT'),
-      finisherName: isPlayer ? 'RIFT EXECUTION' : 'TITAN JUDGEMENT',
+      energy: Number(cfg.energy || (isWarden ? 30 : 35)),
+      ultimateName: cfg.ultimateName || (isWarden ? 'TITAN JUDGEMENT' : 'RIFT EXECUTION'),
+      finisherName: isWarden ? 'TITAN JUDGEMENT' : 'RIFT EXECUTION',
       ultimateCd: 0,
       stamina: 100,
 
@@ -3649,13 +4055,13 @@ body.combat-feel-10 .pause-btn{
       stats: {
         // Physics 11.0: footwork is tuned around acceleration, traction and real stop distance.
         // Raven is faster and more responsive; Warden is heavier and more stable.
-        speed: Math.round((isPlayer ? 500 : 420) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.15 : 1.9)),
-        accel: Math.round((isPlayer ? 3650 : 2850) + baseSpeed * 10.5),
-        airAccel: Math.round((isPlayer ? 1020 : 760) + baseSpeed * 3.1),
-        brake: isPlayer ? .74 : .68,
-        turnBrake: isPlayer ? .54 : .48,
-        jump: Number(cfg.jump || (isPlayer ? 900 : 760)),
-        gravityScale: isPlayer ? 1.00 : 1.12,
+        speed: Math.round((isWarden ? 420 : 500) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.15 : 1.9)),
+        accel: Math.round((isWarden ? 2850 : 3650) + baseSpeed * 10.5),
+        airAccel: Math.round((isWarden ? 760 : 1020) + baseSpeed * 3.1),
+        brake: isWarden ? .68 : .74,
+        turnBrake: isWarden ? .48 : .54,
+        jump: Number(cfg.jump || (isWarden ? 760 : 900)),
+        gravityScale: isWarden ? 1.12 : 1.00,
         hp,
         power: basePower,
         defense: baseDefense
@@ -3729,6 +4135,7 @@ body.combat-feel-10 .pause-btn{
     applyAbilityConfig();
     player = makeFighter('player');
     enemy = makeFighter('enemy');
+    syncHudFighterNames();
     const mobileArena = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
     if (EXACT_BLACK_CITADEL_ARENA) {
       const bounds = getExactArenaCombatBounds();
@@ -3768,7 +4175,7 @@ body.combat-feel-10 .pause-btn{
     updateComboTag();
     syncUltimateButton();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'ULTIMATE / FINISHER 13.0');
+    showCallout('ROUND ' + roundIndex, (player?.name || 'Fighter') + ' VS ' + (enemy?.name || 'Enemy'));
     if (roundIntroTimer) clearTimeout(roundIntroTimer);
     roundIntroTimer = window.setTimeout(()=>{
       if (gameState === 'fight' && !roundResolving) { showCallout('FIGHT', 'Make every hit count'); audio.round(); }
@@ -3817,6 +4224,224 @@ body.combat-feel-10 .pause-btn{
       ui.fight5Vs.classList.remove('show');
       ui.fight5Vs.setAttribute('aria-hidden', 'true');
     }, 1480);
+  }
+
+
+
+  const CHARACTER_SELECT_META = {
+    raven: {
+      id:'raven',
+      name:'Raven',
+      role:'Balanced Duelist',
+      style:'Fast Combo Assassin',
+      image:'assets/fighter-shadow-raven.png',
+      skill:'RIFT EXECUTION',
+      text:'Быстрый персонаж с высоким темпом, удобными комбо и сильным давлением на средней дистанции.',
+      stats:{ power:78, speed:86, defense:72 }
+    },
+    iron_warden: {
+      id:'iron_warden',
+      name:'Iron Warden',
+      role:'Heavy Punisher',
+      style:'Armored Heavy Tank',
+      image:'assets/fighter-iron-warden.png',
+      skill:'TITAN JUDGEMENT',
+      text:'Тяжёлый персонаж с большим уроном, бронёй, сильным блоком и мощным knockback.',
+      stats:{ power:88, speed:62, defense:84 }
+    }
+  };
+
+  function difficultyToValue(name){
+    if (name === 'easy') return .34;
+    if (name === 'hard') return .84;
+    return .62;
+  }
+
+  function difficultyFromValue(value){
+    const v = Number(value || contentBundle?.balance?.aiDifficulty || .62);
+    if (v < .45) return 'easy';
+    if (v > .76) return 'hard';
+    return 'normal';
+  }
+
+  function currentDifficulty14(){
+    try {
+      return localStorage.getItem('eralashCombatDifficulty14') || difficultyFromValue(contentBundle?.balance?.aiDifficulty);
+    } catch (_) {
+      return difficultyFromValue(contentBundle?.balance?.aiDifficulty);
+    }
+  }
+
+  function opponentForSelectedFighter(id){
+    return id === 'iron_warden' ? 'raven' : 'iron_warden';
+  }
+
+  function fighterSelectMeta(id){
+    return CHARACTER_SELECT_META[id] || CHARACTER_SELECT_META.raven;
+  }
+
+  function syncHudFighterNames(){
+    const p = contentFighter('player');
+    const e = contentFighter('enemy');
+    const pName = document.getElementById('pNameHud');
+    const eName = document.getElementById('eNameHud');
+    if (pName) pName.textContent = (p?.name || 'Raven').toUpperCase();
+    if (eName) eName.textContent = (e?.name || 'Iron Warden').toUpperCase();
+  }
+
+  function updateCharacterSelectUI(){
+    const selectedId = contentState.fighterId || 'raven';
+    const enemyId = contentState.enemyId || opponentForSelectedFighter(selectedId);
+    const p = fighterSelectMeta(selectedId);
+    const e = fighterSelectMeta(enemyId);
+
+    document.querySelectorAll('[data-cs-fighter]').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-cs-fighter') === selectedId);
+    });
+
+    const playerImg = document.getElementById('csPlayerImg');
+    const enemyImg = document.getElementById('csEnemyImg');
+    const playerName = document.getElementById('csPlayerName');
+    const enemyName = document.getElementById('csEnemyName');
+    const playerRole = document.getElementById('csPlayerRole');
+    const enemyRole = document.getElementById('csEnemyRole');
+    const selectedSkill = document.getElementById('csSelectedSkill');
+    const selectedText = document.getElementById('csSelectedText');
+
+    if (playerImg) playerImg.src = p.image;
+    if (enemyImg) enemyImg.src = e.image;
+    if (playerName) playerName.textContent = p.name;
+    if (enemyName) enemyName.textContent = e.name;
+    if (playerRole) playerRole.textContent = `${p.role} · ${p.skill}`;
+    if (enemyRole) enemyRole.textContent = `${e.role} · ${e.skill}`;
+    if (selectedSkill) selectedSkill.textContent = p.skill;
+    if (selectedText) selectedText.textContent = p.text;
+
+    const diff = currentDifficulty14();
+    document.querySelectorAll('[data-cs-diff]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-cs-diff') === diff);
+    });
+
+    syncHudFighterNames();
+  }
+
+  function setSelectedFighter14(id){
+    if (!CHARACTER_SELECT_META[id]) return;
+    contentBundle.balance = contentBundle.balance || {};
+    contentState.fighterId = id;
+    contentState.enemyId = opponentForSelectedFighter(id);
+    contentBundle.balance.activeFighterId = contentState.fighterId;
+    contentBundle.balance.enemyFighterId = contentState.enemyId;
+    saveContentState();
+    updateCharacterSelectUI();
+    audio.ui();
+  }
+
+  function setDifficulty14(name){
+    const value = difficultyToValue(name);
+    contentBundle.balance = contentBundle.balance || {};
+    contentBundle.balance.aiDifficulty = value;
+    try { localStorage.setItem('eralashCombatDifficulty14', name); } catch (_) {}
+    updateCharacterSelectUI();
+    audio.ui();
+  }
+
+  function openCharacterSelect(source='menu'){
+    if (gameState !== 'menu' && gameState !== 'result') return;
+    contentBundle.balance = contentBundle.balance || {};
+    const savedDiff = currentDifficulty14();
+    contentBundle.balance.aiDifficulty = difficultyToValue(savedDiff);
+    contentState.fighterId = contentState.fighterId || 'raven';
+    contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+    contentBundle.balance.activeFighterId = contentState.fighterId;
+    contentBundle.balance.enemyFighterId = contentState.enemyId;
+    saveContentState();
+    trackEvent('character_select_open', { source, patch: CHARACTER_SELECT_PATCH });
+    const overlay = document.getElementById('characterSelect');
+    if (!overlay) { newMatch(); return; }
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden','false');
+    requestAnimationFrame(()=>overlay.classList.add('show'));
+    document.body.classList.add('character-select-open');
+    updateCharacterSelectUI();
+  }
+
+  function closeCharacterSelect(startingFight=false){
+    const overlay = document.getElementById('characterSelect');
+    if (!overlay) return;
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden','true');
+    document.body.classList.remove('character-select-open');
+    window.setTimeout(()=>{ if (!overlay.classList.contains('show')) overlay.style.display = 'none'; }, startingFight ? 90 : 180);
+  }
+
+  function startSelectedCharacterMatch(){
+    contentBundle.balance = contentBundle.balance || {};
+    const diff = currentDifficulty14();
+    contentBundle.balance.aiDifficulty = difficultyToValue(diff);
+    contentState.enemyId = opponentForSelectedFighter(contentState.fighterId || 'raven');
+    contentBundle.balance.activeFighterId = contentState.fighterId;
+    contentBundle.balance.enemyFighterId = contentState.enemyId;
+    saveContentState();
+    trackEvent('fight_start', {
+      source:'character_select_14',
+      fighter: contentState.fighterId,
+      enemy: contentState.enemyId,
+      difficulty: diff
+    });
+    closeCharacterSelect(true);
+    audio.ensure();
+    audio.ui();
+    window.setTimeout(()=>newMatch(), 80);
+  }
+
+  function bindCharacterSelect(){
+    const interceptStart = (id, source) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('click', (event) => {
+        if (gameState !== 'menu') return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        audio.ensure();
+        audio.ui();
+        openCharacterSelect(source);
+      }, true);
+    };
+
+    interceptStart('startBtn', 'main_start_button');
+    interceptStart('realStartZone', 'real_art_start_zone');
+
+    document.querySelectorAll('[data-cs-fighter]').forEach(card => {
+      card.addEventListener('click', () => {
+        if (card.classList.contains('locked')) return;
+        setSelectedFighter14(card.getAttribute('data-cs-fighter'));
+      });
+    });
+
+    document.querySelectorAll('[data-cs-diff]').forEach(btn => {
+      btn.addEventListener('click', () => setDifficulty14(btn.getAttribute('data-cs-diff') || 'normal'));
+    });
+
+    document.getElementById('csStartFightBtn')?.addEventListener('click', startSelectedCharacterMatch);
+    document.getElementById('csCloseBtn')?.addEventListener('click', () => { audio.ui(); closeCharacterSelect(false); });
+    document.getElementById('csBackBtn')?.addEventListener('click', () => { audio.ui(); closeCharacterSelect(false); });
+
+    window.addEventListener('keydown', (event) => {
+      const overlay = document.getElementById('characterSelect');
+      if (!overlay || !overlay.classList.contains('show')) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        audio.ui();
+        closeCharacterSelect(false);
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        startSelectedCharacterMatch();
+      }
+    });
+
+    updateCharacterSelectUI();
   }
 
 
@@ -5591,8 +6216,18 @@ body.combat-feel-10 .pause-btn{
 
 
   
+  function spriteBankKeyForFighter(f){
+    const id = String(f?.contentId || f?.name || '').toLowerCase();
+    return id.includes('warden') ? 'enemy' : 'player';
+  }
+
+  function fighterIsWarden(f){
+    const id = String(f?.contentId || f?.name || '').toLowerCase();
+    return id.includes('warden') || String(f?.name || '').toLowerCase().includes('iron');
+  }
+
   function spriteAnimForFighter(f){
-    const bank = f.id === 'player' ? spriteFighterSheets.player : spriteFighterSheets.enemy;
+    const bank = spriteFighterSheets[spriteBankKeyForFighter(f)] || (f.id === 'player' ? spriteFighterSheets.player : spriteFighterSheets.enemy);
     if (!bank) return null;
 
     if (f.state === 'attack' && f.attack) {
@@ -5633,6 +6268,8 @@ body.combat-feel-10 .pause-btn{
     const fw = img.naturalWidth / frames;
     const fh = img.naturalHeight;
     const isEnemy = f.id !== 'player';
+    const isWardenVisual = fighterIsWarden(f);
+    const visualAccent = f.colorB || (isWardenVisual ? '#3eb6ff' : '#c92832');
     const dir = f.dir || (isEnemy ? -1 : 1);
     const attacking = f.state === 'attack';
     const hurt = f.state === 'hitstun' || f.state === 'knockdown';
@@ -5644,14 +6281,14 @@ body.combat-feel-10 .pause-btn{
     const attackPunch = attacking ? Math.sin(attackP * Math.PI) : 0;
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
 
-    let spriteH = coarse ? clamp(h * .44, 310, 455) : clamp(h * (isEnemy ? .54 : .50), 390, isEnemy ? 560 : 520);
+    let spriteH = coarse ? clamp(h * .44, 310, 455) : clamp(h * (isWardenVisual ? .54 : .50), 390, isWardenVisual ? 560 : 520);
     spriteH *= anim.scale || 1;
     if (attacking) spriteH *= atkName === 'ultimate' ? 1.04 : 1.015;
     let spriteW = spriteH * (fw / Math.max(1, fh));
 
     // Large frames from generated sheets can contain extra horizontal padding.
     // Keep visible size stable so the fighters do not become giant pasted posters.
-    const maxW = coarse ? w * .38 : w * (isEnemy ? .34 : .32);
+    const maxW = coarse ? w * .38 : w * (isWardenVisual ? .34 : .32);
     if (spriteW > maxW) {
       const k = maxW / spriteW;
       spriteW *= k;
@@ -5701,7 +6338,7 @@ body.combat-feel-10 .pause-btn{
     ctx.rotate(lean);
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
-    ctx.shadowColor = isEnemy ? 'rgba(70,190,255,.45)' : 'rgba(255,45,60,.45)';
+    ctx.shadowColor = visualAccent;
     ctx.shadowBlur = 24;
     if (hurt) ctx.filter = 'brightness(1.75) contrast(1.2) saturate(1.25)';
     else if (blocking) ctx.filter = 'brightness(1.35) contrast(1.15) saturate(1.22)';
@@ -5725,7 +6362,7 @@ body.combat-feel-10 .pause-btn{
 
     // Active hit frame: draw a clear slash/impact arc that follows attack frames.
     if (attacking) {
-      const c = isEnemy ? '#4bc6ff' : '#ff2636';
+      const c = visualAccent;
       const reach = atkName === 'ultimate' ? spriteW*.62 : atkName === 'special' ? spriteW*.52 : atkName === 'heavy' ? spriteW*.47 : spriteW*.36;
       const baseX = x + dir * spriteW*.18;
       const baseY = y - spriteH*.55;
@@ -5755,15 +6392,15 @@ body.combat-feel-10 .pause-btn{
     const plateW = clamp(spriteW*.45, 110, 170);
     const plateGrad = ctx.createLinearGradient(x-plateW*.5, y+14, x+plateW*.5, y+38);
     plateGrad.addColorStop(0,'rgba(0,0,0,.70)');
-    plateGrad.addColorStop(.5, isEnemy ? 'rgba(42,160,255,.22)' : 'rgba(255,35,50,.20)');
+    plateGrad.addColorStop(.5, isWardenVisual ? 'rgba(42,160,255,.22)' : 'rgba(255,35,50,.20)');
     plateGrad.addColorStop(1,'rgba(0,0,0,.70)');
     ctx.fillStyle = plateGrad;
-    ctx.strokeStyle = isEnemy ? 'rgba(125,220,255,.58)' : 'rgba(255,60,76,.50)';
+    ctx.strokeStyle = isWardenVisual ? 'rgba(125,220,255,.58)' : 'rgba(255,60,76,.50)';
     roundRect(ctx, x-plateW*.5, y+13, plateW, 25, 12, true, true);
     ctx.font = '950 13px Inter, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = isEnemy ? '#c8f2ff' : '#ffd06e';
+    ctx.fillStyle = isWardenVisual ? '#c8f2ff' : '#ffd06e';
     ctx.shadowColor = 'rgba(0,0,0,.85)';
     ctx.shadowBlur = 7;
     ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), x, y+26);
@@ -5776,7 +6413,7 @@ body.combat-feel-10 .pause-btn{
   function drawPremiumFighterArt(f){
     if (drawSpriteSheetFighter(f)) return true;
     if (!USE_PREMIUM_FIGHTER_ART) return false;
-    const img = f.id === 'player' ? premiumFighterArt.player : premiumFighterArt.enemy;
+    const img = fighterIsWarden(f) ? premiumFighterArt.enemy : premiumFighterArt.player;
     if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
 
     const time = performance.now();
@@ -8660,10 +9297,11 @@ function sessionId(){
   bindControls();
   bindEconomyControls();
   bindRealArtClickMap();
+  bindCharacterSelect();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
-  window.eralashStartFight = newMatch;
+  window.eralashStartFight = () => openCharacterSelect('window_api');
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });
 })();

@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-ultimate-finisher-13-ready",
-  "version": "13.0.0",
+  "name": "eralash-combat-character-select-14-ready",
+  "version": "14.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Ultimate / Finisher 13.0: cinematic ultimates, energy flow, finishers, AI ultimate usage and premium KO drama."
+  "description": "EraLash Combat Character Select 14.0: premium fighter selection, selected-vs-enemy preview, difficulty selector, content-state persistence and selected fighter stats."
 }
