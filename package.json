@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-true-arena-fighter-presentation-22-2-premium-art-ready",
-  "version": "22.2.0",
+  "name": "eralash-combat-arena-select-luxury-rebuild-23-ready",
+  "version": "23.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat True Arena Set & Fighter Presentation 22.2: premium arena art rebuild with dedicated WebP stage previews, commercial Arena Select presentation and preserved 21.0 combat clarity."
+  "description": "EraLash Combat Arena Select Luxury Rebuild 23.0: cinematic stage-selection screen with hero arena preview, compact arena rail, luxury stage key art, cleaner typography and mobile-safe layout."
 }

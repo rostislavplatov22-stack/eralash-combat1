@@ -420,3 +420,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## Arena Select 15.0
 
 Добавлен премиальный экран выбора арены после выбора персонажа. Состояние арены сохраняется, а фон/свет/частицы меняются в бою.
+
+
+## Arena Select Luxury Rebuild 23.0
+
+Полный redesign выбора арены: вместо дешёвой сетки 2×2 добавлен cinematic hero-preview выбранной арены, compact arena rail, premium stage key art, чистая типографика, reduced UI noise и mobile-safe action flow.
