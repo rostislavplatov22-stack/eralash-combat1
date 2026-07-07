@@ -3504,9 +3504,48 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
 }
 
 
+
+/* ==========================================================
+   Arena Flow 16.3 — overlay layer fix
+   Previous 16.x opened Character/Arena Select, but the painted
+   Real Art menu has z-index:60, while selects were z-index:52/53.
+   Result: click worked internally, overlay stayed behind menu.
+   ========================================================== */
+body.character-select-open #characterSelect,
+#characterSelect.character-select.show{
+  z-index:180 !important;
+  display:flex !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+}
+body.arena-select-open #arenaSelect,
+#arenaSelect.arena-select.show{
+  z-index:181 !important;
+  display:flex !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+}
+#arenaReveal16.arena-reveal16,
+#arenaReveal16.arena-reveal16.show{
+  z-index:182 !important;
+}
+body.character-select-open #menu,
+body.arena-select-open #menu{
+  pointer-events:none !important;
+  filter:brightness(.46) blur(1.2px) !important;
+}
+body.character-select-open #menu .dc-real-hotzones,
+body.arena-select-open #menu .dc-real-hotzones{
+  pointer-events:none !important;
+}
+body.character-select-open .character-select,
+body.arena-select-open .arena-select{
+  opacity:1 !important;
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-16-2">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -3814,7 +3853,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">16.0 закрепляет полный flow Character → Arena → Cinematic VS. Выбери арену перед боем: свет, атмосфера и stage tone меняются без поломки боёвки.</div>
+          <div class="cs-locked-note">16.3 закрепляет полный flow Character → Arena → Cinematic VS. Выбери арену перед боем: свет, атмосфера и stage tone меняются без поломки боёвки.</div>
         </aside>
       </div>
     </div>
@@ -3825,7 +3864,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">Premium Arena Select · 16.0</div>
+          <div class="as-kicker">Premium Arena Select · 16.3</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
           <p class="as-subtitle">Арена меняет атмосферу боя: цвет света, фон, эффекты воздуха, настроение VS-screen и читаемость персонажей.</p>
         </div>
@@ -4988,7 +5027,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
         shell.style.setProperty('--my', ((event.clientY - r.top) / Math.max(1,r.height) * 100).toFixed(1) + '%');
       });
     });
-    document.getElementById('asStartFightBtn')?.addEventListener('click', () => hardStartSelectedArenaMatch16_2('arena_button_16_2'));
+    document.getElementById('asStartFightBtn')?.addEventListener('click', startSelectedArenaMatch);
     document.getElementById('asCloseBtn')?.addEventListener('click', () => { audio.ui(); closeArenaSelect(false); openCharacterSelect('arena_back'); });
     document.getElementById('asBackBtn')?.addEventListener('click', () => { audio.ui(); closeArenaSelect(false); openCharacterSelect('arena_back'); });
 
@@ -5003,7 +5042,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
       }
       if (event.key === 'Enter') {
         event.preventDefault();
-        hardStartSelectedArenaMatch16_2('arena_enter_16_2');
+        startSelectedArenaMatch();
       }
     });
 
@@ -5122,7 +5161,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
     closeCharacterSelect(true);
     audio.ensure();
     audio.ui();
-    window.setTimeout(()=>hardOpenArenaSelect16_2('character_select_14_16_2'), 90);
+    window.setTimeout(()=>openArenaSelect('character_select_14'), 90);
   }
 
   function bindCharacterSelect(){
@@ -5135,7 +5174,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
         event.stopImmediatePropagation();
         audio.ensure();
         audio.ui();
-        hardOpenCharacterSelect16_2(source);
+        openCharacterSelect(source);
       }, true);
     };
 
@@ -8045,230 +8084,6 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
     if(!down) input.pressed[k]=false;
   }
 
-
-
-  /*
-   * ARENA FLOW 16.2 — hard start-gate hotfix.
-   * Desktop real-art menu uses painted UI + invisible click zones.
-   * Some deployment/browser combinations let the visual start button receive no
-   * reliable DOM click. This bridge catches the visual CTA area at document
-   * capture level before the painted clickmap can swallow the event.
-   */
-  let startGateLastAction16_2 = 0;
-  let arenaFightGateLock16_2 = false;
-
-  function startGateMenuVisible16_2(){
-    try {
-      if (!ui?.menu) return false;
-      const cs = getComputedStyle(ui.menu);
-      return cs.display !== 'none' && cs.visibility !== 'hidden';
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function overlayOpen16_2(){
-    return !!document.querySelector('#characterSelect.show, #arenaSelect.show, #arenaReveal16.show, #result[style*="flex"], #pauseOverlay.show, .dcv4-modal.show');
-  }
-
-  function eventPoint16_2(event){
-    return event?.changedTouches?.[0] || event?.touches?.[0] || event;
-  }
-
-  function isVisualStartArea16_2(event){
-    if (!document.body.classList.contains('real-art-v4')) return false;
-    if (!startGateMenuVisible16_2() || overlayOpen16_2()) return false;
-
-    const lobby = document.querySelector('#menu .dc-v3-lobby');
-    const p = eventPoint16_2(event);
-    if (!lobby || !p || typeof p.clientX !== 'number' || typeof p.clientY !== 'number') return false;
-
-    const r = lobby.getBoundingClientRect();
-    if (r.width < 100 || r.height < 100) return false;
-    if (p.clientX < r.left || p.clientX > r.right || p.clientY < r.top || p.clientY > r.bottom) return false;
-
-    const x = ((p.clientX - r.left) / r.width) * 100;
-    const y = ((p.clientY - r.top) / r.height) * 100;
-
-    // Generous rectangle around the painted "НАЧАТЬ БОЙ" CTA.
-    return x >= 28.8 && x <= 67.4 && y >= 70.8 && y <= 86.3;
-  }
-
-  function consumeStartGateEvent16_2(event){
-    try {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-    } catch (_) {}
-  }
-
-  function hardOpenCharacterSelect16_2(source='start_gate_16_2'){
-    const now = Date.now();
-    if (now - startGateLastAction16_2 < 260) return;
-    startGateLastAction16_2 = now;
-
-    try { audio.ensure(); } catch (_) {}
-    try { audio.ui(); } catch (_) {}
-
-    // If a previous broken transition left gameState in fight while the menu is
-    // still visible, recover to a clean menu state before opening the modal.
-    if (startGateMenuVisible16_2()) {
-      gameState = 'menu';
-      setPaused(false, true);
-      document.body.classList.remove('is-fighting','fight-entering','menu-leaving','arena-select-open');
-      if (ui?.menu) {
-        ui.menu.removeAttribute('aria-hidden');
-        ui.menu.style.removeProperty('display');
-      }
-    }
-
-    contentBundle.balance = contentBundle.balance || {};
-    const savedDiff = currentDifficulty14();
-    contentBundle.balance.aiDifficulty = difficultyToValue(savedDiff);
-    contentState.fighterId = contentState.fighterId || 'raven';
-    contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
-    contentBundle.balance.activeFighterId = contentState.fighterId;
-    contentBundle.balance.enemyFighterId = contentState.enemyId;
-    saveContentState();
-
-    try { trackEvent('character_select_open', { source, patch:'arena_flow_16_2_start_gate' }); } catch (_) {}
-
-    let opened = false;
-    try {
-      openCharacterSelect(source);
-      opened = true;
-    } catch (err) {
-      console.error('16.2 start gate openCharacterSelect failed', err);
-    }
-
-    const overlay = document.getElementById('characterSelect');
-    if (overlay) {
-      overlay.style.display = 'flex';
-      overlay.setAttribute('aria-hidden','false');
-      overlay.classList.add('show');
-      document.body.classList.add('character-select-open');
-      try { updateCharacterSelectUI(); } catch (_) {}
-      opened = true;
-    }
-
-    if (!opened) {
-      try { newMatch(); } catch (err) { console.error('16.2 start gate fallback newMatch failed', err); }
-    }
-  }
-
-  function hardOpenArenaSelect16_2(source='character_start_gate_16_2'){
-    const now = Date.now();
-    if (now - startGateLastAction16_2 < 220) return;
-    startGateLastAction16_2 = now;
-
-    try { audio.ensure(); } catch (_) {}
-    try { audio.ui(); } catch (_) {}
-
-    gameState = 'menu';
-    contentBundle.balance = contentBundle.balance || {};
-    const diff = currentDifficulty14();
-    contentBundle.balance.aiDifficulty = difficultyToValue(diff);
-    contentState.fighterId = contentState.fighterId || 'raven';
-    contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
-    contentBundle.balance.activeFighterId = contentState.fighterId;
-    contentBundle.balance.enemyFighterId = contentState.enemyId;
-    saveContentState();
-
-    try { closeCharacterSelect(true); } catch (_) {}
-    window.setTimeout(() => {
-      try {
-        openArenaSelect(source);
-      } catch (err) {
-        console.error('16.2 start gate openArenaSelect failed', err);
-      }
-
-      const overlay = document.getElementById('arenaSelect');
-      if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.setAttribute('aria-hidden','false');
-        overlay.classList.add('show');
-        document.body.classList.add('arena-select-open');
-        try { updateArenaSelectUI(); } catch (_) {}
-      } else {
-        hardStartSelectedArenaMatch16_2('arena_missing_fallback_16_2');
-      }
-    }, 70);
-  }
-
-  function hardStartSelectedArenaMatch16_2(source='arena_start_gate_16_2'){
-    if (arenaFightGateLock16_2) return;
-    arenaFightGateLock16_2 = true;
-
-    try { audio.ensure(); } catch (_) {}
-    try { audio.ui(); } catch (_) {}
-
-    gameState = 'menu';
-    contentBundle.balance = contentBundle.balance || {};
-    contentState.arenaId = currentArena15();
-    contentBundle.balance.activeArenaId = contentState.arenaId;
-    saveContentState();
-
-    try {
-      trackEvent('fight_start', {
-        source,
-        fighter: contentState.fighterId,
-        enemy: contentState.enemyId,
-        arena: contentState.arenaId,
-        difficulty: currentDifficulty14(),
-        patch:'arena_flow_16_2_start_gate'
-      });
-    } catch (_) {}
-
-    try { closeArenaSelect(true); } catch (_) {}
-    let launched = false;
-    const launch = () => {
-      if (launched) return;
-      launched = true;
-      try { newMatch(); } catch (err) { console.error('16.2 start gate newMatch failed', err); }
-      window.setTimeout(() => { arenaFightGateLock16_2 = false; }, 900);
-    };
-
-    try {
-      showArenaReveal16(launch);
-    } catch (_) {
-      launch();
-    }
-
-    // Safety net: if animation callback is swallowed, force the fight anyway.
-    window.setTimeout(() => {
-      if (!launched || !document.body.classList.contains('is-fighting')) launch();
-    }, 1650);
-  }
-
-  function bindStartGate16_2(){
-    const handler = (event) => {
-      const target = event.target;
-      if (!target?.closest) return;
-
-      if (target.closest('#csStartFightBtn')) {
-        consumeStartGateEvent16_2(event);
-        hardOpenArenaSelect16_2('cs_start_gate_16_2');
-        return;
-      }
-
-      if (target.closest('#asStartFightBtn')) {
-        consumeStartGateEvent16_2(event);
-        hardStartSelectedArenaMatch16_2('as_start_gate_16_2');
-        return;
-      }
-
-      if (target.closest('#startBtn, #realStartZone') || isVisualStartArea16_2(event)) {
-        consumeStartGateEvent16_2(event);
-        hardOpenCharacterSelect16_2('visual_start_gate_16_2');
-      }
-    };
-
-    document.addEventListener('pointerup', handler, { capture:true, passive:false });
-    document.addEventListener('click', handler, true);
-    document.addEventListener('touchend', handler, { capture:true, passive:false });
-  }
-
-
   function bindControls(){
     document.querySelectorAll('.control-btn').forEach(btn=>{
       const name = btn.dataset.input;
@@ -8310,7 +8125,7 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
     if (ui.pauseMenuBtn) ui.pauseMenuBtn.addEventListener('click',()=>{ audio.ui(); setPaused(false, true); ui.result.style.display='none'; document.body.classList.remove('is-fighting','fight-entering','menu-leaving'); document.body.classList.add('menu-returning'); ui.menu.removeAttribute('aria-hidden'); ui.menu.style.removeProperty('display'); gameState='menu'; hideTelegramMainButton(); window.setTimeout(()=>document.body.classList.remove('menu-returning'),460); });
 
 
-    ui.startBtn.addEventListener('click',()=>{trackEvent('character_select_open',{source:'start_button_16'});audio.ui();audio.ensure();hardOpenCharacterSelect16_2('start_button_16_2');});
+    ui.startBtn.addEventListener('click',()=>{trackEvent('character_select_open',{source:'start_button_16'});audio.ui();audio.ensure();openCharacterSelect('start_button_16');});
     ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
     ui.menuBtn.addEventListener('click',()=>{audio.ui();setPaused(false,true);if(roundEndTimer){clearTimeout(roundEndTimer);roundEndTimer=0;}ui.result.style.display='none';document.body.classList.remove('is-fighting','menu-leaving');document.body.classList.add('menu-returning');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();window.setTimeout(()=>document.body.classList.remove('menu-returning'),460);});
     ui.muteBtn.addEventListener('click',()=>{
@@ -9529,7 +9344,7 @@ function sessionId(){
       { id:'analytics',    x1:1.6,  y1:86.3, x2:21.5, y2:93.3, fn:()=>loadAnalytics() },
 
       // Main and top zones
-      { id:'start',        x1:30.0, y1:72.3, x2:66.4, y2:84.9, fn:()=>{ trackEvent('character_select_open',{source:'real_art_clickmap_16'}); audio.ensure(); hardOpenCharacterSelect16_2('real_art_clickmap_16_2'); } },
+      { id:'start',        x1:30.0, y1:72.3, x2:66.4, y2:84.9, fn:()=>{ trackEvent('character_select_open',{source:'real_art_clickmap_16'}); audio.ensure(); openCharacterSelect('real_art_clickmap_16'); } },
       { id:'profileTop',   x1:23.0, y1:1.4,  x2:48.0, y2:7.8,  fn:()=>loadProfilePanel() },
       { id:'settingsTop',  x1:92.0, y1:1.0,  x2:97.7, y2:8.0,  fn:()=>loadSettingsPanel() },
 
@@ -9613,7 +9428,7 @@ function sessionId(){
         }
         if (tg.MainButton) {
           tg.MainButton.setText('ENTER ARENA');
-          tg.MainButton.onClick(()=>{ audio.ui(); audio.ensure(); hardOpenCharacterSelect16_2('telegram_main_button_16_2'); });
+          tg.MainButton.onClick(()=>{ audio.ui(); audio.ensure(); openCharacterSelect('telegram_main_button_16'); });
           // Внутриигровая кнопка Telegram перекрывала нижнюю часть экрана и блокировала прокрутку меню на iPhone.
           // Оставляем собственные premium-кнопки внутри Mini App и скрываем системную MainButton.
           tg.MainButton.hide();
@@ -10333,18 +10148,197 @@ function sessionId(){
   }
 
 
+
+  /* Arena Flow 16.3 — Start Flow Layer Guard
+     Hardens the whole launch chain:
+     - real-art Start always opens visible Character Select above menu
+     - Character Select Start always opens visible Arena Select above menu
+     - Arena Select Start always starts combat and hides all overlays/menu
+  */
+  function forceVisibleOverlay16_3(id, bodyClass, zIndex){
+    const el = document.getElementById(id);
+    if (!el) return null;
+    if (bodyClass) document.body.classList.add(bodyClass);
+    el.style.setProperty('display', 'flex', 'important');
+    el.style.setProperty('visibility', 'visible', 'important');
+    el.style.setProperty('pointer-events', 'auto', 'important');
+    el.style.setProperty('z-index', String(zIndex), 'important');
+    el.setAttribute('aria-hidden', 'false');
+    el.classList.add('show');
+    return el;
+  }
+
+  function hideOverlay16_3(id, bodyClass){
+    const el = document.getElementById(id);
+    if (bodyClass) document.body.classList.remove(bodyClass);
+    if (!el) return;
+    el.classList.remove('show');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.removeProperty('visibility');
+    el.style.removeProperty('pointer-events');
+    if (id === 'characterSelect' || id === 'arenaSelect') {
+      window.setTimeout(() => {
+        if (!el.classList.contains('show')) el.style.setProperty('display', 'none', 'important');
+      }, 80);
+    }
+  }
+
+  function openCharacterSelect16_3(source='start_gate_16_3'){
+    if (gameState !== 'menu' && gameState !== 'result') gameState = 'menu';
+    try { audio.ensure(); audio.ui(); } catch(_) {}
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      const savedDiff = currentDifficulty14();
+      contentBundle.balance.aiDifficulty = difficultyToValue(savedDiff);
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      saveContentState();
+      trackEvent('character_select_open', { source, patch:'16.3_layer_fix' });
+      updateCharacterSelectUI();
+    } catch(err) { console.warn('Arena Flow 16.3 character prefill failed', err); }
+    forceVisibleOverlay16_3('characterSelect', 'character-select-open', 180);
+  }
+
+  function openArenaSelect16_3(source='character_start_16_3'){
+    if (gameState !== 'menu' && gameState !== 'result') gameState = 'menu';
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      const diff = currentDifficulty14();
+      contentBundle.balance.aiDifficulty = difficultyToValue(diff);
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+      contentState.arenaId = currentArena15();
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      contentBundle.balance.activeArenaId = contentState.arenaId;
+      saveContentState();
+      trackEvent('arena_select_open', { source, patch:'16.3_layer_fix' });
+      updateArenaSelectUI();
+    } catch(err) { console.warn('Arena Flow 16.3 arena prefill failed', err); }
+    hideOverlay16_3('characterSelect', 'character-select-open');
+    window.setTimeout(() => forceVisibleOverlay16_3('arenaSelect', 'arena-select-open', 181), 90);
+  }
+
+  function startSelectedArenaMatch16_3(source='arena_start_16_3'){
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = contentState.enemyId || opponentForSelectedFighter(contentState.fighterId);
+      contentState.arenaId = currentArena15();
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      contentBundle.balance.activeArenaId = contentState.arenaId;
+      saveContentState();
+      trackEvent('fight_start', {
+        source,
+        patch:'16.3_layer_fix',
+        fighter: contentState.fighterId,
+        enemy: contentState.enemyId,
+        arena: contentState.arenaId,
+        difficulty: currentDifficulty14()
+      });
+    } catch(err) { console.warn('Arena Flow 16.3 start state failed', err); }
+
+    hideOverlay16_3('characterSelect', 'character-select-open');
+    hideOverlay16_3('arenaSelect', 'arena-select-open');
+    try { audio.ensure(); audio.ui(); } catch(_) {}
+
+    let launched = false;
+    const launch = () => {
+      if (launched) return;
+      launched = true;
+      const ar = document.getElementById('arenaReveal16');
+      if (ar) {
+        ar.classList.remove('show');
+        ar.setAttribute('aria-hidden','true');
+        ar.style.setProperty('display','none','important');
+      }
+      newMatch();
+    };
+
+    try {
+      showArenaReveal16(launch);
+    } catch(err) {
+      console.warn('Arena Flow 16.3 reveal fallback to direct match', err);
+      launch();
+    }
+
+    window.setTimeout(() => {
+      if (!document.body.classList.contains('is-fighting') && gameState !== 'fight') launch();
+    }, 1250);
+    window.setTimeout(() => {
+      if (gameState === 'fight') {
+        document.body.classList.add('is-fighting');
+        ui.menu?.style?.setProperty('display', 'none', 'important');
+      }
+    }, 1550);
+  }
+
+  function bindArenaFlowLayerFix16_3(){
+    const hardBind = (id, fn) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      ['pointerdown','click','touchend'].forEach(type => {
+        el.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          fn(type);
+        }, { capture:true, passive:false });
+      });
+    };
+
+    hardBind('startBtn', () => openCharacterSelect16_3('start_button_16_3'));
+    hardBind('realStartZone', () => openCharacterSelect16_3('real_start_zone_16_3'));
+    hardBind('csStartFightBtn', () => openArenaSelect16_3('character_start_button_16_3'));
+    hardBind('asStartFightBtn', () => startSelectedArenaMatch16_3('arena_start_button_16_3'));
+
+    // Coordinate shield for the painted big "НАЧАТЬ БОЙ" button.
+    const handlePaintedStart = (event) => {
+      if (!document.body.classList.contains('real-art-v4')) return;
+      if (document.body.classList.contains('character-select-open') || document.body.classList.contains('arena-select-open')) return;
+      if (gameState !== 'menu' && gameState !== 'result') return;
+      const p = event.changedTouches?.[0] || event;
+      if (!p || typeof p.clientX !== 'number') return;
+      const lobby = document.querySelector('#menu .dc-v3-lobby') || ui.menu;
+      if (!lobby) return;
+      const r = lobby.getBoundingClientRect();
+      if (r.width < 100 || r.height < 100) return;
+      const x = ((p.clientX - r.left) / r.width) * 100;
+      const y = ((p.clientY - r.top) / r.height) * 100;
+      // Wider than the painted button so browser scaling/Vercel viewport differences cannot miss it.
+      const insideBigStart = x >= 24 && x <= 72 && y >= 63 && y <= 87;
+      if (!insideBigStart) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      openCharacterSelect16_3('painted_start_shield_16_3');
+    };
+    document.addEventListener('pointerdown', handlePaintedStart, { capture:true, passive:false });
+    document.addEventListener('click', handlePaintedStart, { capture:true, passive:false });
+    document.addEventListener('touchend', handlePaintedStart, { capture:true, passive:false });
+
+    window.eralashStartFight = () => openCharacterSelect16_3('window_api_16_3');
+    window.eralashOpenArenaSelect = () => openArenaSelect16_3('window_api_16_3');
+    window.eralashDirectFight = () => startSelectedArenaMatch16_3('window_api_direct_16_3');
+  }
+
+
   resize();
-  bindStartGate16_2();
   bindControls();
   bindEconomyControls();
   bindRealArtClickMap();
   bindCharacterSelect();
   bindArenaSelect();
+  bindArenaFlowLayerFix16_3();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
-  window.eralashStartFight = () => hardOpenCharacterSelect16_2('window_api_16_2');
-  window.eralashOpenArenaSelect = () => openArenaSelect('window_api');
+  window.eralashStartFight = () => openCharacterSelect16_3('window_api_16_3');
+  window.eralashOpenArenaSelect = () => openArenaSelect16_3('window_api_16_3');
+  window.eralashDirectFight = () => startSelectedArenaMatch16_3('window_api_direct_16_3');
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });
 })();
