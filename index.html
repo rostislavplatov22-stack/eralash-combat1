@@ -9328,7 +9328,14 @@ function sessionId(){
     const handle = (event) => {
       if (!document.body.classList.contains('real-art-v4')) return;
       if (ui.menu.style.display === 'none' || gameState === 'fight') return;
-      if (event.target?.closest?.('.dcv4-modal')) return;
+
+      // Arena Flow 16.1 hotfix:
+      // The painted real-art clickmap is a global capture listener. In 16.0 it also
+      // intercepted clicks inside Character Select / Arena Select overlays and on
+      // real DOM buttons, so "Start Fight / Начать бой" looked inactive.
+      const target = event.target;
+      if (target?.closest?.('#characterSelect, #arenaSelect, #arenaReveal16, #result, #pauseOverlay, .dcv4-modal')) return;
+      if (target?.closest?.('#menu button:not(.dc-real-zone), #menu a, #menu input, #menu select, #menu textarea')) return;
 
       const isTouch = event.type === 'touchend';
       if (!isTouch && Date.now() - lastTouchAt < 650) return;
