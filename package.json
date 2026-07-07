@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-fullscreen-combat-space-25-3-ready",
-  "version": "25.3.0",
+  "name": "eralash-combat-fighter-motion-combat-presence-26-ready",
+  "version": "26.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Fullscreen Combat Space Hotfix 25.3: makes approved arena art cover the full fight viewport and expands combat movement bounds so fighters can retreat to the real map edges."
+  "description": "EraLash Combat Fighter Motion & Combat Presence 26.0: upgrades sprite fighter rendering with planted contact shadows, stronger motion poses, Raven weapon trails, Iron Warden shield presence, hit/block readability and round-end presence while preserving approved fullscreen arenas."
 }

@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Cinematic Art & Fighter Identity 24.0</title>
+  <title>EraLash Combat — Fighter Motion 26.0 & Fighter Identity 24.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5006,7 +5006,7 @@ body.arena-real-art-25-1 .ci24-card{
 }
 
 
-/* Arena Fullscreen Combat Space Hotfix 25.3 */
+/* Fighter Motion & Combat Presence 26.0 */
 body.arena-approved-25-2 #debug{
   display:none !important;
 }
@@ -5019,6 +5019,21 @@ body.arena-approved-25-2 .as-rail-thumb.sunken{background-image:url('assets/thum
 body.arena-approved-25-2 .as-rail-thumb.foundry{background-image:url('assets/thumb-approved-iron-foundry-25-3.webp?v=253') !important}
 body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thumb-approved-crimson-garden-25-3.webp?v=253') !important}
 
+
+/* Fighter Motion & Combat Presence 26.0 */
+body.fighter-motion-26 #debug{display:none !important;}
+body.fighter-motion-26 .control-btn,
+body.fighter-motion-26 .fighter-card,
+body.fighter-motion-26 .timer{
+  backdrop-filter: blur(16px) saturate(1.08);
+}
+body.fighter-motion-26 .hud{
+  filter: drop-shadow(0 18px 38px rgba(0,0,0,.42));
+}
+body.fighter-motion-26 .callout .title{
+  letter-spacing:.18em;
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -5027,7 +5042,7 @@ body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thu
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -5274,7 +5289,7 @@ body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thu
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">Cinematic Fighter Identity · 24.0</div>
+          <div class="cs-kicker">Fighter Motion & Combat Presence · 26.0</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
           <p class="cs-subtitle">Кинематографичный выбор бойца: Raven — быстрый ассасин, Iron Warden — тяжёлый танк. Выбор сразу меняет VS-подачу и боевую роль.</p>
         </div>
@@ -5475,7 +5490,7 @@ body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thu
 
   <div id="arenaReveal16" class="arena-reveal16" aria-hidden="true">
     <div class="ar16-card">
-      <div class="ar16-kicker">Cinematic Match Locked · 25.1</div>
+      <div class="ar16-kicker">Cinematic Match Locked · 26.0</div>
       <div id="ar16Arena" class="ar16-arena">Black Citadel</div>
       <div class="ar16-vs-row">
         <span id="ar16Player">Raven</span>
@@ -5493,7 +5508,7 @@ body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thu
     <img id="ci24PlayerArt" class="ci24-fighter left" src="assets/fighter-shadow-raven.png" alt="">
     <img id="ci24EnemyArt" class="ci24-fighter right" src="assets/fighter-iron-warden.png" alt="">
     <div class="ci24-card">
-      <div class="ci24-k">Cinematic Duel Intro · 25.1</div>
+      <div class="ci24-k">Cinematic Duel Intro · 26.0</div>
       <div id="ci24StageName" class="ci24-stage-name">Black Citadel</div>
       <div class="ci24-vs">
         <span id="ci24PlayerName">Raven</span>
@@ -5609,7 +5624,7 @@ body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thu
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
+  const SPRITE_COMBAT_PATCH = '26.0 FIGHTER MOTION & COMBAT PRESENCE';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -13811,6 +13826,459 @@ function sessionId(){
     if (ok) drawCombatPose21Overlay(f);
     return ok;
   }
+
+
+  /* Fighter Motion & Combat Presence 26.0
+     This pass keeps the approved fullscreen arenas intact, but upgrades the fighters:
+     - feet feel planted on the floor with contact shadows, floor reflection and stance rings
+     - idle / walk / backstep / block / hit / attack have stronger readable body language
+     - Raven gets sharper weapon trails and assassin afterimages
+     - Iron Warden gets heavier shield glow, armor brace and impact core
+     - roundEnd adds winner/defeated presentation instead of static PNG stickers
+  */
+  const FIGHTER_MOTION_26 = true;
+  const FIGHTER_MOTION_PATCH = '26.0 FIGHTER MOTION & COMBAT PRESENCE';
+
+  function hexAlpha26(c, a){
+    if (typeof c === 'string' && c[0] === '#' && c.length === 7) return c + a;
+    return c || 'rgba(255,255,255,.5)';
+  }
+
+  function fighterMotion26IsWarden(f){
+    return fighterIsWarden(f) || f.id === 'enemy';
+  }
+
+  function fighterMotion26Accent(f){
+    return fighterMotion26IsWarden(f) ? '#4fc8ff' : '#ff3548';
+  }
+
+  function fighterMotion26IsWinner(f){
+    return gameState === 'roundEnd' && f && Number(f.hp) > 0;
+  }
+
+  function fighterMotion26IsDefeated(f){
+    return gameState === 'roundEnd' && f && Number(f.hp) <= 0;
+  }
+
+  function fighterMotion26Phase(f){
+    const dir = f.dir || 1;
+    const moving = f.state === 'walk' || Math.abs(f.vx || 0) > 45 || Math.abs(f.walkIntent || 0) > 0;
+    const backstep = moving && Math.sign(f.vx || f.walkIntent || 0) === -dir;
+    const forward = moving && Math.sign(f.vx || f.walkIntent || 0) === dir;
+    return { moving, backstep, forward };
+  }
+
+  function drawFighterGrounding26(f, x, y, spriteW, spriteH, isWarden){
+    const accent = fighterMotion26Accent(f);
+    const hpLow = f.hp < f.maxHp * .35;
+    const phase = fighterMotion26Phase(f);
+    const speed = Math.min(1, Math.abs(f.vx || 0) / 520);
+    ctx.save();
+
+    // Deep body contact shadow: this is what removes the "PNG sticker" feeling.
+    const shadowW = spriteW * (isWarden ? .52 : .46) * (1 + speed*.12);
+    const shadowH = isWarden ? 28 : 23;
+    const ground = ctx.createRadialGradient(x, y+10, 4, x, y+12, shadowW);
+    ground.addColorStop(0,'rgba(0,0,0,.92)');
+    ground.addColorStop(.42,'rgba(0,0,0,.50)');
+    ground.addColorStop(.74,'rgba(0,0,0,.20)');
+    ground.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle = ground;
+    ctx.beginPath();
+    ctx.ellipse(x, y+13, shadowW, shadowH, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // Wet-floor reflection, very subtle: enough to bind the feet to the approved arena art.
+    const refl = ctx.createLinearGradient(0, y-4, 0, y+82);
+    refl.addColorStop(0, hexAlpha26(accent, hpLow ? '28' : '20'));
+    refl.addColorStop(.38, 'rgba(255,255,255,.035)');
+    refl.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = refl;
+    ctx.beginPath();
+    ctx.ellipse(x, y+23, spriteW*(isWarden ? .33 : .30), 18 + speed*8, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // Stance ring: appears stronger in block / attack / round end, light in idle.
+    const ringAlpha =
+      f.state === 'block' ? .38 :
+      f.state === 'attack' ? .34 :
+      fighterMotion26IsWinner(f) ? .45 :
+      phase.moving ? .20 : .13;
+    ctx.globalAlpha = ringAlpha;
+    ctx.strokeStyle = hexAlpha26(accent, 'bb');
+    ctx.shadowColor = hexAlpha26(accent, 'aa');
+    ctx.shadowBlur = f.state === 'attack' ? 18 : 10;
+    ctx.lineWidth = f.state === 'attack' ? 2.8 : 1.6;
+    ctx.beginPath();
+    ctx.ellipse(x, y+9, spriteW*(isWarden?.34:.30), isWarden ? 17 : 14, 0, 0, Math.PI*2);
+    ctx.stroke();
+
+    // Foot lock points. Small but very important visually.
+    ctx.globalAlpha = f.state === 'walk' ? .42 : .28;
+    ctx.fillStyle = hexAlpha26(accent, 'b8');
+    const footSpread = spriteW * (isWarden ? .17 : .14);
+    for (const fx of [-footSpread, footSpread]) {
+      ctx.beginPath();
+      ctx.ellipse(x+fx, y+9, isWarden?7:5, 2.2, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawRavenWeaponTrail26(f, x, y, spriteW, spriteH, dir, attackP, active, atkName){
+    if (fighterMotion26IsWarden(f)) return;
+    const power = atkName === 'ultimate' ? 1.55 : atkName === 'special' ? 1.25 : atkName === 'heavy' ? 1.08 : .88;
+    const sweep = Math.sin(clamp(attackP,0,1) * Math.PI);
+    const baseX = x + dir * spriteW * .18;
+    const baseY = y - spriteH * .54;
+    const reach = spriteW * (.40 + .25*power);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    // Assassin blade ribbon.
+    for (let i=0;i<3;i++){
+      ctx.globalAlpha = (active ? .92 : .42) * (1 - i*.22);
+      ctx.strokeStyle = i === 0 ? 'rgba(255,248,230,.95)' : (i === 1 ? 'rgba(255,40,58,.72)' : 'rgba(120,0,15,.44)');
+      ctx.shadowColor = i === 0 ? 'rgba(255,248,230,.95)' : 'rgba(255,40,58,.88)';
+      ctx.shadowBlur = active ? 36 - i*8 : 18 - i*4;
+      ctx.lineWidth = (active ? 10 : 6) * power * (1 + i*.55);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(baseX - dir*spriteW*.08, baseY + spriteH*(.07 + .05*sweep));
+      ctx.quadraticCurveTo(baseX + dir*reach*.42, baseY - spriteH*(.18 + .10*sweep), baseX + dir*reach*(.86+i*.04), baseY + spriteH*(.06 - .06*sweep));
+      ctx.stroke();
+    }
+
+    // Piercing tip.
+    const tipX = baseX + dir*reach*(.88 + .12*sweep);
+    const tipY = baseY - spriteH*.04*sweep;
+    const flare = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, spriteW*.18);
+    flare.addColorStop(0,'rgba(255,255,244,.95)');
+    flare.addColorStop(.25,'rgba(255,40,60,.72)');
+    flare.addColorStop(1,'rgba(255,40,60,0)');
+    ctx.fillStyle = flare;
+    ctx.globalAlpha = active ? .76 : .28;
+    ctx.beginPath();
+    ctx.ellipse(tipX, tipY, spriteW*.14, spriteH*.045, dir*.28, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawWardenShieldCore26(f, x, y, spriteW, spriteH, dir, attackP, active, atkName){
+    if (!fighterMotion26IsWarden(f)) return;
+    const blocking = f.state === 'block';
+    const striking = f.state === 'attack' && (atkName === 'heavy' || atkName === 'special' || atkName === 'ultimate');
+    if (!blocking && !striking && !fighterMotion26IsWinner(f)) return;
+
+    const coreX = x + dir * spriteW * .12;
+    const coreY = y - spriteH * .50;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const alpha = blocking ? .86 : striking ? (.50 + .28*Math.sin(attackP*Math.PI)) : .34;
+    const grd = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, spriteH*.33);
+    grd.addColorStop(0, `rgba(230,250,255,${alpha})`);
+    grd.addColorStop(.24, `rgba(80,205,255,${alpha*.58})`);
+    grd.addColorStop(.62, `rgba(20,80,255,${alpha*.22})`);
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.ellipse(coreX, coreY, spriteW*.18, spriteH*.28, dir*.08, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha = blocking ? .82 : .46;
+    ctx.strokeStyle = 'rgba(190,245,255,.92)';
+    ctx.shadowColor = 'rgba(80,205,255,.95)';
+    ctx.shadowBlur = blocking ? 34 : 22;
+    ctx.lineWidth = blocking ? 4.2 : 2.6;
+    ctx.beginPath();
+    ctx.ellipse(coreX, coreY, spriteW*.16, spriteH*.25, dir*.08, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMotionStreak26(f, img, frame, fw, fh, x, y, spriteW, spriteH, dir, squashX, squashY, lean, isWarden, attackP){
+    const phase = fighterMotion26Phase(f);
+    const attacking = f.state === 'attack';
+    const dodging = f.state === 'dodge';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown';
+    const backstep = phase.backstep;
+    const shouldTrail = attacking || dodging || hurt || Math.abs(f.vx || 0) > 175 || backstep;
+    if (!shouldTrail) return;
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const accent = isWarden ? 'rgba(70,190,255,' : 'rgba(255,45,60,';
+    const copies = attacking ? 3 : 2;
+    for (let i=1;i<=copies;i++){
+      const d = dodging ? 34 : attacking ? 24 + attackP*26 : backstep ? 22 : 14;
+      ctx.globalAlpha = (dodging ? .24 : attacking ? .16 : .11) / i;
+      ctx.filter = `blur(${1.3+i*.9}px) brightness(1.05)`;
+      ctx.shadowColor = accent + '.75)';
+      ctx.shadowBlur = 14;
+      ctx.save();
+      ctx.translate(x - dir*i*d, y + i*2);
+      ctx.scale(dir*squashX, squashY);
+      ctx.rotate(lean*.55);
+      ctx.drawImage(img, frame * fw, 0, fw, fh, -spriteW*.5, -spriteH, spriteW, spriteH);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  function drawSpriteSheetFighter(f){
+    if (!USE_SPRITE_FIGHTERS) return false;
+    const anim = spriteAnimForFighter(f);
+    if (!anim || !anim.img || !anim.img.complete || !anim.img.naturalWidth || !anim.img.naturalHeight) return false;
+
+    const img = anim.img;
+    const frames = Math.max(1, anim.frames || 1);
+    const frame = spriteFrameIndex(f, anim);
+    const fw = img.naturalWidth / frames;
+    const fh = img.naturalHeight;
+    const isEnemy = f.id !== 'player';
+    const isWardenVisual = fighterMotion26IsWarden(f);
+    const visualAccent = f.colorB || (isWardenVisual ? '#4fc8ff' : '#ff3548');
+    const dir = f.dir || (isEnemy ? -1 : 1);
+    const attacking = f.state === 'attack';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown';
+    const blocking = f.state === 'block';
+    const dodging = f.state === 'dodge';
+    const phase = fighterMotion26Phase(f);
+    const atkName = f.attack?.name || '';
+    const active = attacking && f.attack && f.stateT >= f.attack.startup && f.stateT <= f.attack.startup + f.attack.active;
+    const attackP = attacking && f.attack ? clamp(f.stateT / Math.max(.001, f.attack.total), 0, 1) : 0;
+    const attackPunch = attacking ? Math.sin(attackP * Math.PI) : 0;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const defeated = fighterMotion26IsDefeated(f);
+    const winner = fighterMotion26IsWinner(f);
+
+    let spriteH = coarse ? clamp(h * .46, 325, 470) : clamp(h * (isWardenVisual ? .575 : .535), 415, isWardenVisual ? 590 : 552);
+    spriteH *= anim.scale || 1;
+    if (attacking) spriteH *= atkName === 'ultimate' ? 1.045 : 1.015;
+    if (winner) spriteH *= 1.025;
+    let spriteW = spriteH * (fw / Math.max(1, fh));
+
+    const maxW = coarse ? w * .40 : w * (isWardenVisual ? .365 : .345);
+    if (spriteW > maxW) {
+      const k = maxW / spriteW;
+      spriteW *= k;
+      spriteH *= k;
+    }
+
+    const now = performance.now();
+    const idleBreathe = Math.sin(now / (isWardenVisual ? 520 : 390));
+    const walkSwing = Math.sin(now / (phase.backstep ? 112 : 78));
+    const walkBob = phase.moving ? Math.abs(walkSwing) * (phase.backstep ? 3.2 : 5.6) : idleBreathe * (isWardenVisual ? 1.3 : 2.2);
+    const hitRecoil = hurt ? -dir * (22 + Math.min(22, f.stateT * 76)) : 0;
+    const blockBrace = blocking ? -dir * (isWardenVisual ? 12 : 9) : 0;
+    const lungeVisual = attacking ? dir * attackPunch * (atkName === 'ultimate' ? 52 : atkName === 'special' ? 38 : atkName === 'heavy' ? 30 : 20) : 0;
+    const dodgeVisual = dodging ? -dir * Math.max(0, 1 - f.stateT / .30) * 60 : 0;
+    const x = f.x + lungeVisual + hitRecoil + blockBrace + dodgeVisual + (phase.backstep ? -dir * 8 : 0);
+    const y = f.y + walkBob + (attacking ? -attackPunch*4 : 0) + (hurt ? 8 : 0) + (defeated ? 18 : winner ? -8 : 0);
+
+    const lean =
+      clamp((f.vx || 0) / 850, -0.12, 0.12) +
+      (phase.forward ? dir*.045 : 0) +
+      (phase.backstep ? -dir*.070 : 0) +
+      (blocking ? -dir*(isWardenVisual ? .075 : .055) : 0) +
+      (hurt ? -dir*.13 : 0) +
+      (attacking ? dir*.080*attackPunch : 0) +
+      (dodging ? -dir*.18 : 0) +
+      (winner ? dir*.035 : 0) +
+      (defeated ? -dir*.18 : 0);
+
+    const squashX = 1 + (phase.moving ? Math.abs(walkSwing)*.022 : 0) + (attacking ? attackPunch*.060 : 0) + (blocking && isWardenVisual ? .025 : 0);
+    const squashY = 1 - (phase.moving ? Math.abs(walkSwing)*.012 : 0) - (attacking ? attackPunch*.025 : 0) + (winner ? .012 : 0) - (defeated ? .055 : 0);
+
+    drawFighterGrounding26(f, x, f.y, spriteW, spriteH, isWardenVisual);
+
+    // Back aura / body separation.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const auraAlpha = blocking ? .24 : active ? .28 : winner ? .32 : hurt ? .24 : .15;
+    const bodyLift = ctx.createRadialGradient(x, y - spriteH*.52, 0, x, y - spriteH*.52, spriteW*.66);
+    bodyLift.addColorStop(0, hexAlpha26(visualAccent, Math.round(auraAlpha*255).toString(16).padStart(2,'0')));
+    bodyLift.addColorStop(.44, hexAlpha26(visualAccent, '1d'));
+    bodyLift.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bodyLift;
+    ctx.beginPath();
+    ctx.ellipse(x, y - spriteH*.52, spriteW*.45, spriteH*.40, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    drawMotionStreak26(f, img, frame, fw, fh, x, y, spriteW, spriteH, dir, squashX, squashY, lean, isWardenVisual, attackP);
+
+    // State-specific visual pose layer before body.
+    if (phase.backstep || dodging) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = dodging ? .42 : .20;
+      ctx.strokeStyle = hexAlpha26(visualAccent, 'aa');
+      ctx.shadowColor = hexAlpha26(visualAccent, 'bb');
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = dodging ? 6 : 3;
+      ctx.beginPath();
+      ctx.moveTo(x + dir*spriteW*.18, y - spriteH*.20);
+      ctx.quadraticCurveTo(x - dir*spriteW*.18, y - spriteH*.48, x - dir*spriteW*.42, y - spriteH*.68);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    if (attacking && !isWardenVisual) {
+      drawRavenWeaponTrail26(f, x, y, spriteW, spriteH, dir, attackP, active, atkName);
+    }
+
+    // Main sprite body.
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir * squashX, squashY);
+    ctx.rotate(lean);
+    ctx.globalAlpha = defeated ? .68 : 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.shadowColor = visualAccent;
+    ctx.shadowBlur = active ? 32 : blocking ? 22 : winner ? 28 : 18;
+
+    if (hurt) ctx.filter = 'brightness(1.70) contrast(1.24) saturate(1.25) drop-shadow(0 0 18px rgba(255,72,80,.72))';
+    else if (blocking) ctx.filter = 'brightness(1.36) contrast(1.22) saturate(1.20)';
+    else if (winner) ctx.filter = 'brightness(1.42) contrast(1.24) saturate(1.18)';
+    else if (active) ctx.filter = 'brightness(1.46) contrast(1.26) saturate(1.22)';
+    else ctx.filter = 'brightness(1.30) contrast(1.22) saturate(1.14)';
+    ctx.drawImage(img, frame * fw, 0, fw, fh, -spriteW*.5, -spriteH, spriteW, spriteH);
+    ctx.filter = 'none';
+    ctx.shadowBlur = 0;
+
+    // In-body block shield remains tied to sprite pose.
+    if (blocking) {
+      const shieldColor = isWardenVisual ? 'rgba(90,210,255,.95)' : 'rgba(255,65,80,.85)';
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = shieldColor;
+      ctx.lineWidth = isWardenVisual ? 6 : 4;
+      ctx.shadowColor = shieldColor;
+      ctx.shadowBlur = isWardenVisual ? 36 : 24;
+      ctx.beginPath();
+      ctx.ellipse(spriteW*.20, -spriteH*.52, spriteW*(isWardenVisual ? .15 : .12), spriteH*(isWardenVisual ? .28 : .23), -.08, 0, Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Warden shield / heavy impact glow after body.
+    drawWardenShieldCore26(f, x, y, spriteW, spriteH, dir, attackP, active, atkName);
+
+    // Attack arc on top for both fighters, tuned to each archetype.
+    if (attacking) {
+      if (isWardenVisual) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const crushX = x + dir * spriteW * (.20 + .30*attackPunch);
+        const crushY = y - spriteH * .50;
+        const core = ctx.createRadialGradient(crushX, crushY, 0, crushX, crushY, spriteW*.28);
+        core.addColorStop(0,'rgba(240,252,255,.86)');
+        core.addColorStop(.24,'rgba(80,205,255,.62)');
+        core.addColorStop(1,'rgba(80,205,255,0)');
+        ctx.fillStyle = core;
+        ctx.globalAlpha = active ? .84 : .34;
+        ctx.beginPath();
+        ctx.ellipse(crushX, crushY, spriteW*.22, spriteH*.075, dir*.18, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+      drawReadableAttackArc20_1(x, y, spriteW, spriteH, dir, atkName, attackP, active, visualAccent, isWardenVisual);
+    }
+
+    // Hit reaction flare and defeated/winner readable pose.
+    if (hurt || defeated) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = defeated ? .38 : .54;
+      ctx.fillStyle = 'rgba(255,76,84,.32)';
+      ctx.beginPath();
+      ctx.ellipse(x - dir*spriteW*.18, y - spriteH*.54, spriteW*.24, spriteH*.24, -dir*.28, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if (winner) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = .46;
+      ctx.strokeStyle = hexAlpha26(visualAccent, 'cc');
+      ctx.shadowColor = hexAlpha26(visualAccent, 'ee');
+      ctx.shadowBlur = 24;
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.ellipse(x, y - spriteH*.50, spriteW*.38, spriteH*.42, 0, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Nameplate: thinner and better anchored to feet.
+    ctx.save();
+    const plateW = clamp(spriteW*.44, isWardenVisual ? 142 : 110, isWardenVisual ? 180 : 150);
+    const plateY = f.y + 29;
+    const plateGrad = ctx.createLinearGradient(x-plateW*.5, plateY, x+plateW*.5, plateY+28);
+    plateGrad.addColorStop(0,'rgba(0,0,0,.74)');
+    plateGrad.addColorStop(.5, isWardenVisual ? 'rgba(42,160,255,.22)' : 'rgba(255,35,50,.20)');
+    plateGrad.addColorStop(1,'rgba(0,0,0,.74)');
+    ctx.fillStyle = plateGrad;
+    ctx.strokeStyle = isWardenVisual ? 'rgba(125,220,255,.62)' : 'rgba(255,60,76,.54)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(x-plateW*.5, plateY, plateW, 25, 12);
+    ctx.fill();
+    ctx.stroke();
+    ctx.font = '950 13px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = isWardenVisual ? '#c8f2ff' : '#ffd06e';
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = 7;
+    ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), x, plateY+13);
+    ctx.restore();
+
+    return true;
+  }
+
+  function drawFighterPresence26Overlay(f){
+    if (!FIGHTER_MOTION_26 || !f || !USE_PREMIUM_FIGHTER_ART) return;
+    const isWarden = fighterMotion26IsWarden(f);
+    const spriteH = fighterVisualHeight(f);
+    const spriteW = fighterVisualWidth(f) * (isWarden ? 1.18 : 1.10);
+    const accent = fighterMotion26Accent(f);
+    const phase = fighterMotion26Phase(f);
+    if (f.state === 'block' || f.state === 'hitstun' || phase.backstep || fighterMotion26IsWinner(f)) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = f.state === 'block' ? .30 : fighterMotion26IsWinner(f) ? .28 : .16;
+      ctx.strokeStyle = hexAlpha26(accent, 'aa');
+      ctx.shadowColor = hexAlpha26(accent, 'cc');
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = f.state === 'block' ? 3 : 1.5;
+      ctx.beginPath();
+      ctx.ellipse(f.x, f.y - spriteH*.50, spriteW*.46, spriteH*.42, 0, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawPremiumFighterArt(f){
+    const ok = drawPremiumFighterArt20_1_core(f);
+    if (ok) {
+      drawCombatPose21Overlay(f);
+      drawFighterPresence26Overlay(f);
+    }
+    return ok;
+  }
+
+  function physicsDebugLine(){
+    if (ui && ui.debug) {
+      ui.debug.style.display = 'none';
+      ui.debug.innerHTML = '';
+    }
+  }
+
 
   /* Arena Flow 16.3 — Start Flow Layer Guard
      Hardens the whole launch chain:

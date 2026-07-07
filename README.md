@@ -506,3 +506,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 - Crimson Garden
 
 Теперь arena roster расширен до 8 сцен. Новые арены подключены к Arena Select, cinematic intro, in-fight stage art и arena mood FX. Версия сохраняет Luxury Arena Select 23.0 и Cinematic Art / Fighter Identity 24.0.
+
+
+## Fighter Motion & Combat Presence 26.0
+
+Усилены визуальная пластика бойцов, контакт с полом, motion trails, block/hit readability, Raven weapon trail, Iron Warden shield presence и round-end presentation. Approved fullscreen arenas 25.3 сохранены.
