@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Fighter Motion 26.0 & Fighter Identity 24.0</title>
+  <title>EraLash Combat — Attack Animation Test 26.3</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5006,7 +5006,7 @@ body.arena-real-art-25-1 .ci24-card{
 }
 
 
-/* Fighter Motion & Combat Presence 26.0 */
+/* Attack Animation Test 26.3 */
 body.arena-approved-25-2 #debug{
   display:none !important;
 }
@@ -5020,7 +5020,7 @@ body.arena-approved-25-2 .as-rail-thumb.foundry{background-image:url('assets/thu
 body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thumb-approved-crimson-garden-25-3.webp?v=253') !important}
 
 
-/* Fighter Motion & Combat Presence 26.0 */
+/* Attack Animation Test 26.3 */
 body.fighter-motion-26 #debug{display:none !important;}
 body.fighter-motion-26 .control-btn,
 body.fighter-motion-26 .fighter-card,
@@ -5624,7 +5624,7 @@ body.fighter-motion-26 .callout .title{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '26.0 FIGHTER MOTION & COMBAT PRESENCE';
+  const SPRITE_COMBAT_PATCH = '26.3 ATTACK ANIMATION TEST';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -5651,6 +5651,63 @@ body.fighter-motion-26 .callout .title{
       heavy: { img: loadSpriteSheet('assets/sprites/warden_light.png'), frames: 4, fps: 10, loop: false, scale: 1.10 },
       block: { img: loadSpriteSheet('assets/sprites/warden_block.png'), frames: 6, fps: 7,  loop: true,  scale: 1.06 },
       hit:   { img: loadSpriteSheet('assets/sprites/warden_idle.png'),  frames: 6, fps: 9,  loop: false, scale: 1.04 }
+    }
+  };
+
+
+  function loadAttackPose26_3(src){
+    const img = new Image();
+    img.decoding = 'async';
+    img.loading = 'eager';
+    img.src = src + '?v=263';
+    return img;
+  }
+
+  const attackPoseFrames26_3 = {
+    player: {
+      // L / H = Quick Fang test, SP / ULT = approved Shadow Lunge test.
+      light: [
+        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_anticipation_26_3.webp'), anchorX:.48, scale:.92, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_contact_26_3.webp'),      anchorX:.39, scale:.98, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_recovery_26_3.webp'),     anchorX:.47, scale:.94, y:.02 }
+      ],
+      heavy: [
+        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_anticipation_26_3.webp'), anchorX:.48, scale:.95, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_contact_26_3.webp'),      anchorX:.39, scale:1.02, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_recovery_26_3.webp'),     anchorX:.47, scale:.96, y:.02 }
+      ],
+      special: [
+        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_anticipation_26_3.webp'), anchorX:.47, scale:.95, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_contact_26_3.webp'),      anchorX:.37, scale:1.03, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_recovery_26_3.webp'),     anchorX:.46, scale:.96, y:.02 }
+      ],
+      ultimate: [
+        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_anticipation_26_3.webp'), anchorX:.47, scale:1.00, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_contact_26_3.webp'),      anchorX:.37, scale:1.10, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_recovery_26_3.webp'),     anchorX:.46, scale:1.02, y:.02 }
+      ]
+    },
+    enemy: {
+      light: [
+        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_anticipation_26_3.webp'), anchorX:.47, scale:.95, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_contact_26_3.webp'),      anchorX:.44, scale:1.02, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_recovery_26_3.webp'),     anchorX:.46, scale:.98, y:.01 }
+      ],
+      special: [
+        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_anticipation_26_3.webp'), anchorX:.47, scale:1.00, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_contact_26_3.webp'),      anchorX:.44, scale:1.08, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_recovery_26_3.webp'),     anchorX:.46, scale:1.02, y:.01 }
+      ],
+      heavy: [
+        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_anticipation_26_3.webp'), anchorX:.48, scale:1.03, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_contact_26_3.webp'),      anchorX:.46, scale:1.10, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_recovery_26_3.webp'),     anchorX:.48, scale:1.02, y:.01 }
+      ],
+      ultimate: [
+        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_anticipation_26_3.webp'), anchorX:.48, scale:1.08, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_contact_26_3.webp'),      anchorX:.46, scale:1.16, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_recovery_26_3.webp'),     anchorX:.48, scale:1.08, y:.01 }
+      ]
     }
   };
 
@@ -10022,7 +10079,124 @@ body.fighter-motion-26 .callout .title{
     ctx.restore();
   }
 
+
+  function attackPoseSet26_3(f){
+    if (!f || f.state !== 'attack' || !f.attack) return null;
+    const side = f.id === 'player' ? 'player' : 'enemy';
+    const type = f.attack.name || f.lastAttackType || 'light';
+    return (attackPoseFrames26_3[side] && attackPoseFrames26_3[side][type]) || null;
+  }
+
+  function attackPosePhase26_3(f){
+    const atk = f.attack;
+    if (!atk) return 0;
+    const total = Math.max(.001, atk.total || (atk.startup + atk.active + atk.recovery));
+    const startupEnd = (atk.startup || 0) / total;
+    const activeEnd = ((atk.startup || 0) + (atk.active || 0)) / total;
+    const p = clamp(f.stateT / total, 0, 1);
+    if (p < startupEnd) return 0;
+    if (p < activeEnd) return 1;
+    return 2;
+  }
+
+  function drawAttackPoseSprite26_3(f){
+    const set = attackPoseSet26_3(f);
+    if (!set) return false;
+    const phase = attackPosePhase26_3(f);
+    const frame = set[Math.min(2, Math.max(0, phase))];
+    const img = frame && frame.img;
+    if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
+
+    const isEnemy = f.id !== 'player';
+    const isWardenVisual = fighterIsWarden(f);
+    const dir = f.dir || (isEnemy ? -1 : 1);
+    const atkName = f.attack?.name || '';
+    const active = phase === 1;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const visualAccent = f.colorB || (isWardenVisual ? '#3eb6ff' : '#c92832');
+    const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+    let poseH = coarse ? clamp(h * (isWardenVisual ? .52 : .49), 330, 510) : clamp(h * (isWardenVisual ? .63 : .57), 430, isWardenVisual ? 660 : 610);
+    poseH *= frame.scale || 1;
+    let poseW = poseH * aspect;
+    const maxW = coarse ? w * .74 : w * (isWardenVisual ? .64 : .58);
+    if (poseW > maxW) {
+      const k = maxW / poseW;
+      poseW *= k;
+      poseH *= k;
+    }
+
+    const p = clamp(f.stateT / Math.max(.001, f.attack.total || .4), 0, 1);
+    const phaseImpulse = phase === 0 ? -0.16 : phase === 1 ? .26 : .06;
+    const x = f.x + dir * poseW * phaseImpulse * (isWardenVisual ? .22 : .18);
+    const y = f.y + poseH * (frame.y || 0);
+
+    // Ground shadow / planted contact before drawing the cutout.
+    ctx.save();
+    const shW = Math.max(100, poseW * (isWardenVisual ? .34 : .28));
+    const shadow = ctx.createRadialGradient(x, y + 7, 8, x, y + 7, shW);
+    shadow.addColorStop(0, active ? 'rgba(0,0,0,.92)' : 'rgba(0,0,0,.82)');
+    shadow.addColorStop(.42, active ? 'rgba(0,0,0,.48)' : 'rgba(0,0,0,.34)');
+    shadow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 8, shW, isWardenVisual ? 30 : 22, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Readability rim behind the real pose frame.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = active ? .30 : .18;
+    const rim = ctx.createRadialGradient(x, y-poseH*.50, 0, x, y-poseH*.50, poseW*.42);
+    rim.addColorStop(0, visualAccent + '66');
+    rim.addColorStop(.45, visualAccent + '22');
+    rim.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rim;
+    ctx.beginPath();
+    ctx.ellipse(x, y-poseH*.50, poseW*.30, poseH*.34, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Full attack key pose cutout.
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir, 1);
+    const anchorX = frame.anchorX ?? .5;
+    ctx.filter = active ? 'brightness(1.18) contrast(1.14) saturate(1.18)' : 'brightness(1.08) contrast(1.10) saturate(1.06)';
+    ctx.shadowColor = visualAccent;
+    ctx.shadowBlur = active ? 28 : 16;
+    ctx.drawImage(img, -poseW * anchorX, -poseH, poseW, poseH);
+    ctx.filter = 'none';
+    ctx.restore();
+
+    if (active) {
+      drawReadableAttackArc20_1(x, y, poseW * .55, poseH, dir, atkName, p, true, visualAccent, isWardenVisual);
+    }
+
+    // Minimal world-space nameplate so attack frames stay grounded.
+    ctx.save();
+    const plateW = clamp(poseW*.22, 112, 178);
+    const plateGrad = ctx.createLinearGradient(x-plateW*.5, y+13, x+plateW*.5, y+38);
+    plateGrad.addColorStop(0,'rgba(0,0,0,.72)');
+    plateGrad.addColorStop(.5, isWardenVisual ? 'rgba(42,160,255,.20)' : 'rgba(255,35,50,.18)');
+    plateGrad.addColorStop(1,'rgba(0,0,0,.72)');
+    ctx.fillStyle = plateGrad;
+    ctx.strokeStyle = isWardenVisual ? 'rgba(125,220,255,.55)' : 'rgba(255,60,76,.50)';
+    roundRect(ctx, x-plateW*.5, y+13, plateW, 25, 12, true, true);
+    ctx.font = '950 13px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = isWardenVisual ? '#c8f2ff' : '#ffd06e';
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = 7;
+    ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), x, y+26);
+    ctx.restore();
+
+    return true;
+  }
+
   function drawSpriteSheetFighter(f){
+    if (drawAttackPoseSprite26_3(f)) return true;
     if (!USE_SPRITE_FIGHTERS) return false;
     const anim = spriteAnimForFighter(f);
     if (!anim || !anim.img || !anim.img.complete || !anim.img.naturalWidth || !anim.img.naturalHeight) return false;
@@ -13828,7 +14002,7 @@ function sessionId(){
   }
 
 
-  /* Fighter Motion & Combat Presence 26.0
+  /* Attack Animation Test 26.3
      This pass keeps the approved fullscreen arenas intact, but upgrades the fighters:
      - feet feel planted on the floor with contact shadows, floor reflection and stance rings
      - idle / walk / backstep / block / hit / attack have stronger readable body language
@@ -14028,7 +14202,124 @@ function sessionId(){
     ctx.restore();
   }
 
+
+  function attackPoseSet26_3(f){
+    if (!f || f.state !== 'attack' || !f.attack) return null;
+    const side = f.id === 'player' ? 'player' : 'enemy';
+    const type = f.attack.name || f.lastAttackType || 'light';
+    return (attackPoseFrames26_3[side] && attackPoseFrames26_3[side][type]) || null;
+  }
+
+  function attackPosePhase26_3(f){
+    const atk = f.attack;
+    if (!atk) return 0;
+    const total = Math.max(.001, atk.total || (atk.startup + atk.active + atk.recovery));
+    const startupEnd = (atk.startup || 0) / total;
+    const activeEnd = ((atk.startup || 0) + (atk.active || 0)) / total;
+    const p = clamp(f.stateT / total, 0, 1);
+    if (p < startupEnd) return 0;
+    if (p < activeEnd) return 1;
+    return 2;
+  }
+
+  function drawAttackPoseSprite26_3(f){
+    const set = attackPoseSet26_3(f);
+    if (!set) return false;
+    const phase = attackPosePhase26_3(f);
+    const frame = set[Math.min(2, Math.max(0, phase))];
+    const img = frame && frame.img;
+    if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
+
+    const isEnemy = f.id !== 'player';
+    const isWardenVisual = fighterIsWarden(f);
+    const dir = f.dir || (isEnemy ? -1 : 1);
+    const atkName = f.attack?.name || '';
+    const active = phase === 1;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const visualAccent = f.colorB || (isWardenVisual ? '#3eb6ff' : '#c92832');
+    const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+    let poseH = coarse ? clamp(h * (isWardenVisual ? .52 : .49), 330, 510) : clamp(h * (isWardenVisual ? .63 : .57), 430, isWardenVisual ? 660 : 610);
+    poseH *= frame.scale || 1;
+    let poseW = poseH * aspect;
+    const maxW = coarse ? w * .74 : w * (isWardenVisual ? .64 : .58);
+    if (poseW > maxW) {
+      const k = maxW / poseW;
+      poseW *= k;
+      poseH *= k;
+    }
+
+    const p = clamp(f.stateT / Math.max(.001, f.attack.total || .4), 0, 1);
+    const phaseImpulse = phase === 0 ? -0.16 : phase === 1 ? .26 : .06;
+    const x = f.x + dir * poseW * phaseImpulse * (isWardenVisual ? .22 : .18);
+    const y = f.y + poseH * (frame.y || 0);
+
+    // Ground shadow / planted contact before drawing the cutout.
+    ctx.save();
+    const shW = Math.max(100, poseW * (isWardenVisual ? .34 : .28));
+    const shadow = ctx.createRadialGradient(x, y + 7, 8, x, y + 7, shW);
+    shadow.addColorStop(0, active ? 'rgba(0,0,0,.92)' : 'rgba(0,0,0,.82)');
+    shadow.addColorStop(.42, active ? 'rgba(0,0,0,.48)' : 'rgba(0,0,0,.34)');
+    shadow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 8, shW, isWardenVisual ? 30 : 22, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Readability rim behind the real pose frame.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = active ? .30 : .18;
+    const rim = ctx.createRadialGradient(x, y-poseH*.50, 0, x, y-poseH*.50, poseW*.42);
+    rim.addColorStop(0, visualAccent + '66');
+    rim.addColorStop(.45, visualAccent + '22');
+    rim.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rim;
+    ctx.beginPath();
+    ctx.ellipse(x, y-poseH*.50, poseW*.30, poseH*.34, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Full attack key pose cutout.
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir, 1);
+    const anchorX = frame.anchorX ?? .5;
+    ctx.filter = active ? 'brightness(1.18) contrast(1.14) saturate(1.18)' : 'brightness(1.08) contrast(1.10) saturate(1.06)';
+    ctx.shadowColor = visualAccent;
+    ctx.shadowBlur = active ? 28 : 16;
+    ctx.drawImage(img, -poseW * anchorX, -poseH, poseW, poseH);
+    ctx.filter = 'none';
+    ctx.restore();
+
+    if (active) {
+      drawReadableAttackArc20_1(x, y, poseW * .55, poseH, dir, atkName, p, true, visualAccent, isWardenVisual);
+    }
+
+    // Minimal world-space nameplate so attack frames stay grounded.
+    ctx.save();
+    const plateW = clamp(poseW*.22, 112, 178);
+    const plateGrad = ctx.createLinearGradient(x-plateW*.5, y+13, x+plateW*.5, y+38);
+    plateGrad.addColorStop(0,'rgba(0,0,0,.72)');
+    plateGrad.addColorStop(.5, isWardenVisual ? 'rgba(42,160,255,.20)' : 'rgba(255,35,50,.18)');
+    plateGrad.addColorStop(1,'rgba(0,0,0,.72)');
+    ctx.fillStyle = plateGrad;
+    ctx.strokeStyle = isWardenVisual ? 'rgba(125,220,255,.55)' : 'rgba(255,60,76,.50)';
+    roundRect(ctx, x-plateW*.5, y+13, plateW, 25, 12, true, true);
+    ctx.font = '950 13px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = isWardenVisual ? '#c8f2ff' : '#ffd06e';
+    ctx.shadowColor = 'rgba(0,0,0,.85)';
+    ctx.shadowBlur = 7;
+    ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), x, y+26);
+    ctx.restore();
+
+    return true;
+  }
+
   function drawSpriteSheetFighter(f){
+    if (drawAttackPoseSprite26_3(f)) return true;
     if (!USE_SPRITE_FIGHTERS) return false;
     const anim = spriteAnimForFighter(f);
     if (!anim || !anim.img || !anim.img.complete || !anim.img.naturalWidth || !anim.img.naturalHeight) return false;

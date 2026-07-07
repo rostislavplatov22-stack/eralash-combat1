@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-fighter-motion-combat-presence-26-ready",
-  "version": "26.0.0",
+  "name": "eralash-combat-attack-animation-test-26-3-ready",
+  "version": "26.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Fighter Motion & Combat Presence 26.0: upgrades sprite fighter rendering with planted contact shadows, stronger motion poses, Raven weapon trails, Iron Warden shield presence, hit/block readability and round-end presence while preserving approved fullscreen arenas."
+  "description": "EraLash Combat Attack Animation Test 26.3 with clean pose sprites, WebP/PNG cutouts and real anticipation-contact-recovery attack frames."
 }

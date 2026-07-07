@@ -511,3 +511,12 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## Fighter Motion & Combat Presence 26.0
 
 Усилены визуальная пластика бойцов, контакт с полом, motion trails, block/hit readability, Raven weapon trail, Iron Warden shield presence и round-end presentation. Approved fullscreen arenas 25.3 сохранены.
+
+
+## Attack Animation Test 26.3
+
+- Added cleaned PNG/WebP pose cutouts from approved Raven and Iron Warden attack frames.
+- Added real anticipation → contact → recovery rendering for attack states.
+- Raven uses Quick Fang and Shadow Lunge pose-frame tests.
+- Iron Warden uses Thunder Ram and Judgment Breaker pose-frame tests.
+- Existing approved fullscreen arenas and combat bounds are preserved.
