@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Arena Flow 17.0 premium stage mood system, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Impact 18.0 premium hit feedback system, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Arena Flow 17.0</title>
+  <title>EraLash Combat — Combat Impact 18.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -90,6 +90,60 @@
     .control-btn.active{transform:translateY(2px) scale(.96);background:linear-gradient(180deg,rgba(217,183,106,.3),rgba(255,255,255,.08));box-shadow:0 0 24px rgba(217,183,106,.23)}
     .combo-tag{position:absolute;z-index:31;right:calc(18px + env(safe-area-inset-right));top:calc(104px + env(safe-area-inset-top));padding:8px 12px;border:1px solid rgba(217,183,106,.35);border-radius:999px;background:linear-gradient(180deg,rgba(10,12,16,.76),rgba(0,0,0,.46));box-shadow:0 14px 40px rgba(0,0,0,.35);font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:#fff;pointer-events:none;display:none}
     .combo-tag b{color:var(--gold);font-size:18px;margin-right:6px}
+
+    /* =========================
+       COMBAT IMPACT 18.0 — premium hit feedback layer
+       ========================= */
+    .impact-beat18{
+      position:absolute;
+      z-index:34;
+      left:50%;
+      top:calc(134px + env(safe-area-inset-top));
+      transform:translateX(-50%) scale(.96);
+      min-width:220px;
+      max-width:min(430px,78vw);
+      padding:12px 16px 13px;
+      border:1px solid rgba(217,183,106,.46);
+      border-radius:18px;
+      background:
+        radial-gradient(circle at 50% 0%,rgba(255,230,174,.18),transparent 52%),
+        linear-gradient(180deg,rgba(12,14,18,.82),rgba(0,0,0,.54));
+      box-shadow:0 22px 70px rgba(0,0,0,.48),0 0 34px var(--arena17-glow,rgba(217,183,106,.20));
+      backdrop-filter:blur(14px);
+      text-align:center;
+      pointer-events:none;
+      opacity:0;
+      display:none;
+    }
+    .impact-beat18.show{display:block;animation:impactBeat18 .58s cubic-bezier(.17,.86,.22,1) both}
+    .impact-beat18 .k{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:rgba(217,183,106,.86);font-weight:1000}
+    .impact-beat18 .w{margin-top:3px;font-size:22px;line-height:1;letter-spacing:.12em;text-transform:uppercase;font-weight:1000;color:#fff;text-shadow:0 0 20px var(--impact18-color,#ffd27a)}
+    .impact-beat18 .m{margin-top:6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,240,230,.74);font-weight:900}
+    body.impact-heavy18 .hud,
+    body.impact-special18 .hud,
+    body.impact-ultimate18 .hud{animation:hudImpact18 .32s ease-out both}
+    body.impact-block18 .hud{animation:hudBlock18 .24s ease-out both}
+    @keyframes impactBeat18{
+      0%{opacity:0;transform:translateX(-50%) translateY(-16px) scale(.88);filter:blur(3px)}
+      26%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.035);filter:blur(0)}
+      68%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+      100%{opacity:0;transform:translateX(-50%) translateY(-8px) scale(.98)}
+    }
+    @keyframes hudImpact18{
+      0%{transform:translateY(0);filter:none}
+      34%{transform:translateY(2px) scale(1.006);filter:drop-shadow(0 0 18px var(--impact18-color,rgba(217,183,106,.45)))}
+      100%{transform:translateY(0);filter:none}
+    }
+    @keyframes hudBlock18{
+      0%{transform:translateY(0)}
+      40%{transform:translateY(1px);filter:drop-shadow(0 0 14px rgba(142,220,255,.42))}
+      100%{transform:translateY(0)}
+    }
+    @media (max-width:760px){
+      .impact-beat18{top:calc(92px + env(safe-area-inset-top));padding:10px 12px;border-radius:15px;max-width:74vw}
+      .impact-beat18 .w{font-size:17px}
+      .impact-beat18 .m{font-size:9px}
+    }
     .debug{position:absolute;left:12px;bottom:100px;z-index:60;color:#fff;background:rgba(0,0,0,.45);font-size:11px;padding:7px 9px;border-radius:10px;display:none}
     .pause-btn{position:absolute;right:calc(18px + env(safe-area-inset-right));top:calc(94px + env(safe-area-inset-top));z-index:66;width:46px;height:46px;border-radius:16px;border:1px solid rgba(217,183,106,.42);background:linear-gradient(180deg,rgba(20,18,14,.82),rgba(0,0,0,.58));color:#ffe7ad;font-weight:1000;letter-spacing:.06em;box-shadow:0 16px 34px rgba(0,0,0,.38),inset 0 0 0 1px rgba(255,255,255,.04);display:none;place-items:center;pointer-events:auto;touch-action:manipulation}
     body.is-fighting .pause-btn{display:grid}
@@ -3700,7 +3754,7 @@ body.arena-select-open .arena-select{
 
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -3726,6 +3780,11 @@ body.arena-select-open .arena-select{
     <div id="calloutSmall" class="small">Round 1</div>
   </div>
   <div id="comboTag" class="combo-tag"><b id="comboCount">0</b> HIT COMBO</div>
+  <div id="impactBeat18" class="impact-beat18" aria-hidden="true">
+    <div class="k">Combat Impact · 18.0</div>
+    <div id="impactWord18" class="w">HEAVY IMPACT</div>
+    <div id="impactMeta18" class="m">hit stop · knockback · sparks</div>
+  </div>
 
   <div id="arenaMoodBadge17" class="arena-mood-badge17" aria-hidden="true">
     <div class="k">Stage Mood · 17.0</div>
@@ -4199,14 +4258,14 @@ body.arena-select-open .arena-select{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '17.0 ARENA MOOD SYSTEM';
+  const SPRITE_COMBAT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
 
   function loadSpriteSheet(src){
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
     // 9.1: cache-bust sprite sheets so Vercel/browser cannot show an older invisible asset.
-    img.src = src + '?v=arena-flow-17';
+    img.src = src + '?v=combat-impact-18';
     return img;
   }
 
@@ -4342,6 +4401,9 @@ body.arena-select-open .arena-select{
     calloutSmall: document.getElementById('calloutSmall'),
     comboTag: document.getElementById('comboTag'),
     comboCount: document.getElementById('comboCount'),
+    impactBeat18: document.getElementById('impactBeat18'),
+    impactWord18: document.getElementById('impactWord18'),
+    impactMeta18: document.getElementById('impactMeta18'),
     debug: document.getElementById('debug'),
     resultTitle: document.getElementById('resultTitle'),
     resultText: document.getElementById('resultText'),
@@ -4403,6 +4465,8 @@ body.arena-select-open .arena-select{
   let lastHitAt = 0;
   let roundIntroTimer = 0;
   let combatFeel10T = 0;
+  let combatImpact18T = 0;
+  let impactBeat18Timer = 0;
   let ultimateCineT = 0;
   let ultimateCineMax = 0;
   let ultimateCineKind = '';
@@ -4442,11 +4506,11 @@ body.arena-select-open .arena-select{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '17.0 ARENA MOOD SYSTEM';
-  const AI_COMBOS_PATCH = '17.0 ARENA MOOD SYSTEM';
-  const ULTIMATE_FINISHER_PATCH = '17.0 ARENA MOOD SYSTEM';
-  const CHARACTER_SELECT_PATCH = '17.0 ARENA MOOD SYSTEM';
-  const ARENA_SELECT_PATCH = '17.0 PREMIUM ARENA MOOD SYSTEM';
+  const REAL_PHYSICS_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const AI_COMBOS_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const ULTIMATE_FINISHER_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const CHARACTER_SELECT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const ARENA_SELECT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
 
   const AI_PROFILES = {
     easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
@@ -4899,6 +4963,7 @@ body.arena-select-open .arena-select{
     flash = 0;
     cinematic = 0;
     cameraZoom = 1;
+    combatImpact18T = 0;
     comboCount = 0;
     comboTimer = 0;
     comboDamage = 0;
@@ -6217,6 +6282,7 @@ body.arena-select-open .arena-select{
 
     spawnHitSpark(defender.x - facing*28, defender.y - (defender.collisionH || defender.h)*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
     spawnPremiumImpact(attacker, defender, atk, blocked);
+    spawnCombatImpact18(attacker, defender, atk, blocked, dmg, counterHit);
     spawnSlashWave(attacker, defender, atk.name);
     spawnFootDust(defender, blocked ? 4 : atk.name === 'ultimate' ? 16 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5, blocked ? '#8edcff' : attacker.colorB);
     floatingDamage(blocked ? 'BLOCK' : (counterHit ? 'COUNTER -' + dmg : '-' + dmg), defender.x, defender.y - defender.h*.88, blocked ? '#8edcff' : '#fff3d1', atk.name);
@@ -6387,17 +6453,140 @@ body.arena-select-open .arena-select{
     else if (gameState === 'fight') setPaused(true);
   }
 
+
+  function lowPowerCombat18(){
+    try {
+      return (window.matchMedia && window.matchMedia('(pointer:coarse)').matches) || w < 760 || ((navigator.deviceMemory || 8) <= 4);
+    } catch (_) {
+      return w < 760;
+    }
+  }
+
+  function impactClass18(kind){
+    if (kind === 'block') return 'impact-block18';
+    if (kind === 'ultimate') return 'impact-ultimate18';
+    if (kind === 'special') return 'impact-special18';
+    if (kind === 'heavy') return 'impact-heavy18';
+    return 'impact-light18';
+  }
+
+  function pulseImpactClass18(kind, color){
+    const cls = impactClass18(kind);
+    document.documentElement.style.setProperty('--impact18-color', color || '#ffd27a');
+    document.body.classList.remove('impact-light18','impact-heavy18','impact-special18','impact-ultimate18','impact-block18');
+    void document.body.offsetWidth;
+    document.body.classList.add(cls);
+    window.clearTimeout(impactBeat18Timer);
+    impactBeat18Timer = window.setTimeout(()=>document.body.classList.remove(cls), kind === 'ultimate' ? 520 : 330);
+  }
+
+  function showImpactBeat18(word, meta, color){
+    const beat = ui.impactBeat18 || document.getElementById('impactBeat18');
+    if (!beat) return;
+    if (ui.impactWord18) ui.impactWord18.textContent = word;
+    if (ui.impactMeta18) ui.impactMeta18.textContent = meta;
+    beat.style.setProperty('--impact18-color', color || '#ffd27a');
+    beat.setAttribute('aria-hidden','false');
+    beat.classList.remove('show');
+    void beat.offsetWidth;
+    beat.classList.add('show');
+    window.setTimeout(()=>beat.setAttribute('aria-hidden','true'), 620);
+  }
+
+  function spawnCombatImpact18(attacker, defender, atk, blocked=false, dmg=0, counterHit=false){
+    if (!attacker || !defender || !atk) return;
+    const type = atk.name || 'light';
+    const low = lowPowerCombat18();
+    const facing = Math.sign(defender.x - attacker.x) || attacker.dir || 1;
+    const color = blocked ? '#8edcff' : (type === 'ultimate' ? '#fff0b7' : attacker.colorB || '#ff3946');
+    const cx = defender.x - facing * (blocked ? 22 : 42);
+    const cy = defender.y - (defender.collisionH || defender.h || 190) * (type === 'ultimate' ? .72 : type === 'special' ? .66 : .60);
+    const power = type === 'ultimate' ? 2.20 : type === 'special' ? 1.62 : type === 'heavy' ? 1.32 : .92;
+    const kind = blocked ? 'block' : type;
+
+    pulseImpactClass18(kind, color);
+    combatImpact18T = Math.max(combatImpact18T, type === 'ultimate' ? .62 : type === 'special' ? .46 : type === 'heavy' ? .34 : .20);
+
+    const impactFreeze = blocked ? .025 : type === 'ultimate' ? .075 : type === 'special' ? .052 : type === 'heavy' ? .036 : .014;
+    hitStop = Math.max(hitStop, (atk.hitStop || .06) + impactFreeze);
+    if (!blocked && (type === 'heavy' || type === 'special' || type === 'ultimate')) {
+      slowMo = Math.min(slowMo, type === 'ultimate' ? .52 : type === 'special' ? .68 : .78);
+      cameraZoom = Math.max(cameraZoom, type === 'ultimate' ? 1.20 : type === 'special' ? 1.11 : 1.065);
+    }
+
+    if (blocked) showImpactBeat18('BLOCK IMPACT', `${Math.round(atk.blockDamage || dmg || 0)} CHIP · ${Math.round(defender.stamina)} GUARD`, color);
+    else if (counterHit) showImpactBeat18('COUNTER HIT', `${Math.round(dmg)} DMG · ${Math.round((atk.kb || 0)/10)} KB`, '#ffd27a');
+    else if (type === 'ultimate') showImpactBeat18('ULTIMATE IMPACT', `${Math.round(dmg)} DMG · cinematic freeze`, color);
+    else if (type === 'special') showImpactBeat18('SPECIAL IMPACT', `${Math.round(dmg)} DMG · energy strike`, color);
+    else if (type === 'heavy') showImpactBeat18('HEAVY IMPACT', `${Math.round(dmg)} DMG · armor break`, color);
+
+    // 18.0: layered readable impact particles. Counts are capped on mobile.
+    const ringCount = low ? 1 : (type === 'ultimate' ? 4 : type === 'special' ? 3 : 2);
+    for (let i=0;i<ringCount;i++) {
+      particles.push({
+        kind:'shockwave',
+        x: cx + facing * i * 8,
+        y: cy + i * 7,
+        vx:0, vy:0,
+        life:.24 + power*.10 + i*.04,
+        max:.36 + power*.10 + i*.04,
+        size:(42 + i*18) * power,
+        color:i%2 ? color : '#fff3d1'
+      });
+    }
+
+    const rays = low ? (blocked ? 8 : 12) : (blocked ? 14 : Math.round(18 + power * 16));
+    for (let i=0;i<rays;i++){
+      const spread = blocked ? .72 : 1.10;
+      const a = (facing > 0 ? Math.PI : 0) + (Math.random()-.5)*spread;
+      const speed = (250 + Math.random()*780) * power;
+      particles.push({
+        kind:'impactLine',
+        x:cx + (Math.random()-.5)*26,
+        y:cy + (Math.random()-.5)*42,
+        vx:Math.cos(a)*speed,
+        vy:Math.sin(a)*speed*.40 - Math.random()*120,
+        life:.16 + Math.random()*.18,
+        max:.34,
+        size:(40 + Math.random()*95) * power,
+        color:i%5===0 ? '#fff3d1' : color,
+        angle:a
+      });
+    }
+
+    const floorCount = low ? 4 : (type === 'ultimate' ? 18 : type === 'special' ? 12 : type === 'heavy' ? 9 : 5);
+    for (let i=0;i<floorCount;i++){
+      particles.push({
+        kind:'dust',
+        x:defender.x + (Math.random()-.5)*82,
+        y:defender.y - 6 + Math.random()*14,
+        vx:(Math.random()-.5)*150,
+        vy:-20 - Math.random()*90,
+        life:.42 + Math.random()*.24,
+        max:.72,
+        size:8 + Math.random()*18*power,
+        color:blocked ? 'rgba(142,220,255,.35)' : 'rgba(217,183,106,.36)'
+      });
+    }
+
+    const premiumText = blocked ? 'GUARD' : type === 'light' ? 'HIT' : type.toUpperCase();
+    if (type !== 'light' || counterHit || blocked) {
+      showCombatWord(counterHit ? 'COUNTER' : premiumText, cx, cy - 34, counterHit ? '#ffd27a' : color);
+    }
+  }
+
   function spawnHitSpark(x,y,color,type){
-    const count = type === 'special' ? 38 : type === 'heavy' ? 28 : 18;
+    const low = lowPowerCombat18();
+    const count = low ? (type === 'ultimate' ? 26 : type === 'special' ? 22 : type === 'heavy' ? 16 : 10) : (type === 'ultimate' ? 56 : type === 'special' ? 42 : type === 'heavy' ? 30 : 18);
     for(let i=0;i<count;i++){
       const a = Math.random()*Math.PI*2;
-      const s = (type === 'special' ? 520 : type === 'heavy' ? 420 : 320) * (0.25 + Math.random());
+      const s = (type === 'ultimate' ? 760 : type === 'special' ? 560 : type === 'heavy' ? 440 : 320) * (0.25 + Math.random());
       particles.push({
         x,y,
         vx: Math.cos(a)*s,
         vy: Math.sin(a)*s - 80,
-        life: type === 'special' ? .48 : .32,
-        max: type === 'special' ? .48 : .32,
+        life: type === 'ultimate' ? .58 : type === 'special' ? .48 : .32,
+        max: type === 'ultimate' ? .58 : type === 'special' ? .48 : .32,
         size: Math.random()*3.2+1.4,
         color,
         kind:'spark'
@@ -6459,7 +6648,7 @@ body.arena-select-open .arena-select{
   }
 
   function floatingDamage(text,x,y,color,type='light'){
-    const scale = type === 'ultimate' ? 1.38 : type === 'special' ? 1.22 : type === 'heavy' ? 1.12 : 1;
+    const scale = type === 'ultimate' ? 1.55 : type === 'special' ? 1.32 : type === 'heavy' ? 1.20 : 1.04;
     texts.push({
       text,
       x:x + (Math.random()-.5)*26,
@@ -7052,6 +7241,7 @@ body.arena-select-open .arena-select{
     }
     cinematic = Math.max(0, cinematic - dt);
     combatFeel10T = Math.max(0, combatFeel10T - dt);
+    combatImpact18T = Math.max(0, combatImpact18T - dt);
     updateUltimateCinematic(dt);
     cameraZoom = lerp(cameraZoom, 1, dt*2.6);
 
@@ -8319,6 +8509,22 @@ body.arena-select-open .arena-select{
       ctx.restore();
     }
 
+
+    if (combatImpact18T > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha = Math.min(.32, combatImpact18T*.42);
+      const mood = arenaMood17();
+      const g18 = ctx.createRadialGradient(w*.5,h*.54,w*.05,w*.5,h*.54,w*.78);
+      g18.addColorStop(0,'rgba(255,244,206,.24)');
+      g18.addColorStop(.34,mood.gradeA || 'rgba(217,183,106,.14)');
+      g18.addColorStop(.72,'rgba(201,40,50,.10)');
+      g18.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = g18;
+      ctx.fillRect(0,0,w,h);
+      ctx.restore();
+    }
+
     if (flash > 0) {
       ctx.save();
       ctx.globalCompositeOperation='lighter';
@@ -8412,7 +8618,7 @@ body.arena-select-open .arena-select{
       roundFreeze = 0;
       if (ui && ui.debug) {
         ui.debug.style.display = 'block';
-        ui.debug.innerHTML = 'ARENA FLOW 17.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+        ui.debug.innerHTML = 'COMBAT IMPACT 18.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
       }
     }
     raf = requestAnimationFrame(loop);

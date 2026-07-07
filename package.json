@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-flow-17-ready",
-  "version": "17.0.0",
+  "name": "eralash-combat-combat-impact-18-ready",
+  "version": "18.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Flow 17.0: adds premium Arena Mood System with arena-specific intro text, stage lighting, fog, particles, combat badge and mobile-safe FX."
+  "description": "EraLash Combat Impact 18.0: adds premium hit feedback, heavier hit stop, knockback tuning, impact HUD, damage numbers, block impact, camera punch, screen shake and mobile-safe combat FX."
 }
