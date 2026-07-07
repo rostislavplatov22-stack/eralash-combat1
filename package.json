@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-approved-art-hotfix-25-2-ready",
-  "version": "25.2.0",
+  "name": "eralash-combat-arena-fullscreen-combat-space-25-3-ready",
+  "version": "25.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Approved Art Hotfix 25.2: forces approved real arena artworks in fight, removes cheap procedural canvas fallback, cache-busts new assets, hides debug UI and normalizes stale arena ids."
+  "description": "EraLash Combat Arena Fullscreen Combat Space Hotfix 25.3: makes approved arena art cover the full fight viewport and expands combat movement bounds so fighters can retreat to the real map edges."
 }
