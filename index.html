@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — True Arena Set & Fighter Presentation 22.1</title>
+  <title>EraLash Combat — True Arena Set & Fighter Presentation 22.2</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -4137,9 +4137,203 @@ body.arena-set-22-1 .as-stage-fx17{
   body.arena-set-22-1 .as-preview{height:176px}
 }
 
+
+/* ==========================================================
+   True Arena Set 22.2 — Premium Arena Art Rebuild
+   22.1 was not premium enough: three arena cards still looked
+   like procedural placeholders. 22.2 replaces them with dedicated
+   stage art assets and rebuilds selection cards for commercial read.
+   ========================================================== */
+body.arena-set-22-2 .arena-select{
+  background:
+    radial-gradient(circle at 14% 20%,rgba(179,44,25,.28),transparent 30%),
+    radial-gradient(circle at 86% 16%,rgba(54,122,160,.22),transparent 34%),
+    linear-gradient(180deg,rgba(1,2,5,.94),rgba(0,0,0,.985)) !important;
+}
+body.arena-set-22-2 .as-shell{
+  width:min(1260px,96vw) !important;
+  border-radius:30px !important;
+  background:
+    linear-gradient(145deg,rgba(15,15,17,.92),rgba(4,5,7,.96)),
+    radial-gradient(circle at 50% -12%,rgba(245,201,112,.20),transparent 38%) !important;
+  box-shadow:
+    0 38px 120px rgba(0,0,0,.84),
+    0 0 0 1px rgba(255,235,180,.16),
+    inset 0 0 0 1px rgba(255,255,255,.055) !important;
+}
+body.arena-set-22-2 .as-top{
+  padding:22px 26px 12px !important;
+}
+body.arena-set-22-2 .as-kicker:after{
+  content:" · PREMIUM ART";
+  color:rgba(255,239,190,.72);
+}
+body.arena-set-22-2 .as-title{
+  font-size:clamp(34px,4.4vw,62px) !important;
+  letter-spacing:.018em !important;
+  background:linear-gradient(180deg,#fff4cb 0%,#d7a843 54%,#7b541b 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 16px 34px rgba(0,0,0,.78));
+}
+body.arena-set-22-2 .as-title span{
+  color:inherit !important;
+}
+body.arena-set-22-2 .as-subtitle{
+  color:rgba(236,232,221,.72) !important;
+}
+body.arena-set-22-2 .as-body{
+  grid-template-columns:minmax(0,1.24fr) minmax(330px,.78fr) !important;
+  gap:18px !important;
+}
+body.arena-set-22-2 .as-grid{
+  gap:16px !important;
+}
+body.arena-set-22-2 .as-card{
+  min-height:244px !important;
+  border-radius:24px !important;
+  border-color:rgba(255,230,168,.16) !important;
+  box-shadow:
+    0 26px 72px rgba(0,0,0,.58),
+    inset 0 0 0 1px rgba(255,255,255,.045) !important;
+  background:#030405 !important;
+}
+body.arena-set-22-2 .as-card:hover{
+  transform:translateY(-5px) scale(1.008) !important;
+  filter:none !important;
+  border-color:rgba(255,226,151,.55) !important;
+  box-shadow:
+    0 34px 96px rgba(0,0,0,.72),
+    0 0 0 1px rgba(255,226,151,.18),
+    inset 0 0 42px rgba(255,226,151,.08) !important;
+}
+body.arena-set-22-2 .as-card.active{
+  transform:translateY(-4px) !important;
+  border-color:rgba(255,232,168,.92) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,232,168,.40),
+    0 34px 92px rgba(0,0,0,.76),
+    0 0 50px rgba(217,183,106,.20),
+    inset 0 0 46px rgba(255,225,150,.11) !important;
+}
+body.arena-set-22-2 .as-card:before,
+body.arena-set-22-2 .as-preview:before{
+  transform:scale(1.0) !important;
+  opacity:1 !important;
+  filter:brightness(.86) contrast(1.08) saturate(1.05) !important;
+  background-size:cover !important;
+  background-position:center !important;
+}
+body.arena-set-22-2 .as-card:after,
+body.arena-set-22-2 .as-preview:after{
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.08) 0%,rgba(0,0,0,.08) 40%,rgba(0,0,0,.72) 100%),
+    radial-gradient(circle at 50% 38%,var(--arena-glow,rgba(217,183,106,.20)),transparent 36%),
+    linear-gradient(90deg,rgba(0,0,0,.32),transparent 18%,transparent 82%,rgba(0,0,0,.32)) !important;
+}
+body.arena-set-22-2 .as-card[data-as-arena="black_citadel"]:before,
+body.arena-set-22-2 .as-preview:not(.infernal):not(.moon):not(.frozen):before{
+  background-image:url('assets/arena-black-citadel-courtyard.png') !important;
+  filter:brightness(.74) contrast(1.12) saturate(1.02) !important;
+}
+body.arena-set-22-2 .as-card[data-as-arena="infernal_bridge"]:before,
+body.arena-set-22-2 .as-preview.infernal:before{
+  background-image:url('assets/arena-infernal-bridge-premium.webp') !important;
+  filter:brightness(.86) contrast(1.12) saturate(1.18) !important;
+}
+body.arena-set-22-2 .as-card[data-as-arena="moon_ritual"]:before,
+body.arena-set-22-2 .as-preview.moon:before{
+  background-image:url('assets/arena-moon-ritual-premium.webp') !important;
+  filter:brightness(.88) contrast(1.10) saturate(1.10) !important;
+}
+body.arena-set-22-2 .as-card[data-as-arena="frozen_throne"]:before,
+body.arena-set-22-2 .as-preview.frozen:before{
+  background-image:url('assets/arena-frozen-throne-premium.webp') !important;
+  filter:brightness(.90) contrast(1.12) saturate(1.08) !important;
+}
+body.arena-set-22-2 .as-card-content{
+  left:14px !important;
+  right:14px !important;
+  bottom:14px !important;
+  padding:13px 14px 12px !important;
+  border-radius:18px !important;
+  border:1px solid rgba(255,236,190,.15) !important;
+  background:
+    linear-gradient(180deg,rgba(4,5,7,.58),rgba(0,0,0,.78)),
+    radial-gradient(circle at 0 0,var(--arena-glow,rgba(217,183,106,.16)),transparent 44%) !important;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.50),
+    inset 0 0 0 1px rgba(255,255,255,.04) !important;
+  backdrop-filter:blur(7px) saturate(1.16) !important;
+}
+body.arena-set-22-2 .as-tag{
+  border-color:rgba(255,230,168,.28) !important;
+  background:rgba(0,0,0,.54) !important;
+  color:#ffedb6 !important;
+}
+body.arena-set-22-2 .as-card h3{
+  font-size:clamp(23px,2vw,31px) !important;
+  letter-spacing:.055em !important;
+  text-shadow:0 8px 24px rgba(0,0,0,.92) !important;
+}
+body.arena-set-22-2 .as-card p{
+  max-width:94%;
+  color:rgba(255,247,230,.86) !important;
+  text-shadow:0 4px 16px rgba(0,0,0,.86);
+}
+body.arena-set-22-2 .as-panel{
+  border-color:rgba(255,226,151,.23) !important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025)),
+    radial-gradient(circle at 20% 0,var(--arena-glow,rgba(217,183,106,.11)),transparent 36%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    0 24px 80px rgba(0,0,0,.42) !important;
+}
+body.arena-set-22-2 .as-preview{
+  height:252px !important;
+  border-radius:20px !important;
+  border-color:rgba(255,230,168,.18) !important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.54),
+    inset 0 0 0 1px rgba(255,255,255,.04) !important;
+}
+body.arena-set-22-2 .as-preview-label{
+  left:14px;
+  right:14px;
+  bottom:14px;
+  border-color:rgba(255,236,190,.16) !important;
+  background:linear-gradient(180deg,rgba(1,2,4,.56),rgba(0,0,0,.76)) !important;
+  backdrop-filter:blur(7px) saturate(1.15) !important;
+}
+body.arena-set-22-2 .as-stat{
+  background:rgba(0,0,0,.22) !important;
+  border-color:rgba(255,255,255,.07) !important;
+}
+body.arena-set-22-2 .as-stage-fx17{
+  border-color:rgba(255,232,168,.25) !important;
+  background:
+    radial-gradient(circle at 0 0,var(--arena-glow,rgba(217,183,106,.18)),transparent 44%),
+    linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035)) !important;
+}
+body.arena-set-22-2 .as-start{
+  box-shadow:0 18px 50px rgba(217,183,106,.30), inset 0 0 0 1px rgba(255,255,255,.22) !important;
+}
+@media(max-height:920px) and (min-width:900px){
+  body.arena-set-22-2 .as-title{font-size:clamp(34px,4.0vw,56px) !important}
+  body.arena-set-22-2 .as-card{min-height:218px !important}
+  body.arena-set-22-2 .as-preview{height:224px !important}
+}
+@media(max-width:880px){
+  body.arena-set-22-2 .as-body{grid-template-columns:1fr !important}
+  body.arena-set-22-2 .as-card{min-height:226px !important}
+  body.arena-set-22-2 .as-preview{height:214px !important}
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 fighter-presentation-22">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -4474,7 +4668,7 @@ body.arena-set-22-1 .as-stage-fx17{
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">True Arena Set · 22.1</div>
+          <div class="as-kicker">True Arena Set · 22.2</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
           <p class="as-subtitle">Арена теперь меняет не только цвет, а саму сцену боя: архитектуру, пол, свет, глубину, intro и читаемость персонажей.</p>
         </div>
@@ -4529,7 +4723,7 @@ body.arena-set-22-1 .as-stage-fx17{
             <div class="as-stat"><span>Atmosphere</span><b id="asAtmosphere">Smoke + sparks</b></div>
             <div class="as-stat"><span>Combat Read</span><b id="asReadability">Balanced</b></div>
           </div>
-          <div id="asStageFx17" class="as-stage-fx17"><b>22.1 True Stage:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
+          <div id="asStageFx17" class="as-stage-fx17"><b>22.2 Premium Stage Art:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
           <div class="as-match-line" aria-label="Match summary">
             <span id="asPlayerName">Raven</span>
             <b>VS</b>
@@ -4540,7 +4734,7 @@ body.arena-set-22-1 .as-stage-fx17{
             <button id="asBackBtn" class="as-back" type="button">Назад</button>
             <button id="asStartFightBtn" class="as-start" type="button">Start Fight</button>
           </div>
-          <div class="as-note">22.1 фиксирует True Arena Set: отдельную боевую сцену, stage floor, parallax depth и premium fighter presentation.</div>
+          <div class="as-note">22.2 перестраивает Arena Select: отдельные premium stage-art превью, читаемый выбранный preview и коммерческая подача арен.</div>
         </aside>
       </div>
     </div>
@@ -5840,7 +6034,7 @@ body.arena-set-22-1 .as-stage-fx17{
           : mood.type === 'moon-ritual'
             ? 'new moon ritual plate · standing stones · ritual circle · lunar backlight'
             : 'new frozen throne plate · ice palace columns · cracked floor · pale silhouette light';
-      ui.asStageFx17.innerHTML = `<b>22.1 True Stage:</b> ${stageNote22}`;
+      ui.asStageFx17.innerHTML = `<b>22.2 Premium Stage Art:</b> ${stageNote22}`;
     }
   }
 
