@@ -1,3 +1,7 @@
+# EraLash Combat — True Arena Set & Fighter Presentation 22.0
+
+Версия 22.0 добавляет реально разные арены, stage floor, parallax depth и улучшенную презентацию бойцов на Character Select / VS screen.
+
 # EraLash Combat — Combat Clarity, Animation & Camera 21.0
 
 Рабочая версия 21.0 с readable combat poses, contact-point hit FX, cinematic duel camera, stage clarity cleanup и compact HUD timing.

@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Character Readability Hotfix 20.1</title>
+  <title>EraLash Combat — True Arena Set & Fighter Presentation 22.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3752,9 +3752,216 @@ body.arena-select-open .arena-select{
   opacity:1 !important;
 }
 
+
+/* ==========================================================
+   True Arena Set & Fighter Presentation 22.0
+   Big production pass: distinct arena plates, stronger fighter cards,
+   premium VS portraits, stage-specific UI and cleaner presentation.
+   ========================================================== */
+:root{
+  --stage22-accent:#d9b76a;
+  --stage22-heat:rgba(217,183,106,.20);
+  --stage22-shadow:rgba(0,0,0,.72);
+}
+body.arena-set-22 .as-kicker,
+body.fighter-presentation-22 .cs-kicker{
+  color:#fff0bd;
+  text-shadow:0 0 22px rgba(217,183,106,.22);
+}
+body.arena-set-22 .as-card{
+  min-height:214px;
+}
+body.arena-set-22 .as-card:before,
+body.arena-set-22 .as-preview:before{
+  filter:none !important;
+  transform:scale(1.02);
+  background-size:cover;
+  background-position:center;
+}
+body.arena-set-22 .as-card[data-as-arena="black_citadel"]:before,
+body.arena-set-22 .as-preview:not(.infernal):not(.moon):not(.frozen):before{
+  background-image:
+    radial-gradient(circle at 50% 16%,rgba(242,214,154,.18),transparent 26%),
+    linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.65)),
+    url('assets/arena-black-citadel-courtyard.png');
+  filter:brightness(.62) saturate(1.04) !important;
+}
+body.arena-set-22 .as-card[data-as-arena="infernal_bridge"]:before,
+body.arena-set-22 .as-preview.infernal:before{
+  background-image:
+    radial-gradient(circle at 50% 8%,rgba(255,178,64,.34),transparent 22%),
+    radial-gradient(circle at 18% 52%,rgba(255,51,24,.30),transparent 32%),
+    radial-gradient(circle at 82% 48%,rgba(255,95,34,.28),transparent 34%),
+    linear-gradient(180deg,#170605 0%,#241009 38%,#070304 100%),
+    repeating-linear-gradient(112deg,rgba(255,118,42,.18) 0 2px,transparent 2px 40px);
+}
+body.arena-set-22 .as-card[data-as-arena="moon_ritual"]:before,
+body.arena-set-22 .as-preview.moon:before{
+  background-image:
+    radial-gradient(circle at 50% 13%,rgba(184,220,255,.46),transparent 15%),
+    radial-gradient(circle at 50% 64%,rgba(116,86,255,.20),transparent 31%),
+    linear-gradient(180deg,#07111f 0%,#0b0920 45%,#030408 100%),
+    repeating-radial-gradient(ellipse at 50% 74%,rgba(139,205,255,.18) 0 2px,transparent 2px 34px);
+}
+body.arena-set-22 .as-card[data-as-arena="frozen_throne"]:before,
+body.arena-set-22 .as-preview.frozen:before{
+  background-image:
+    radial-gradient(circle at 50% 16%,rgba(232,255,255,.42),transparent 20%),
+    radial-gradient(circle at 20% 52%,rgba(158,222,255,.18),transparent 34%),
+    radial-gradient(circle at 84% 50%,rgba(206,236,255,.16),transparent 34%),
+    linear-gradient(180deg,#071520 0%,#091726 48%,#020408 100%),
+    repeating-linear-gradient(70deg,rgba(220,252,255,.16) 0 1px,transparent 1px 34px);
+}
+body.arena-set-22 .as-card[data-as-arena="infernal_bridge"]:after{
+  background:
+    linear-gradient(90deg,rgba(255,70,22,.16),transparent 36%,rgba(255,170,64,.13)),
+    linear-gradient(180deg,transparent 0 45%,rgba(0,0,0,.78));
+}
+body.arena-set-22 .as-card[data-as-arena="moon_ritual"]:after{
+  background:
+    radial-gradient(circle at 50% 68%,rgba(119,203,255,.20),transparent 34%),
+    linear-gradient(180deg,transparent 0 40%,rgba(0,0,0,.77));
+}
+body.arena-set-22 .as-card[data-as-arena="frozen_throne"]:after{
+  background:
+    linear-gradient(90deg,rgba(203,248,255,.14),transparent 42%,rgba(147,198,255,.14)),
+    linear-gradient(180deg,transparent 0 43%,rgba(0,0,0,.78));
+}
+body.arena-set-22 .as-card h3{
+  font-size:clamp(20px,2vw,27px);
+  text-shadow:0 12px 28px rgba(0,0,0,.82);
+}
+body.arena-set-22 .as-card.active{
+  transform:translateY(-2px);
+}
+body.arena-set-22 .as-preview{
+  height:248px;
+  box-shadow:
+    0 24px 72px rgba(0,0,0,.42),
+    inset 0 0 0 1px rgba(255,255,255,.05);
+}
+body.arena-set-22 .as-preview:after{
+  background:
+    radial-gradient(circle at 50% 56%,var(--as-glow,rgba(217,183,106,.30)),transparent 30%),
+    linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.68));
+}
+body.fighter-presentation-22 .cs-card{
+  min-height:420px;
+  background-blend-mode:screen,normal;
+}
+body.fighter-presentation-22 .cs-card:before{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.07);
+  background:
+    radial-gradient(circle at 50% 70%,rgba(255,255,255,.08),transparent 28%),
+    linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  opacity:.75;
+  pointer-events:none;
+}
+body.fighter-presentation-22 .cs-card.raven{
+  background:
+    radial-gradient(circle at 45% 18%,rgba(232,58,70,.20),transparent 34%),
+    linear-gradient(180deg,rgba(93,7,18,.38),rgba(3,3,6,.94));
+}
+body.fighter-presentation-22 .cs-card.warden{
+  background:
+    radial-gradient(circle at 56% 18%,rgba(122,220,255,.18),transparent 34%),
+    linear-gradient(180deg,rgba(13,79,126,.34),rgba(3,3,6,.94));
+}
+body.fighter-presentation-22 .cs-card.raven img{
+  height:82%;
+  bottom:34px;
+  transform:translateX(-52%) rotate(-1.5deg);
+  filter:drop-shadow(0 28px 34px rgba(0,0,0,.92)) drop-shadow(0 0 22px rgba(220,36,52,.20)) contrast(1.12) saturate(1.10);
+}
+body.fighter-presentation-22 .cs-card.warden img{
+  height:87%;
+  bottom:26px;
+  transform:translateX(-48%) scale(1.04);
+  filter:drop-shadow(0 30px 36px rgba(0,0,0,.94)) drop-shadow(0 0 22px rgba(130,218,255,.18)) contrast(1.10) saturate(1.05);
+}
+body.fighter-presentation-22 .cs-face{
+  min-height:210px;
+  background:
+    radial-gradient(circle at 74% 50%,rgba(255,255,255,.10),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.09),rgba(0,0,0,.48));
+}
+body.fighter-presentation-22 .cs-face img{
+  height:242px;
+  opacity:1;
+  filter:drop-shadow(0 22px 28px rgba(0,0,0,.88)) contrast(1.08);
+}
+.fight5-vs-portrait22{
+  position:absolute;
+  z-index:1;
+  bottom:-24px;
+  right:0;
+  height:310px;
+  max-width:58%;
+  object-fit:contain;
+  opacity:.84;
+  filter:drop-shadow(0 28px 34px rgba(0,0,0,.92)) contrast(1.08) saturate(1.08);
+  pointer-events:none;
+}
+.fight5-vs-card.enemy .fight5-vs-portrait22{
+  left:0;
+  right:auto;
+  transform:scaleX(-1);
+}
+.fight5-vs-card.player .fight5-vs-portrait22{
+  transform:translateX(12%) rotate(-1.5deg);
+}
+.fight5-vs-card.enemy .fight5-vs-portrait22{
+  transform:scaleX(-1) translateX(12%) rotate(-1deg);
+}
+.fight5-vs-role22{
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  margin-top:16px;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(0,0,0,.36);
+  color:#fff0bd;
+  font-size:10px;
+  letter-spacing:.18em;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+body.fighter-presentation-22 .fight5-vs-card{
+  min-height:300px;
+  padding-right:32%;
+}
+body.fighter-presentation-22 .fight5-vs-card.enemy{
+  padding-left:32%;
+  padding-right:28px;
+}
+body.fighter-presentation-22 .fight5-vs-card.player{
+  background:
+    radial-gradient(circle at 84% 52%,rgba(226,45,60,.18),transparent 35%),
+    linear-gradient(180deg,rgba(20,20,24,.80),rgba(0,0,0,.52));
+}
+body.fighter-presentation-22 .fight5-vs-card.enemy{
+  background:
+    radial-gradient(circle at 16% 52%,rgba(120,218,255,.17),transparent 35%),
+    linear-gradient(180deg,rgba(20,20,24,.80),rgba(0,0,0,.52));
+}
+@media(max-width:720px){
+  body.fighter-presentation-22 .fight5-vs-inner{grid-template-columns:1fr;gap:10px}
+  body.fighter-presentation-22 .fight5-vs-card{min-height:150px;padding:18px 30% 18px 18px}
+  body.fighter-presentation-22 .fight5-vs-card.enemy{padding:18px 18px 18px 30%}
+  .fight5-vs-portrait22{height:172px;max-width:34%}
+  .fight5-vs-role22{display:none}
+  body.fighter-presentation-22 .cs-card{min-height:360px}
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 fighter-presentation-22">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -3787,7 +3994,7 @@ body.arena-select-open .arena-select{
   </div>
 
   <div id="arenaMoodBadge17" class="arena-mood-badge17" aria-hidden="true">
-    <div class="k">Stage Mood · 17.0</div>
+    <div class="k">True Stage · 22.0</div>
     <div id="arenaMoodName17" class="n">Black Citadel</div>
     <div id="arenaMoodText17" class="m">Smoke + sparks · Gold / Ember</div>
   </div>
@@ -3976,18 +4183,22 @@ body.arena-select-open .arena-select{
   <div id="fight5Vs" class="fight5-vs" aria-hidden="true">
     <div class="fight5-vs-inner">
       <div class="fight5-vs-card player">
+        <img id="fight5PlayerPortrait22" class="fight5-vs-portrait22" src="assets/fighter-shadow-raven.png" alt="">
         <div class="fight5-vs-label">Player Fighter</div>
         <div id="fight5PlayerName" class="fight5-vs-name">Raven</div>
         <div id="fight5PlayerStyle" class="fight5-vs-style">Dark steel assassin</div>
+        <div id="fight5PlayerRole22" class="fight5-vs-role22">ASSASSIN · SPEED CONTROL</div>
       </div>
       <div>
         <div class="fight5-vs-mark">VS</div>
         <div id="fight5ArenaName" class="fight5-vs-sub">Black Citadel</div>
       </div>
       <div class="fight5-vs-card enemy">
+        <img id="fight5EnemyPortrait22" class="fight5-vs-portrait22" src="assets/fighter-iron-warden.png" alt="">
         <div class="fight5-vs-label">Arena AI</div>
         <div id="fight5EnemyName" class="fight5-vs-name">Iron Warden</div>
         <div id="fight5EnemyStyle" class="fight5-vs-style">Gunmetal juggernaut</div>
+        <div id="fight5EnemyRole22" class="fight5-vs-role22">TANK · ARMOR BREAK</div>
       </div>
     </div>
   </div>
@@ -3997,7 +4208,7 @@ body.arena-select-open .arena-select{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">Premium Character Select · 17.0</div>
+          <div class="cs-kicker">Premium Fighter Presentation · 22.0</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
           <p class="cs-subtitle">Выбери стиль боя перед матчем: быстрый Raven или тяжёлый Iron Warden. Противник автоматически станет противоположным бойцом.</p>
         </div>
@@ -4074,7 +4285,7 @@ body.arena-select-open .arena-select{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">17.0 закрепляет Arena Mood System: выбранная арена получает собственный свет, частицы, intro-text и performance-safe mobile FX.</div>
+          <div class="cs-locked-note">17.0 закрепляет True Arena Set: выбранная арена получает отдельную сцену, stage floor, depth layers, intro и fighter spotlight.</div>
         </aside>
       </div>
     </div>
@@ -4085,9 +4296,9 @@ body.arena-select-open .arena-select{
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">Premium Arena Select · 17.0</div>
+          <div class="as-kicker">True Arena Set · 22.0</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
-          <p class="as-subtitle">Арена меняет атмосферу боя: цвет света, фон, эффекты воздуха, настроение VS-screen и читаемость персонажей.</p>
+          <p class="as-subtitle">Арена теперь меняет не только цвет, а саму сцену боя: архитектуру, пол, свет, глубину, intro и читаемость персонажей.</p>
         </div>
         <button id="asCloseBtn" class="as-close" type="button" aria-label="Закрыть выбор арены">×</button>
       </div>
@@ -4140,7 +4351,7 @@ body.arena-select-open .arena-select{
             <div class="as-stat"><span>Atmosphere</span><b id="asAtmosphere">Smoke + sparks</b></div>
             <div class="as-stat"><span>Combat Read</span><b id="asReadability">Balanced</b></div>
           </div>
-          <div id="asStageFx17" class="as-stage-fx17"><b>17.0 Stage FX:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
+          <div id="asStageFx17" class="as-stage-fx17"><b>22.0 True Stage:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
           <div class="as-match-line" aria-label="Match summary">
             <span id="asPlayerName">Raven</span>
             <b>VS</b>
@@ -4151,7 +4362,7 @@ body.arena-select-open .arena-select{
             <button id="asBackBtn" class="as-back" type="button">Назад</button>
             <button id="asStartFightBtn" class="as-start" type="button">Start Fight</button>
           </div>
-          <div class="as-note">17.0 добавляет уникальный stage mood для каждой арены: частицы, fog layer, свет, intro phrase и mobile-safe FX.</div>
+          <div class="as-note">22.0 добавляет True Arena Set: отдельную боевую сцену, stage floor, parallax depth и premium fighter presentation.</div>
         </aside>
       </div>
     </div>
@@ -4530,11 +4741,11 @@ body.arena-select-open .arena-select{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '18.0 COMBAT IMPACT SYSTEM';
-  const AI_COMBOS_PATCH = '18.0 COMBAT IMPACT SYSTEM';
-  const ULTIMATE_FINISHER_PATCH = '18.0 COMBAT IMPACT SYSTEM';
-  const CHARACTER_SELECT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
-  const ARENA_SELECT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const REAL_PHYSICS_PATCH = '22.0 TRUE ARENA SET';
+  const AI_COMBOS_PATCH = '22.0 TRUE ARENA SET';
+  const ULTIMATE_FINISHER_PATCH = '22.0 TRUE ARENA SET';
+  const CHARACTER_SELECT_PATCH = '22.0 TRUE ARENA SET';
+  const ARENA_SELECT_PATCH = '22.0 TRUE ARENA SET';
 
   const AI_PROFILES = {
     // Combat AI & Combo 19.0 — each difficulty now drives reaction, defense, combo planning and punish discipline.
@@ -5219,10 +5430,20 @@ body.arena-select-open .arena-select{
   function showFight5VsIntro(){
     if (!ui.fight5Vs) return;
     const arena = contentArena();
+    const pFighter22 = contentFighter('player');
+    const eFighter22 = contentFighter('enemy');
     ui.fight5PlayerName.textContent = fight5Name('Raven', 'player');
     ui.fight5PlayerStyle.textContent = fight5Style('player');
     ui.fight5EnemyName.textContent = fight5Name('Iron Warden', 'enemy');
     ui.fight5EnemyStyle.textContent = fight5Style('enemy');
+    const pPortrait22 = document.getElementById('fight5PlayerPortrait22');
+    const ePortrait22 = document.getElementById('fight5EnemyPortrait22');
+    const pRole22 = document.getElementById('fight5PlayerRole22');
+    const eRole22 = document.getElementById('fight5EnemyRole22');
+    if (pPortrait22 && pFighter22?.image) pPortrait22.src = pFighter22.image;
+    if (ePortrait22 && eFighter22?.image) ePortrait22.src = eFighter22.image;
+    if (pRole22) pRole22.textContent = `${pFighter22?.role || 'FIGHTER'} · ${pFighter22?.specialName || 'SIGNATURE'}`.toUpperCase();
+    if (eRole22) eRole22.textContent = `${eFighter22?.role || 'ARENA AI'} · ${eFighter22?.specialName || 'SIGNATURE'}`.toUpperCase();
     ui.fight5ArenaName.textContent = (arena?.title || 'Black Citadel').toUpperCase();
     ui.fight5Vs.setAttribute('aria-hidden', 'false');
     ui.fight5Vs.classList.remove('show');
@@ -5433,7 +5654,16 @@ body.arena-select-open .arena-select{
     if (ui.arenaMoodBadge17) ui.arenaMoodBadge17.style.borderColor = mood.accent + '55';
     if (ui.arenaIntroName17) ui.arenaIntroName17.textContent = mood.title;
     if (ui.arenaIntroQuote17) ui.arenaIntroQuote17.textContent = mood.quote;
-    if (ui.asStageFx17) ui.asStageFx17.innerHTML = `<b>17.0 Stage FX:</b> ${mood.stageFx}`;
+    if (ui.asStageFx17) {
+      const stageNote22 = mood.type === 'black-citadel'
+        ? 'real gothic courtyard plate · wet stone · ember smoke · clean duel light'
+        : mood.type === 'infernal-bridge'
+          ? 'new infernal bridge plate · furnace gates · molten floor seams · ember depth'
+          : mood.type === 'moon-ritual'
+            ? 'new moon ritual plate · standing stones · ritual circle · lunar backlight'
+            : 'new frozen throne plate · ice palace columns · cracked floor · pale silhouette light';
+      ui.asStageFx17.innerHTML = `<b>22.0 True Stage:</b> ${stageNote22}`;
+    }
   }
 
   function showArenaIntro17(){
@@ -7815,6 +8045,309 @@ body.arena-select-open .arena-select{
       return true;
     }
 
+
+    function drawTrueArenaStage22(kind, accent){
+      const selected = kind || 'black-citadel';
+      const selectedAccent = accent || '#d9b76a';
+      const r = EXACT_BLACK_CITADEL_ARENA ? getExactArenaStageRect() : { x:0, y:0, w, h };
+      const rx = r.x, ry = r.y, rw = r.w, rh = r.h;
+      const cx = rx + rw * .5;
+      const floorTop = ry + rh * .62;
+      const floorBottom = ry + rh * .95;
+      const mobileStage = rw < 760 || (window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+
+      ctx.save();
+      ctx.fillStyle = '#020204';
+      ctx.fillRect(0,0,w,h);
+
+      const outside = ctx.createRadialGradient(cx, ry + rh * .54, rw*.12, cx, ry + rh*.54, rw*.72);
+      outside.addColorStop(0,'rgba(0,0,0,0)');
+      outside.addColorStop(.68,'rgba(0,0,0,.18)');
+      outside.addColorStop(1,'rgba(0,0,0,.92)');
+      ctx.fillStyle = outside;
+      ctx.fillRect(0,0,w,h);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(rx, ry, rw, rh);
+      ctx.clip();
+
+      let skyTop = '#06070c', skyMid = '#121018', skyLow = '#030305';
+      let glowA = 'rgba(217,183,106,.22)';
+      let glowB = 'rgba(255,70,35,.12)';
+      let floorA = 'rgba(38,31,24,.98)';
+      let floorB = 'rgba(5,4,5,.98)';
+      let particle = selectedAccent;
+      let lineGlow = selectedAccent + '55';
+
+      if (selected === 'infernal-bridge') {
+        skyTop = '#160404'; skyMid = '#2c0c06'; skyLow = '#090202';
+        glowA = 'rgba(255,116,32,.42)'; glowB = 'rgba(255,36,14,.20)';
+        floorA = 'rgba(55,20,11,.98)'; floorB = 'rgba(9,3,3,.98)';
+        particle = '#ff7a32';
+      } else if (selected === 'moon-ritual') {
+        skyTop = '#06111f'; skyMid = '#0d1230'; skyLow = '#02040a';
+        glowA = 'rgba(154,209,255,.34)'; glowB = 'rgba(118,76,255,.18)';
+        floorA = 'rgba(22,24,43,.98)'; floorB = 'rgba(4,4,12,.98)';
+        particle = '#94dcff';
+      } else if (selected === 'frozen-throne') {
+        skyTop = '#061522'; skyMid = '#0d2234'; skyLow = '#02070d';
+        glowA = 'rgba(215,255,255,.38)'; glowB = 'rgba(144,198,255,.18)';
+        floorA = 'rgba(22,42,56,.98)'; floorB = 'rgba(3,9,15,.98)';
+        particle = '#dffcff';
+      }
+
+      const sky = ctx.createLinearGradient(0, ry, 0, ry + rh);
+      sky.addColorStop(0, skyTop);
+      sky.addColorStop(.45, skyMid);
+      sky.addColorStop(1, skyLow);
+      ctx.fillStyle = sky;
+      ctx.fillRect(rx, ry, rw, rh);
+
+      // Deep background glow and parallax silhouettes.
+      ctx.globalCompositeOperation = 'screen';
+      const backGlow = ctx.createRadialGradient(cx, ry + rh*.20, 0, cx, ry + rh*.24, rw*.46);
+      backGlow.addColorStop(0, glowA);
+      backGlow.addColorStop(.38, glowB);
+      backGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = backGlow;
+      ctx.fillRect(rx, ry, rw, rh);
+      ctx.globalCompositeOperation = 'source-over';
+
+      function poly(points, fill, stroke='rgba(255,255,255,.06)', width=1){
+        ctx.beginPath();
+        points.forEach((p,i)=>{ if(i) ctx.lineTo(rx + p[0]*rw, ry + p[1]*rh); else ctx.moveTo(rx + p[0]*rw, ry + p[1]*rh); });
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = width; ctx.stroke(); }
+      }
+
+      function ellipseLight(x,y,ww,hh,color,alpha=.18){
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = alpha;
+        const g = ctx.createRadialGradient(rx+x*rw, ry+y*rh, 0, rx+x*rw, ry+y*rh, Math.max(ww*rw, hh*rh));
+        g.addColorStop(0,color);
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(rx+x*rw, ry+y*rh, ww*rw, hh*rh, 0, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (selected === 'infernal-bridge') {
+        // Furnace gates, bridge anchors and molten depth: true new stage, not color-only.
+        for (let i=0;i<5;i++){
+          const x = .06 + i*.22;
+          poly([[x,.18],[x+.095,.13],[x+.17,.31],[x+.15,.64],[x-.015,.64],[x-.03,.30]], 'rgba(18,6,5,.78)', 'rgba(255,126,58,.10)', 2);
+          ellipseLight(x+.075,.48,.045,.18,'rgba(255,80,22,.42)',.22);
+        }
+        for (let i=0;i<4;i++){
+          const x = .17 + i*.23 + Math.sin(t*.55+i)*.004;
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255,126,58,.16)';
+          ctx.lineWidth = Math.max(1, rw*.004);
+          ctx.beginPath();
+          ctx.moveTo(rx+x*rw, ry+rh*.05);
+          ctx.lineTo(rx+(x-.05)*rw, ry+rh*.60);
+          ctx.stroke();
+          ctx.restore();
+        }
+        // molten chasm under bridge
+        ctx.save();
+        ctx.globalCompositeOperation='screen';
+        for(let i=0;i<9;i++){
+          const y = floorTop + (floorBottom-floorTop)*(.12 + i*.085);
+          const g = ctx.createLinearGradient(rx+rw*.18,y,rx+rw*.82,y);
+          g.addColorStop(0,'rgba(0,0,0,0)');
+          g.addColorStop(.5, i%2 ? 'rgba(255,55,18,.28)' : 'rgba(255,170,40,.22)');
+          g.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.strokeStyle = g;
+          ctx.lineWidth = Math.max(1.2, rh*.003);
+          ctx.beginPath();
+          ctx.moveTo(rx+rw*.18, y + Math.sin(t*1.2+i)*2);
+          ctx.bezierCurveTo(rx+rw*.36, y-9, rx+rw*.64, y+10, rx+rw*.82, y + Math.cos(t+i)*3);
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else if (selected === 'moon-ritual') {
+        // Giant moon, ritual stones and circle floor.
+        ctx.save();
+        ctx.globalCompositeOperation='screen';
+        const moon = ctx.createRadialGradient(cx, ry+rh*.14, 0, cx, ry+rh*.14, rw*.15);
+        moon.addColorStop(0,'rgba(245,250,255,.46)');
+        moon.addColorStop(.55,'rgba(120,192,255,.16)');
+        moon.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle = moon;
+        ctx.beginPath();
+        ctx.arc(cx, ry+rh*.14, rw*.12, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+        for (let i=0;i<7;i++){
+          const x = .08 + i*.14;
+          const hgt = .23 + (i%3)*.045;
+          poly([[x,.40+hgt*.12],[x+.035,.26],[x+.067,.40+hgt*.08],[x+.055,.68],[x-.006,.68]], 'rgba(8,10,22,.82)', 'rgba(148,220,255,.12)', 1.4);
+        }
+        // ritual circle
+        ctx.save();
+        ctx.translate(cx, floorTop + (floorBottom-floorTop)*.42);
+        ctx.globalCompositeOperation='screen';
+        ctx.strokeStyle = 'rgba(134,216,255,.28)';
+        ctx.lineWidth = Math.max(1, rw*.0018);
+        for(let rr=0; rr<4; rr++){
+          ctx.globalAlpha = .18 - rr*.02;
+          ctx.beginPath();
+          ctx.ellipse(0,0,rw*(.13+rr*.055),rh*(.035+rr*.013),0,0,Math.PI*2);
+          ctx.stroke();
+        }
+        for(let i=0;i<18;i++){
+          const a = i*Math.PI*2/18 + t*.08;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a)*rw*.16, Math.sin(a)*rh*.043);
+          ctx.lineTo(Math.cos(a)*rw*.24, Math.sin(a)*rh*.064);
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else if (selected === 'frozen-throne') {
+        // Frozen palace, ice throne silhouette and crystalline foreground.
+        for (let i=0;i<7;i++){
+          const x = .02 + i*.16;
+          poly([[x,.24],[x+.055,.14],[x+.11,.24],[x+.095,.66],[x+.015,.66]], 'rgba(8,20,30,.75)', 'rgba(210,255,255,.12)', 1.5);
+          ellipseLight(x+.055,.31,.035,.13,'rgba(210,255,255,.18)',.14);
+        }
+        poly([[.41,.22],[.50,.10],[.59,.22],[.64,.65],[.36,.65]], 'rgba(10,25,38,.72)', 'rgba(210,255,255,.15)', 2);
+        ctx.save();
+        ctx.globalCompositeOperation='screen';
+        for(let i=0;i<16;i++){
+          const x = rx + rw*(.12 + (i%8)*.11);
+          const y = floorTop + rh*(.07 + Math.floor(i/8)*.10);
+          ctx.strokeStyle = i%2 ? 'rgba(225,255,255,.16)' : 'rgba(132,202,255,.13)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + Math.sin(i)*rw*.052, y + rh*(.035 + (i%3)*.012));
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else {
+        // Fallback exact citadel-style procedural plate.
+        for (let i=0;i<6;i++){
+          const x = .03 + i*.18;
+          poly([[x,.29],[x+.055,.20],[x+.12,.30],[x+.11,.66],[x-.005,.66]], 'rgba(8,9,13,.78)', 'rgba(217,183,106,.10)', 1);
+        }
+      }
+
+      // True stage floor: clear playable plane with perspective.
+      const floor = ctx.createLinearGradient(0, floorTop, 0, floorBottom);
+      floor.addColorStop(0, floorA);
+      floor.addColorStop(.48, 'rgba(10,9,11,.98)');
+      floor.addColorStop(1, floorB);
+      ctx.fillStyle = floor;
+      ctx.beginPath();
+      ctx.moveTo(rx + rw*.08, floorBottom);
+      ctx.lineTo(rx + rw*.92, floorBottom);
+      ctx.lineTo(rx + rw*.77, floorTop);
+      ctx.lineTo(rx + rw*.23, floorTop);
+      ctx.closePath();
+      ctx.fill();
+
+      // Perspective seams / stones.
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = selected === 'infernal-bridge' ? .30 : selected === 'moon-ritual' ? .25 : .22;
+      ctx.strokeStyle = lineGlow;
+      ctx.lineWidth = 1;
+      for(let i=1;i<6;i++){
+        const a = i / 6;
+        ctx.beginPath();
+        ctx.moveTo(rx + rw*(.23 + a*.54), floorTop);
+        ctx.lineTo(rx + rw*(.08 + a*.84), floorBottom);
+        ctx.stroke();
+      }
+      for(let j=0;j<5;j++){
+        const yy = floorTop + (floorBottom-floorTop)*(j/5);
+        ctx.beginPath();
+        ctx.moveTo(rx + rw*(.23 - j*.028), yy);
+        ctx.lineTo(rx + rw*(.77 + j*.028), yy);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Combat focus oval: keeps characters readable.
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const focus = ctx.createRadialGradient(cx, floorTop + (floorBottom-floorTop)*.42, 0, cx, floorTop + (floorBottom-floorTop)*.42, rw*.32);
+      focus.addColorStop(0, selected === 'infernal-bridge' ? 'rgba(255,130,50,.13)' : selected === 'frozen-throne' ? 'rgba(220,255,255,.13)' : selected === 'moon-ritual' ? 'rgba(140,214,255,.12)' : 'rgba(217,183,106,.11)');
+      focus.addColorStop(.58,'rgba(255,255,255,.018)');
+      focus.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = focus;
+      ctx.fillRect(rx, ry, rw, rh);
+      ctx.restore();
+
+      // Stage particles: tuned per stage, mobile-safe.
+      const particleN = mobileStage ? 34 : 82;
+      ctx.save();
+      ctx.globalCompositeOperation='screen';
+      for(let i=0;i<particleN;i++){
+        const seed = i*109;
+        const speed = selected === 'infernal-bridge' ? 42 : selected === 'frozen-throne' ? 14 : 22;
+        const px = rx - 60 + ((seed + t*speed + Math.sin(i*1.7)*40) % (rw+120));
+        const rising = selected === 'infernal-bridge';
+        const pyRaw = (seed*1.51 + t*(rising ? 42 : 16)) % Math.max(1,rh);
+        const py = rising ? (ry+rh-pyRaw) : (ry+pyRaw);
+        const size = selected === 'frozen-throne' ? (1.05+(i%4)*.54) : (.65+(i%5)*.38);
+        ctx.globalAlpha = mobileStage ? .10 : (selected === 'infernal-bridge' ? .18 : .13);
+        ctx.fillStyle = i%6 === 0 ? 'rgba(255,255,255,.72)' : particle;
+        if (selected === 'frozen-throne') ctx.fillRect(px, py, size, size);
+        else { ctx.beginPath(); ctx.arc(px, py, size, 0, Math.PI*2); ctx.fill(); }
+      }
+      ctx.restore();
+
+      // Stage name etched into the architecture.
+      ctx.save();
+      ctx.font = `900 ${Math.max(10, Math.min(18, rw*.016))}px Inter, Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,246,214,.56)';
+      ctx.shadowColor = selectedAccent + '66';
+      ctx.shadowBlur = 14;
+      ctx.fillText(String(arena.title || 'TRUE STAGE').toUpperCase(), cx, ry + rh*.105);
+      ctx.restore();
+
+      // Readability matte behind fighters.
+      const matte = ctx.createRadialGradient(cx, floorTop + (floorBottom-floorTop)*.22, rw*.05, cx, floorTop + (floorBottom-floorTop)*.22, rw*.44);
+      matte.addColorStop(0,'rgba(0,0,0,0)');
+      matte.addColorStop(.52,'rgba(0,0,0,.05)');
+      matte.addColorStop(1,'rgba(0,0,0,.44)');
+      ctx.fillStyle = matte;
+      ctx.fillRect(rx, ry, rw, rh);
+
+      ctx.restore();
+
+      // Outside stage cinematic frame.
+      const frame = ctx.createLinearGradient(0,0,w,0);
+      frame.addColorStop(0,'rgba(0,0,0,.88)');
+      frame.addColorStop(.12,'rgba(0,0,0,.18)');
+      frame.addColorStop(.88,'rgba(0,0,0,.18)');
+      frame.addColorStop(1,'rgba(0,0,0,.88)');
+      ctx.fillStyle = frame;
+      ctx.fillRect(0,0,w,h);
+
+      const topFade = ctx.createLinearGradient(0,0,0,h*.26);
+      topFade.addColorStop(0,'rgba(0,0,0,.64)');
+      topFade.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = topFade;
+      ctx.fillRect(0,0,w,h*.28);
+
+      const bottomFade = ctx.createLinearGradient(0,h*.74,0,h);
+      bottomFade.addColorStop(0,'rgba(0,0,0,0)');
+      bottomFade.addColorStop(1,'rgba(0,0,0,.78)');
+      ctx.fillStyle = bottomFade;
+      ctx.fillRect(0,h*.74,w,h*.26);
+      ctx.restore();
+    }
+
     function drawArena15VariantOverlay(kind, accent){
       const selected = kind || 'black-citadel';
       const selectedAccent = accent || '#d9b76a';
@@ -7891,14 +8424,23 @@ body.arena-select-open .arena-select{
     }
 
     const artReady = blackCitadelArenaArt && blackCitadelArenaArt.complete && blackCitadelArenaArt.naturalWidth > 0;
+    const stageKind22 = arena.backgroundType || arenaSelectMeta(currentArena15()).backgroundType || 'black-citadel';
     if (artReady) {
       if (EXACT_BLACK_CITADEL_ARENA) {
+        if (stageKind22 !== 'black-citadel') {
+          drawTrueArenaStage22(stageKind22, arenaAccent);
+          return;
+        }
         drawExactStagePlate(blackCitadelArenaArt);
-        drawArena15VariantOverlay(arena.backgroundType || 'black-citadel', arenaAccent);
+        drawArena15VariantOverlay(stageKind22, arenaAccent);
+        return;
+      }
+      if (stageKind22 !== 'black-citadel') {
+        drawTrueArenaStage22(stageKind22, arenaAccent);
         return;
       }
       drawCoverImage(blackCitadelArenaArt, 0, 0, w, h);
-      drawArena15VariantOverlay(arena.backgroundType || 'black-citadel', arenaAccent);
+      drawArena15VariantOverlay(stageKind22, arenaAccent);
       return;
     } else {
       const sky = ctx.createLinearGradient(0,0,0,h);

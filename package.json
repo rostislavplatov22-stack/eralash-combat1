@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-clarity-animation-camera-21-ready",
-  "version": "21.0.0",
+  "name": "eralash-combat-true-arena-fighter-presentation-22-ready",
+  "version": "22.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Clarity, Animation & Camera Rework 21.0: readable combat poses, contact-point hit FX, cinematic duel camera, stage focus cleanup, compact HUD timing and preserved 20.1 physics/readability."
+  "description": "EraLash Combat True Arena Set & Fighter Presentation 22.0: distinct arena plates, stage floors, parallax depth, upgraded fighter presentation, premium VS portraits and preserved 21.0 combat clarity."
 }
