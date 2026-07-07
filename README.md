@@ -1,3 +1,25 @@
+# EraLash Combat — Cinematic Art & Fighter Identity Upgrade 24.0
+
+## Что добавлено
+
+- Реальные cinematic stage-art ассеты для всех арен в Arena Select и в самом бою.
+- Новый premium fighter identity pass: Raven как assassin, Iron Warden как tank.
+- Новые portrait/key-art ассеты для бойцов.
+- Новый Cinematic Duel Intro 24.0 перед началом боя.
+- Улучшенный Arena Reveal / VS presentation.
+- Arena Select 23.0 сохранён, но визуально усилен 24.0-артом.
+- Сохранены Combat Clarity 21.0, Physics 20.1, AI & Combo 19.0, Combat Impact 18.0 и Arena Flow 17.0.
+
+## Проверка
+
+- `npm run build` должен проходить без ошибок.
+- Start Fight должен пройти цепочку: Character Select → Arena Select → Cinematic Match Locked → Cinematic Duel Intro → Fight.
+- Все четыре арены должны выглядеть разными и в Arena Select, и в самом бою.
+- На мобильном экране кнопка Start Fight должна оставаться доступной.
+
+
+---
+
 # EraLash Combat — True Arena Set & Fighter Presentation 22.2
 
 # True Arena Set & Fighter Presentation 22.2 — Premium Arena Art Rebuild

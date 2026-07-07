@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-select-luxury-rebuild-23-ready",
-  "version": "23.0.0",
+  "name": "eralash-combat-cinematic-art-fighter-identity-24-ready",
+  "version": "24.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Select Luxury Rebuild 23.0: cinematic stage-selection screen with hero arena preview, compact arena rail, luxury stage key art, cleaner typography and mobile-safe layout."
+  "description": "EraLash Combat Cinematic Art & Fighter Identity Upgrade 24.0: cinematic arena artwork, real stage art in fight, premium fighter identity portraits, VS presentation and cinematic battle intro."
 }
