@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-flow-16-3-layer-fix-ready",
-  "version": "16.3.0",
+  "name": "eralash-combat-arena-flow-17-ready",
+  "version": "17.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Flow 16.3: fixes Start Fight by raising Character/Arena Select overlays above Real Art menu and adding a hardened launch guard."
+  "description": "EraLash Combat Arena Flow 17.0: adds premium Arena Mood System with arena-specific intro text, stage lighting, fog, particles, combat badge and mobile-safe FX."
 }

@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Visual 4.2 cinematic combat framing polish, Combat 2.1, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Arena Flow 17.0 premium stage mood system, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Arena Select 16.0</title>
+  <title>EraLash Combat — Arena Flow 17.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3496,6 +3496,161 @@ body.arena-select-open canvas{filter:brightness(.45) saturate(.75) blur(1px)}
   text-transform:uppercase;
 }
 
+
+
+/* Arena Flow 17.0 — Premium Arena Mood System */
+.arena-mood-badge17{
+  position:fixed;
+  left:calc(18px + env(safe-area-inset-left));
+  top:calc(94px + env(safe-area-inset-top));
+  z-index:45;
+  display:none;
+  min-width:190px;
+  max-width:min(360px,42vw);
+  padding:11px 14px 10px;
+  border:1px solid rgba(217,183,106,.28);
+  border-radius:18px;
+  background:
+    linear-gradient(135deg,rgba(10,11,14,.72),rgba(0,0,0,.46)),
+    radial-gradient(circle at 0 0,var(--arena17-glow,rgba(217,183,106,.18)),transparent 62%);
+  box-shadow:0 20px 60px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.045);
+  backdrop-filter:blur(10px) saturate(1.15);
+  pointer-events:none;
+  transform:translateY(-6px);
+  opacity:0;
+  transition:opacity .28s ease, transform .28s ease;
+}
+body.is-fighting .arena-mood-badge17{
+  display:block;
+  opacity:.92;
+  transform:translateY(0);
+}
+.arena-mood-badge17 .k{
+  color:var(--arena17-accent,#d9b76a);
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.20em;
+  text-transform:uppercase;
+}
+.arena-mood-badge17 .n{
+  margin-top:4px;
+  color:#fff3cf;
+  font-size:17px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  text-shadow:0 0 18px var(--arena17-glow,rgba(217,183,106,.18));
+}
+.arena-mood-badge17 .m{
+  margin-top:6px;
+  color:#aeb5c2;
+  font-size:10px;
+  line-height:1.35;
+  font-weight:800;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.arena-intro17{
+  position:fixed;
+  inset:0;
+  z-index:66;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 48%,var(--arena17-glow,rgba(217,183,106,.24)),transparent 34%),
+    linear-gradient(180deg,rgba(0,0,0,.20),rgba(0,0,0,.62));
+  backdrop-filter:blur(2px) saturate(1.08);
+}
+.arena-intro17.show{
+  display:flex;
+  animation:arenaIntro17 .96s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes arenaIntro17{
+  0%{opacity:0;filter:blur(10px);transform:scale(1.035)}
+  13%{opacity:1;filter:blur(0);transform:scale(1)}
+  72%{opacity:1}
+  100%{opacity:0;filter:blur(3px);transform:scale(.992)}
+}
+.arena-intro17-card{
+  width:min(760px,88vw);
+  padding:30px 26px 28px;
+  text-align:center;
+  border:1px solid rgba(255,230,170,.34);
+  border-radius:28px;
+  background:
+    linear-gradient(145deg,rgba(10,12,16,.78),rgba(1,1,3,.86)),
+    radial-gradient(circle at 50% 0%,var(--arena17-glow,rgba(217,183,106,.20)),transparent 52%);
+  box-shadow:0 38px 130px rgba(0,0,0,.72), inset 0 0 0 1px rgba(255,255,255,.06);
+  position:relative;
+  overflow:hidden;
+}
+.arena-intro17-card:before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:50%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--arena17-accent,#d9b76a),transparent);
+  opacity:.46;
+}
+.arena-intro17-k{
+  color:var(--arena17-accent,#d9b76a);
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+}
+.arena-intro17-n{
+  margin-top:10px;
+  color:#fff5d3;
+  font-size:clamp(34px,7vw,76px);
+  line-height:.86;
+  font-weight:1000;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  text-shadow:0 0 30px var(--arena17-glow,rgba(217,183,106,.24)),0 18px 52px rgba(0,0,0,.95);
+}
+.arena-intro17-q{
+  margin:16px auto 0;
+  max-width:580px;
+  color:#c7cbd5;
+  font-size:clamp(12px,2vw,15px);
+  font-weight:850;
+  line-height:1.45;
+  letter-spacing:.10em;
+  text-transform:uppercase;
+}
+.as-stage-fx17{
+  margin-top:10px;
+  padding:11px 12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.085);
+  background:linear-gradient(90deg,rgba(217,183,106,.10),rgba(255,255,255,.04));
+  color:#d7dbe5;
+  font-size:11px;
+  line-height:1.38;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.as-stage-fx17 b{color:#fff2c2}
+@media(max-width:680px){
+  .arena-mood-badge17{
+    top:calc(78px + env(safe-area-inset-top));
+    left:calc(10px + env(safe-area-inset-left));
+    max-width:50vw;
+    padding:9px 10px;
+    border-radius:14px;
+  }
+  .arena-mood-badge17 .n{font-size:13px}
+  .arena-mood-badge17 .m{display:none}
+  .arena-intro17-card{padding:24px 16px 22px;border-radius:22px}
+}
+
 @media(max-width:560px){
   .as-match-line{grid-template-columns:1fr;gap:6px;text-align:center}
   .as-match-line span:last-of-type{text-align:center}
@@ -3545,7 +3700,7 @@ body.arena-select-open .arena-select{
 
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -3571,6 +3726,13 @@ body.arena-select-open .arena-select{
     <div id="calloutSmall" class="small">Round 1</div>
   </div>
   <div id="comboTag" class="combo-tag"><b id="comboCount">0</b> HIT COMBO</div>
+
+  <div id="arenaMoodBadge17" class="arena-mood-badge17" aria-hidden="true">
+    <div class="k">Stage Mood · 17.0</div>
+    <div id="arenaMoodName17" class="n">Black Citadel</div>
+    <div id="arenaMoodText17" class="m">Smoke + sparks · Gold / Ember</div>
+  </div>
+
 
   <div id="menu" class="menu dc-v3-menu">
     <div class="dc-v3-lobby">
@@ -3776,7 +3938,7 @@ body.arena-select-open .arena-select{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">Premium Character Select · 14.0</div>
+          <div class="cs-kicker">Premium Character Select · 17.0</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
           <p class="cs-subtitle">Выбери стиль боя перед матчем: быстрый Raven или тяжёлый Iron Warden. Противник автоматически станет противоположным бойцом.</p>
         </div>
@@ -3853,7 +4015,7 @@ body.arena-select-open .arena-select{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">16.3 закрепляет полный flow Character → Arena → Cinematic VS. Выбери арену перед боем: свет, атмосфера и stage tone меняются без поломки боёвки.</div>
+          <div class="cs-locked-note">17.0 закрепляет Arena Mood System: выбранная арена получает собственный свет, частицы, intro-text и performance-safe mobile FX.</div>
         </aside>
       </div>
     </div>
@@ -3864,7 +4026,7 @@ body.arena-select-open .arena-select{
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">Premium Arena Select · 16.3</div>
+          <div class="as-kicker">Premium Arena Select · 17.0</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
           <p class="as-subtitle">Арена меняет атмосферу боя: цвет света, фон, эффекты воздуха, настроение VS-screen и читаемость персонажей.</p>
         </div>
@@ -3919,6 +4081,7 @@ body.arena-select-open .arena-select{
             <div class="as-stat"><span>Atmosphere</span><b id="asAtmosphere">Smoke + sparks</b></div>
             <div class="as-stat"><span>Combat Read</span><b id="asReadability">Balanced</b></div>
           </div>
+          <div id="asStageFx17" class="as-stage-fx17"><b>17.0 Stage FX:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
           <div class="as-match-line" aria-label="Match summary">
             <span id="asPlayerName">Raven</span>
             <b>VS</b>
@@ -3929,7 +4092,7 @@ body.arena-select-open .arena-select{
             <button id="asBackBtn" class="as-back" type="button">Назад</button>
             <button id="asStartFightBtn" class="as-start" type="button">Start Fight</button>
           </div>
-          <div class="as-note">16.0 добавляет cinematic arena lock, match summary и защищает старт боя от обхода Character/Arena Select.</div>
+          <div class="as-note">17.0 добавляет уникальный stage mood для каждой арены: частицы, fog layer, свет, intro phrase и mobile-safe FX.</div>
         </aside>
       </div>
     </div>
@@ -3939,7 +4102,7 @@ body.arena-select-open .arena-select{
 
   <div id="arenaReveal16" class="arena-reveal16" aria-hidden="true">
     <div class="ar16-card">
-      <div class="ar16-kicker">Arena Locked · 16.0</div>
+      <div class="ar16-kicker">Arena Locked · 17.0</div>
       <div id="ar16Arena" class="ar16-arena">Black Citadel</div>
       <div class="ar16-vs-row">
         <span id="ar16Player">Raven</span>
@@ -3947,6 +4110,15 @@ body.arena-select-open .arena-select{
         <span id="ar16Enemy">Iron Warden</span>
       </div>
       <div id="ar16Mood" class="ar16-mood">Gold / Ember · Smoke + sparks · NORMAL AI</div>
+    </div>
+  </div>
+
+
+  <div id="arenaIntro17" class="arena-intro17" aria-hidden="true">
+    <div class="arena-intro17-card">
+      <div class="arena-intro17-k">Arena Mood System · 17.0</div>
+      <div id="arenaIntroName17" class="arena-intro17-n">Black Citadel</div>
+      <div id="arenaIntroQuote17" class="arena-intro17-q">Darkness answers only strength.</div>
     </div>
   </div>
 
@@ -4027,14 +4199,14 @@ body.arena-select-open .arena-select{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '16.0 PREMIUM ARENA FLOW';
+  const SPRITE_COMBAT_PATCH = '17.0 ARENA MOOD SYSTEM';
 
   function loadSpriteSheet(src){
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
     // 9.1: cache-bust sprite sheets so Vercel/browser cannot show an older invisible asset.
-    img.src = src + '?v=character-select-14';
+    img.src = src + '?v=arena-flow-17';
     return img;
   }
 
@@ -4183,6 +4355,13 @@ body.arena-select-open .arena-select{
     fight5EnemyName: document.getElementById('fight5EnemyName'),
     fight5EnemyStyle: document.getElementById('fight5EnemyStyle'),
     fight5ArenaName: document.getElementById('fight5ArenaName'),
+    arenaMoodBadge17: document.getElementById('arenaMoodBadge17'),
+    arenaMoodName17: document.getElementById('arenaMoodName17'),
+    arenaMoodText17: document.getElementById('arenaMoodText17'),
+    arenaIntro17: document.getElementById('arenaIntro17'),
+    arenaIntroName17: document.getElementById('arenaIntroName17'),
+    arenaIntroQuote17: document.getElementById('arenaIntroQuote17'),
+    asStageFx17: document.getElementById('asStageFx17'),
     pauseBtn: document.getElementById('pauseBtn'),
     pauseOverlay: document.getElementById('pauseOverlay'),
     resumeBtn: document.getElementById('resumeBtn'),
@@ -4263,11 +4442,11 @@ body.arena-select-open .arena-select{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '16.0 ARENA FLOW';
-  const AI_COMBOS_PATCH = '16.0 ARENA FLOW';
-  const ULTIMATE_FINISHER_PATCH = '16.0 ARENA FLOW';
-  const CHARACTER_SELECT_PATCH = '16.0 ARENA FLOW';
-  const ARENA_SELECT_PATCH = '16.0 PREMIUM ARENA FLOW';
+  const REAL_PHYSICS_PATCH = '17.0 ARENA MOOD SYSTEM';
+  const AI_COMBOS_PATCH = '17.0 ARENA MOOD SYSTEM';
+  const ULTIMATE_FINISHER_PATCH = '17.0 ARENA MOOD SYSTEM';
+  const CHARACTER_SELECT_PATCH = '17.0 ARENA MOOD SYSTEM';
+  const ARENA_SELECT_PATCH = '17.0 PREMIUM ARENA MOOD SYSTEM';
 
   const AI_PROFILES = {
     easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
@@ -4732,7 +4911,7 @@ body.arena-select-open .arena-select{
     updateComboTag();
     syncUltimateButton();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, (player?.name || 'Fighter') + ' VS ' + (enemy?.name || 'Enemy'));
+    showCallout('ROUND ' + roundIndex, (contentArena()?.title || 'Arena') + ' · ' + (player?.name || 'Fighter') + ' VS ' + (enemy?.name || 'Enemy'));
     if (roundIntroTimer) clearTimeout(roundIntroTimer);
     roundIntroTimer = window.setTimeout(()=>{
       if (gameState === 'fight' && !roundResolving) { showCallout('FIGHT', 'Make every hit count'); audio.round(); }
@@ -4848,7 +5027,10 @@ body.arena-select-open .arena-select{
       atmosphere:'Smoke + sparks',
       readability:'Balanced',
       previewClass:'',
-      backgroundType:'black-citadel'
+      backgroundType:'black-citadel',
+      quote:'Darkness answers only strength.',
+      stageFx:'Low smoke, ember sparks, gold moon backlight',
+      moodKey:'citadel'
     },
     infernal_bridge: {
       id:'infernal_bridge',
@@ -4860,7 +5042,10 @@ body.arena-select-open .arena-select{
       atmosphere:'Heat haze + embers',
       readability:'Aggressive',
       previewClass:'infernal',
-      backgroundType:'infernal-bridge'
+      backgroundType:'infernal-bridge',
+      quote:'The bridge burns for the fighter who keeps pressure.',
+      stageFx:'Heat haze, furnace pulses, aggressive ember rain',
+      moodKey:'infernal'
     },
     moon_ritual: {
       id:'moon_ritual',
@@ -4872,7 +5057,10 @@ body.arena-select-open .arena-select{
       atmosphere:'Mist + lunar glow',
       readability:'Technical',
       previewClass:'moon',
-      backgroundType:'moon-ritual'
+      backgroundType:'moon-ritual',
+      quote:'Under the moon, every mistake becomes visible.',
+      stageFx:'Blue ritual fog, lunar bloom, clean silhouette light',
+      moodKey:'moon'
     },
     frozen_throne: {
       id:'frozen_throne',
@@ -4884,7 +5072,10 @@ body.arena-select-open .arena-select{
       atmosphere:'Snow dust + haze',
       readability:'Defensive',
       previewClass:'frozen',
-      backgroundType:'frozen-throne'
+      backgroundType:'frozen-throne',
+      quote:'Cold stone rewards patience and punishes panic.',
+      stageFx:'Snow dust, pale haze, icy edge light',
+      moodKey:'frozen'
     }
   };
 
@@ -4905,6 +5096,169 @@ body.arena-select-open .arena-select{
     updateArenaSelectUI();
     audio.ui();
   }
+
+
+  function arenaMood17(){
+    const meta = arenaSelectMeta(currentArena15());
+    const type = meta.backgroundType || 'black-citadel';
+    const mobile = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const lowPower = mobile || w < 760 || ((navigator.deviceMemory || 8) <= 4);
+    const mood = {
+      id: meta.id || 'black_citadel',
+      key: meta.moodKey || 'citadel',
+      title: meta.title || 'Black Citadel',
+      accent: meta.accent || '#d9b76a',
+      glow: (meta.accent || '#d9b76a') + '55',
+      lighting: meta.lighting || 'Gold / Ember',
+      atmosphere: meta.atmosphere || 'Smoke + sparks',
+      stageFx: meta.stageFx || 'Cinematic fog, ambient particles, color grade',
+      quote: meta.quote || 'Darkness answers only strength.',
+      type,
+      lowPower,
+      particleCount: lowPower ? 26 : 76,
+      fogCount: lowPower ? 3 : 7
+    };
+
+    if (type === 'infernal-bridge') {
+      mood.gradeA = 'rgba(255,54,23,.24)';
+      mood.gradeB = 'rgba(255,138,36,.12)';
+      mood.floor = 'rgba(255,84,34,.070)';
+      mood.particle = 'rgba(255,112,46,.88)';
+      mood.edge = 'rgba(255,42,20,.16)';
+    } else if (type === 'moon-ritual') {
+      mood.gradeA = 'rgba(80,174,255,.22)';
+      mood.gradeB = 'rgba(126,84,255,.12)';
+      mood.floor = 'rgba(124,194,255,.055)';
+      mood.particle = 'rgba(134,216,255,.82)';
+      mood.edge = 'rgba(68,150,255,.14)';
+    } else if (type === 'frozen-throne') {
+      mood.gradeA = 'rgba(190,246,255,.22)';
+      mood.gradeB = 'rgba(180,206,255,.12)';
+      mood.floor = 'rgba(200,242,255,.070)';
+      mood.particle = 'rgba(230,252,255,.86)';
+      mood.edge = 'rgba(196,245,255,.16)';
+    } else {
+      mood.gradeA = 'rgba(217,183,106,.16)';
+      mood.gradeB = 'rgba(255,80,40,.09)';
+      mood.floor = 'rgba(210,190,150,.045)';
+      mood.particle = 'rgba(255,218,142,.82)';
+      mood.edge = 'rgba(217,183,106,.11)';
+    }
+    return mood;
+  }
+
+  function syncArenaMood17(){
+    const mood = arenaMood17();
+    const root = document.documentElement;
+    root.style.setProperty('--arena17-accent', mood.accent);
+    root.style.setProperty('--arena17-glow', mood.glow);
+    document.body.setAttribute('data-arena-mood', mood.key);
+
+    if (ui.arenaMoodName17) ui.arenaMoodName17.textContent = mood.title;
+    if (ui.arenaMoodText17) ui.arenaMoodText17.textContent = `${mood.atmosphere} · ${mood.lighting}`;
+    if (ui.arenaMoodBadge17) ui.arenaMoodBadge17.style.borderColor = mood.accent + '55';
+    if (ui.arenaIntroName17) ui.arenaIntroName17.textContent = mood.title;
+    if (ui.arenaIntroQuote17) ui.arenaIntroQuote17.textContent = mood.quote;
+    if (ui.asStageFx17) ui.asStageFx17.innerHTML = `<b>17.0 Stage FX:</b> ${mood.stageFx}`;
+  }
+
+  function showArenaIntro17(){
+    syncArenaMood17();
+    const overlay = ui.arenaIntro17 || document.getElementById('arenaIntro17');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden','false');
+    overlay.classList.remove('show');
+    void overlay.offsetWidth;
+    requestAnimationFrame(()=>overlay.classList.add('show'));
+    window.setTimeout(()=>{
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.style.display = 'none';
+    }, 980);
+  }
+
+  function drawArenaMood17Layer(layer='back'){
+    if (gameState !== 'fight' && gameState !== 'roundEnd') return;
+    const mood = arenaMood17();
+    const t = performance.now() / 1000;
+    const r = EXACT_BLACK_CITADEL_ARENA ? getExactArenaStageRect() : { x:0, y:0, w, h };
+
+    ctx.save();
+    if (layer === 'back') {
+      ctx.globalCompositeOperation = 'screen';
+
+      const moon = ctx.createRadialGradient(r.x + r.w*.50, r.y + r.h*.22, 0, r.x + r.w*.50, r.y + r.h*.25, r.w*.48);
+      moon.addColorStop(0, mood.gradeA);
+      moon.addColorStop(.42, mood.gradeB);
+      moon.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = moon;
+      ctx.fillRect(0,0,w,h);
+
+      const edge = ctx.createLinearGradient(0,0,w,0);
+      edge.addColorStop(0, mood.edge);
+      edge.addColorStop(.28, 'rgba(0,0,0,0)');
+      edge.addColorStop(.72, 'rgba(0,0,0,0)');
+      edge.addColorStop(1, mood.type === 'infernal-bridge' ? 'rgba(255,128,48,.12)' : mood.edge);
+      ctx.fillStyle = edge;
+      ctx.fillRect(0,0,w,h);
+
+      const floor = ctx.createLinearGradient(0,groundY - h*.18,0,h);
+      floor.addColorStop(0,'rgba(0,0,0,0)');
+      floor.addColorStop(.45,mood.floor);
+      floor.addColorStop(1,'rgba(0,0,0,.26)');
+      ctx.fillStyle = floor;
+      ctx.fillRect(0,Math.max(0,groundY-h*.22),w,h);
+
+      // Slow cinematic light pulse, unique per selected stage.
+      const pulse = Math.sin(t * (mood.type === 'infernal-bridge' ? 2.4 : .85)) * .5 + .5;
+      ctx.globalAlpha = (mood.lowPower ? .055 : .095) + pulse * (mood.type === 'infernal-bridge' ? .055 : .025);
+      ctx.fillStyle = mood.gradeA;
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.restore();
+      return;
+    }
+
+    // Foreground atmosphere: particles/fog drawn after fighters for premium depth.
+    ctx.globalCompositeOperation = 'screen';
+    const fogN = mood.fogCount;
+    for (let i=0;i<fogN;i++){
+      const drift = mood.type === 'frozen-throne' ? 10 : mood.type === 'infernal-bridge' ? 28 : 18;
+      const x = r.x - r.w*.10 + ((i*.31*r.w + t*drift*(1+i*.18)) % (r.w*1.20));
+      const y = groundY - h*(.12 + (i%3)*.045) + Math.sin(t*.7+i)*9;
+      const rad = r.w * (.16 + (i%3)*.025);
+      const fog = ctx.createRadialGradient(x,y,0,x,y,rad);
+      fog.addColorStop(0, mood.type === 'infernal-bridge' ? 'rgba(255,90,38,.060)' : mood.type === 'frozen-throne' ? 'rgba(210,250,255,.068)' : mood.type === 'moon-ritual' ? 'rgba(120,196,255,.060)' : 'rgba(214,190,150,.052)');
+      fog.addColorStop(.42, 'rgba(255,255,255,.018)');
+      fog.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = fog;
+      ctx.beginPath();
+      ctx.arc(x,y,rad,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    const n = mood.particleCount;
+    for (let i=0;i<n;i++){
+      const seed = i * 131;
+      const speed = mood.type === 'infernal-bridge' ? 52 : mood.type === 'frozen-throne' ? 18 : 30;
+      const x = r.x - 80 + ((seed + t*speed + Math.sin(i*2.1)*55) % (r.w + 160));
+      const upward = mood.type === 'infernal-bridge' || mood.type === 'black-citadel';
+      const yRaw = (seed*1.71 + t*(upward ? 36 : 17)) % Math.max(1,r.h);
+      const y = upward ? (r.y + r.h - yRaw) : (r.y + yRaw);
+      const s = mood.type === 'frozen-throne' ? (1.0 + (i%4)*.55) : (.65 + (i%5)*.42);
+      ctx.globalAlpha = mood.lowPower ? .10 : (mood.type === 'moon-ritual' ? .11 : .17);
+      ctx.fillStyle = i % 5 === 0 ? '#fff4bf' : mood.particle;
+      if (mood.type === 'frozen-throne') {
+        ctx.fillRect(x, y, s*.95, s*.95);
+      } else {
+        ctx.beginPath();
+        ctx.arc(x,y,s,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
 
   function updateArenaSelectUI(){
     const id = currentArena15();
@@ -4928,6 +5282,7 @@ body.arena-select-open .arena-select{
       preview.style.setProperty('--as-glow', meta.accent + '55');
     }
     if (ui?.fight5ArenaName) ui.fight5ArenaName.textContent = meta.title.toUpperCase();
+    syncArenaMood17();
     updateArenaFlowSummary16();
   }
 
@@ -4951,6 +5306,7 @@ body.arena-select-open .arena-select{
     set('ar16Player', p.name || 'Raven');
     set('ar16Enemy', e.name || 'Iron Warden');
     set('ar16Mood', `${arena.lighting || 'Gold / Ember'} · ${arena.atmosphere || 'Smoke + sparks'} · ${diff}`);
+    syncArenaMood17();
   }
 
   function showArenaReveal16(done){
@@ -5215,6 +5571,7 @@ body.arena-select-open .arena-select{
 
 
   function newMatch(){
+    syncArenaMood17();
     matchFinalized = false;
     roundResolving = false;
     if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
@@ -5240,6 +5597,7 @@ body.arena-select-open .arena-select{
       ui.menu.style.setProperty('display', 'none', 'important');
       document.body.classList.remove('menu-leaving');
       showFight5VsIntro();
+      showArenaIntro17();
       const arena = contentArena();
       showCallout('ROUND ' + roundIndex, (arena?.title || 'Dark fortress arena'));
     }, document.body.classList.contains('real-art-v4') ? 260 : 0);
@@ -7996,6 +8354,7 @@ body.arena-select-open .arena-select{
       ctx.translate(-w*.5, -h*.52);
     }
     drawArena();
+    drawArenaMood17Layer('back');
     ctx.restore();
 
     let cameraShift = 0;
@@ -8018,6 +8377,7 @@ body.arena-select-open .arena-select{
     drawFighter(first);
     drawFighter(second);
     drawParticles();
+    drawArenaMood17Layer('front');
     ctx.restore();
 
     drawVignette();
@@ -8052,7 +8412,7 @@ body.arena-select-open .arena-select{
       roundFreeze = 0;
       if (ui && ui.debug) {
         ui.debug.style.display = 'block';
-        ui.debug.innerHTML = 'ARENA FLOW 16.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+        ui.debug.innerHTML = 'ARENA FLOW 17.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
       }
     }
     raf = requestAnimationFrame(loop);
