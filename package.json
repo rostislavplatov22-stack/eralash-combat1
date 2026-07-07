@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-flow-16-1-ready",
-  "version": "16.1.0",
+  "name": "eralash-combat-arena-flow-16-2-ready",
+  "version": "16.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Flow 16.1: Start Fight clickmap hotfix for Character Select, Arena Select and real DOM menu buttons."
+  "description": "EraLash Combat Arena Flow 16.2: hard start-gate hotfix for painted real-art Start Fight, Character Select, Arena Select and fight launch."
 }
