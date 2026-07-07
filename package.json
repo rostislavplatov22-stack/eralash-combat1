@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-cinematic-art-fighter-identity-24-ready",
-  "version": "24.0.0",
+  "name": "eralash-combat-arena-expansion-pack-25-ready",
+  "version": "25.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Cinematic Art & Fighter Identity Upgrade 24.0: cinematic arena artwork, real stage art in fight, premium fighter identity portraits, VS presentation and cinematic battle intro."
+  "description": "EraLash Combat Arena Expansion Pack 25.0: four new premium arenas with cinematic stage art, arena select integration, in-fight stage identity, atmosphere FX and preserved combat presentation."
 }

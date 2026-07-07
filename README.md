@@ -447,3 +447,17 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## Arena Select Luxury Rebuild 23.0
 
 Полный redesign выбора арены: вместо дешёвой сетки 2×2 добавлен cinematic hero-preview выбранной арены, compact arena rail, premium stage key art, чистая типографика, reduced UI noise и mobile-safe action flow.
+
+
+---
+
+## Arena Expansion Pack 25.0
+
+Добавлено 4 новые premium-арены:
+
+- Storm Sanctuary
+- Sunken Temple
+- Iron Foundry
+- Crimson Garden
+
+Теперь arena roster расширен до 8 сцен. Новые арены подключены к Arena Select, cinematic intro, in-fight stage art и arena mood FX. Версия сохраняет Luxury Arena Select 23.0 и Cinematic Art / Fighter Identity 24.0.
