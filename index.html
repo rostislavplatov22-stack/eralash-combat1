@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Physics & Character Visual 20.0 premium body-weight physics, fighter readability and hit feedback system, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Physics & Character Visual 20.1 readability hotfix with cleaner fighters and visible attack arcs, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Physics & Character Visual 20.0</title>
+  <title>EraLash Combat — Character Readability Hotfix 20.1</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -4849,11 +4849,12 @@ body.arena-select-open .arena-select{
   }
 
   function fighterSpacing(f, opponent){
-    const own = Math.max(54, (f.collisionW || f.w || 90) * (USE_PREMIUM_FIGHTER_ART ? .60 : .56));
-    const other = Math.max(54, (opponent.collisionW || opponent.w || 90) * (USE_PREMIUM_FIGHTER_ART ? .60 : .56));
-    const stance = ((f.stanceWidth20 || 1) + (opponent.stanceWidth20 || 1)) * (USE_PREMIUM_FIGHTER_ART ? 18 : 4);
-    const pressureGap = (f.state === 'attack' || opponent.state === 'attack') ? 18 : 30;
-    return own + other + (USE_PREMIUM_FIGHTER_ART ? 92 : 20) + stance + pressureGap;
+    const own = Math.max(50, (f.collisionW || f.w || 90) * (USE_PREMIUM_FIGHTER_ART ? .56 : .56));
+    const other = Math.max(50, (opponent.collisionW || opponent.w || 90) * (USE_PREMIUM_FIGHTER_ART ? .56 : .56));
+    const stance = ((f.stanceWidth20 || 1) + (opponent.stanceWidth20 || 1)) * (USE_PREMIUM_FIGHTER_ART ? 11 : 4);
+    const pressureGap = (f.state === 'attack' || opponent.state === 'attack') ? 10 : 18;
+    // 20.1: closer duel spacing. 20.0 kept fighters too far apart, so hits looked invisible.
+    return own + other + (USE_PREMIUM_FIGHTER_ART ? 58 : 20) + stance + pressureGap;
   }
 
   function isAttackActive(f){
@@ -7070,8 +7071,8 @@ body.arena-select-open .arena-select{
       ctx.globalCompositeOperation = 'source-over';
       const floorFog = ctx.createLinearGradient(0, groundY - h*.12, 0, h);
       floorFog.addColorStop(0, 'rgba(0,0,0,0)');
-      floorFog.addColorStop(.35, mobile ? 'rgba(7,9,12,.14)' : 'rgba(7,9,12,.22)');
-      floorFog.addColorStop(1, mobile ? 'rgba(0,0,0,.20)' : 'rgba(0,0,0,.30)');
+      floorFog.addColorStop(.35, mobile ? 'rgba(7,9,12,.08)' : 'rgba(7,9,12,.13)');
+      floorFog.addColorStop(1, mobile ? 'rgba(0,0,0,.13)' : 'rgba(0,0,0,.19)');
       ctx.fillStyle = floorFog;
       ctx.fillRect(0, groundY - h*.14, w, h*.20);
       if (!mobile) {
@@ -8083,6 +8084,77 @@ body.arena-select-open .arena-select{
     return Math.floor(((performance.now()/1000 + (f.id === 'enemy' ? .23 : 0)) * (anim.fps || 8)) % frames);
   }
 
+
+  function drawReadableAttackArc20_1(x, y, spriteW, spriteH, dir, atkName, attackP, active, color, isWardenVisual=false){
+    if (!atkName) return;
+    const hexA = (c,a)=> (typeof c === 'string' && c[0] === '#' && c.length === 7) ? c + a : c;
+    const p = clamp(attackP || 0, 0, 1);
+    const sweep = Math.sin(p * Math.PI);
+    const wind = clamp((p - .05) / .55, 0, 1);
+    const typePower = atkName === 'ultimate' ? 1.45 : atkName === 'special' ? 1.22 : atkName === 'heavy' ? 1.05 : .82;
+    const reach = spriteW * (atkName === 'ultimate' ? .82 : atkName === 'special' ? .68 : atkName === 'heavy' ? .58 : .46);
+    const startX = x + dir * spriteW * (isWardenVisual ? .17 : .20);
+    const startY = y - spriteH * (isWardenVisual ? .50 : .54);
+    const endX = startX + dir * reach * (.72 + wind * .34);
+    const endY = startY - spriteH * (.11 + .12 * sweep);
+    const midX = startX + dir * reach * .42;
+    const midY = startY - spriteH * (.24 + .10 * sweep);
+    const c = color || (isWardenVisual ? '#56caff' : '#ff3548');
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    // 20.1: very readable front strike. This is intentionally drawn over the fighter,
+    // so the player can instantly see when L/H/SP/ULT is happening.
+    ctx.globalAlpha = active ? .98 : .55;
+    ctx.strokeStyle = active ? '#fff7dd' : hexA(c,'dd');
+    ctx.shadowColor = active ? '#fff7dd' : hexA(c,'dd');
+    ctx.shadowBlur = active ? 38 : 22;
+    ctx.lineWidth = (atkName === 'ultimate' ? 20 : atkName === 'special' ? 16 : atkName === 'heavy' ? 13 : 9) * typePower;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(startX - dir * spriteW * .05, startY + spriteH * .05);
+    ctx.quadraticCurveTo(midX, midY, endX, endY);
+    ctx.stroke();
+
+    // Wide colored ribbon behind the white core.
+    ctx.globalAlpha = active ? .36 : .22;
+    ctx.strokeStyle = hexA(c,'bb');
+    ctx.shadowColor = hexA(c,'cc');
+    ctx.shadowBlur = 30;
+    ctx.lineWidth *= 2.5;
+    ctx.beginPath();
+    ctx.moveTo(startX - dir * spriteW * .02, startY + spriteH * .08);
+    ctx.quadraticCurveTo(midX + dir*spriteW*.05, midY - spriteH*.06, endX + dir*spriteW*.05, endY + spriteH*.01);
+    ctx.stroke();
+
+    // Strike tip / hand flare.
+    ctx.globalAlpha = active ? .85 : .34;
+    const flare = ctx.createRadialGradient(endX, endY, 0, endX, endY, spriteW * (active ? .18 : .12));
+    flare.addColorStop(0, '#fff9e8');
+    flare.addColorStop(.24, hexA(c,'e8'));
+    flare.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = flare;
+    ctx.beginPath();
+    ctx.ellipse(endX, endY, spriteW * (active ? .16 : .10), spriteH * (active ? .075 : .05), 0, 0, Math.PI*2);
+    ctx.fill();
+
+    if (active && (atkName === 'heavy' || atkName === 'special' || atkName === 'ultimate')) {
+      ctx.globalAlpha = .60;
+      ctx.strokeStyle = '#fff3d1';
+      ctx.shadowBlur = 18;
+      ctx.lineWidth = 3;
+      for (let i=0;i<3;i++){
+        const off = (i-1) * spriteH * .055;
+        ctx.beginPath();
+        ctx.moveTo(endX - dir*spriteW*.18, endY + off);
+        ctx.lineTo(endX + dir*spriteW*.14, endY - off*.45);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
   function drawSpriteSheetFighter(f){
     if (!USE_SPRITE_FIGHTERS) return false;
     const anim = spriteAnimForFighter(f);
@@ -8107,14 +8179,14 @@ body.arena-select-open .arena-select{
     const attackPunch = attacking ? Math.sin(attackP * Math.PI) : 0;
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
 
-    let spriteH = coarse ? clamp(h * .44, 310, 455) : clamp(h * (isWardenVisual ? .54 : .50), 390, isWardenVisual ? 560 : 520);
+    let spriteH = coarse ? clamp(h * .46, 325, 470) : clamp(h * (isWardenVisual ? .575 : .535), 415, isWardenVisual ? 590 : 552);
     spriteH *= anim.scale || 1;
     if (attacking) spriteH *= atkName === 'ultimate' ? 1.04 : 1.015;
     let spriteW = spriteH * (fw / Math.max(1, fh));
 
     // Large frames from generated sheets can contain extra horizontal padding.
     // Keep visible size stable so the fighters do not become giant pasted posters.
-    const maxW = coarse ? w * .38 : w * (isWardenVisual ? .34 : .32);
+    const maxW = coarse ? w * .40 : w * (isWardenVisual ? .365 : .345);
     if (spriteW > maxW) {
       const k = maxW / spriteW;
       spriteW *= k;
@@ -8144,6 +8216,21 @@ body.arena-select-open .arena-select{
     ctx.fill();
     ctx.restore();
 
+    // 20.1 readability lift: controlled rim glow behind the body.
+    // It separates the armor silhouette from the dark citadel without making a cheap neon sticker.
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = isWardenVisual ? .18 : .20;
+    const bodyLift = ctx.createRadialGradient(x, y - spriteH*.52, 0, x, y - spriteH*.52, spriteW*.56);
+    bodyLift.addColorStop(0, visualAccent + '55');
+    bodyLift.addColorStop(.42, visualAccent + '1f');
+    bodyLift.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bodyLift;
+    ctx.beginPath();
+    ctx.ellipse(x, y - spriteH*.54, spriteW*.42, spriteH*.36, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
     // Attack and dodge afterimage.
     if (attacking || f.afterImage > 0) {
       ctx.save();
@@ -8167,8 +8254,8 @@ body.arena-select-open .arena-select{
     ctx.shadowColor = visualAccent;
     ctx.shadowBlur = 24;
     if (hurt) ctx.filter = 'brightness(1.75) contrast(1.2) saturate(1.25)';
-    else if (blocking) ctx.filter = 'brightness(1.35) contrast(1.15) saturate(1.22)';
-    else ctx.filter = 'brightness(1.28) contrast(1.18) saturate(1.18)';
+    else if (blocking) ctx.filter = 'brightness(1.42) contrast(1.20) saturate(1.22)';
+    else ctx.filter = 'brightness(1.36) contrast(1.24) saturate(1.18)';
     ctx.drawImage(img, frame * fw, 0, fw, fh, -spriteW*.5, -spriteH, spriteW, spriteH);
     ctx.filter = 'none';
     ctx.shadowBlur = 0;
@@ -8211,6 +8298,8 @@ body.arena-select-open .arena-select{
       ctx.quadraticCurveTo(baseX + dir*reach*.52, baseY - spriteH*.32, baseX + dir*reach*1.12, baseY + spriteH*.01);
       ctx.stroke();
       ctx.restore();
+
+      drawReadableAttackArc20_1(x, y, spriteW, spriteH, dir, atkName, attackP, active, c, isWardenVisual);
     }
 
     // Nameplate.
@@ -8280,7 +8369,7 @@ body.arena-select-open .arena-select{
     const attackSquashX = attacking ? 1 + attackPunch * (heavyBody20 ? .055 : .082) : 1;
     const attackSquashY = attacking ? 1 - attackPunch * (heavyBody20 ? .025 : .040) : 1;
 
-    let spriteH = coarse ? clamp(h * .40, 245, 405) : clamp(h * .47, 350, 490);
+    let spriteH = coarse ? clamp(h * .42, 260, 425) : clamp(h * .50, 372, 535);
     if (isEnemy) spriteH *= coarse ? 1.06 : 1.09;
     if (heavyBody20) spriteH *= coarse ? 1.035 : 1.055;
     else spriteH *= coarse ? .995 : 1.015;
@@ -8374,11 +8463,11 @@ body.arena-select-open .arena-select{
     // Draw full body character art.
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(dir * strideSquashX * attackSquashX * breatheSquashX, strideSquashY * attackSquashY * breatheSquashY);
-    ctx.rotate(lean);
-    if (hurt || damage20 > .05) {
-      ctx.filter = `brightness(${1.08 + damage20*.34}) saturate(${1.08 + damage20*.22}) contrast(${1.02 + damage20*.10})`;
-    }
+    ctx.scale(dir * (1 + (strideSquashX-1)*.35 + (attackSquashX-1)*.28 + (breatheSquashX-1)*.18), 1 + (strideSquashY-1)*.35 + (attackSquashY-1)*.22 + (breatheSquashY-1)*.12);
+    ctx.rotate(lean * .42);
+    ctx.filter = hurt || damage20 > .05
+      ? `brightness(${1.16 + damage20*.34}) saturate(${1.08 + damage20*.22}) contrast(${1.08 + damage20*.10})`
+      : 'brightness(1.12) contrast(1.14) saturate(1.06)';
     const drawX = -finalW*.5 + xOffset;
     const drawY = -finalH;
     ctx.drawImage(img, drawX, drawY, finalW, finalH);
@@ -8427,6 +8516,10 @@ body.arena-select-open .arena-select{
       ctx.fill();
     }
     ctx.restore();
+
+    if (attacking) {
+      drawReadableAttackArc20_1(x, y, finalW, finalH, dir, atkName, tAttack, active, coreB, heavyBody20);
+    }
 
     // Energy nodes / visor pulse on top for gameplay readability.
     ctx.save();
@@ -9135,10 +9228,12 @@ body.arena-select-open .arena-select{
     const first = player.x < enemy.x ? player : enemy;
     const second = first === player ? enemy : player;
     drawCombatDepth20Layer('front');
+    // 20.1: atmosphere stays behind the fighters, impact particles stay in front.
+    // This fixes the "fighters became muddy" look from 20.0.
+    drawArenaMood17Layer('front');
     drawFighter(first);
     drawFighter(second);
     drawParticles();
-    drawArenaMood17Layer('front');
     ctx.restore();
 
     drawVignette();

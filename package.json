@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-physics-character-20-ready",
-  "version": "20.0.0",
+  "name": "eralash-combat-physics-character-20-1-visual-hitfix-ready",
+  "version": "20.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Physics & Character Visual 20.0: adds body-weight combat physics, enhanced ground friction, stronger separation, contact shadows, rim lights, breathing poses, fighter role visual tuning and mobile-safe character clarity."
+  "description": "EraLash Combat Physics & Character Visual 20.1: fixes 20.0 character readability, restores cleaner fighter silhouettes, improves spacing and adds highly visible attack arcs / strike feedback."
 }
