@@ -1,3 +1,22 @@
+# EraLash Combat — Arena Select 15.2 Start Fix
+
+Исправляет dead start bug после 15.1.
+
+## Что исправлено
+
+- кнопка «Начать бой» больше не зависит от старого clickmap;
+- добавлена видимая premium-кнопка `Начать бой · выбрать персонажа`;
+- любой Start принудительно открывает Character Select;
+- Character Select открывается даже если старый `gameState` завис в неверном значении;
+- после выбора персонажа открывается Arena Select с 4 аренами;
+- только после выбора арены запускается бой;
+- добавлены fallback handlers: click / pointerup / touchend / document delegate;
+- добавлена метка FLOW 15.2.
+
+## Проверка
+
+Главное меню → Начать бой → Character Select → Далее → Arena Select → Start Fight.
+
 # EraLash Combat — Arena Select 15.1 Flow Lock
 
 # EraLash Combat — Premium Character Select 14.0

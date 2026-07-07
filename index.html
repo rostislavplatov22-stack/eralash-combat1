@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Arena Select 15.1 Flow Lock</title>
+  <title>EraLash Combat — Arena Select 15.2 Start Fix</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3379,7 +3379,63 @@ body.is-fighting .flow151-badge,
 body.character-select-open .flow151-badge,
 body.arena-select-open .flow151-badge{opacity:.22}
 
-</style>
+
+    /* Arena Select 15.2 — visible hard start bridge.
+       This button is intentionally above the old cinematic clickmap so Start can never become a dead zone. */
+    .flow152-force-start{
+      position:fixed;
+      left:50%;
+      bottom:calc(22px + env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      z-index:72;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:min(560px, calc(100vw - 28px));
+      justify-content:center;
+      padding:16px 22px;
+      border:1px solid rgba(255,220,140,.68);
+      border-radius:22px;
+      background:
+        linear-gradient(180deg,rgba(255,231,166,.98) 0%,rgba(193,130,40,.97) 48%,rgba(82,40,8,.98) 100%);
+      color:#fff7df;
+      font:900 clamp(14px,2.8vw,20px)/1.05 Inter,Arial,sans-serif;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.08) inset,
+        0 18px 44px rgba(0,0,0,.48),
+        0 0 34px rgba(217,65,53,.28),
+        0 0 42px rgba(217,183,106,.22);
+      text-shadow:0 2px 12px rgba(0,0,0,.55);
+      cursor:pointer;
+      pointer-events:auto;
+      touch-action:manipulation;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .flow152-force-start::before{
+      content:"";
+      width:10px;height:10px;border-radius:999px;
+      background:#fff1b8;
+      box-shadow:0 0 20px rgba(255,229,143,.95),0 0 34px rgba(203,39,41,.42);
+    }
+    .flow152-force-start:active{transform:translateX(-50%) translateY(2px) scale(.99)}
+    body.is-fighting .flow152-force-start,
+    body.character-select-open .flow152-force-start,
+    body.arena-select-open .flow152-force-start,
+    body.result-open .flow152-force-start{display:none!important}
+    @media (max-width:720px){
+      .flow152-force-start{
+        bottom:calc(12px + env(safe-area-inset-bottom));
+        min-width:calc(100vw - 22px);
+        border-radius:18px;
+        padding:15px 14px;
+        letter-spacing:.1em;
+      }
+    }
+
+  </style>
 </head>
 <body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14">
 <div id="app">
@@ -3689,7 +3745,7 @@ body.arena-select-open .flow151-badge{opacity:.22}
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Далее: выбрать арену</button>
           </div>
-          <div class="cs-locked-note">15.1 фиксирует pre-fight flow: сначала персонаж, потом арена. Выбери арену перед боем: свет, атмосфера и stage tone меняются без поломки боёвки.</div>
+          <div class="cs-locked-note">15.2 фиксирует кнопку Start и pre-fight flow: сначала персонаж, потом арена. Выбери арену перед боем: свет, атмосфера и stage tone меняются без поломки боёвки.</div>
         </aside>
       </div>
     </div>
@@ -3700,7 +3756,7 @@ body.arena-select-open .flow151-badge{opacity:.22}
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">Premium Arena Select · 15.1</div>
+          <div class="as-kicker">Premium Arena Select · 15.2</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
           <p class="as-subtitle">Арена меняет атмосферу боя: цвет света, фон, эффекты воздуха, настроение VS-screen и читаемость персонажей.</p>
         </div>
@@ -3759,7 +3815,7 @@ body.arena-select-open .flow151-badge{opacity:.22}
             <button id="asBackBtn" class="as-back" type="button">Назад</button>
             <button id="asStartFightBtn" class="as-start" type="button">Start Fight</button>
           </div>
-          <div class="as-note">15.1 меняет stage direction без риска сломать sprite combat, AI, ultimate, раунды и физику 11.0.</div>
+          <div class="as-note">15.2 меняет stage direction без риска сломать sprite combat, AI, ultimate, раунды и физику 11.0.</div>
         </aside>
       </div>
     </div>
@@ -3768,7 +3824,8 @@ body.arena-select-open .flow151-badge{opacity:.22}
 
 
 
-  <div id="flow151Badge" class="flow151-badge" aria-hidden="true">FLOW 15.1 · CHARACTER → ARENA → FIGHT</div>
+  <div id="flow151Badge" class="flow151-badge" aria-hidden="true">FLOW 15.2 · CHARACTER → ARENA → FIGHT</div>
+  <button id="flow152ForceStart" class="flow152-force-start" type="button">Начать бой · выбрать персонажа</button>
 
   <div id="result" class="result fight5-result" style="display:none">
     <div class="menu-panel">
@@ -4893,51 +4950,82 @@ body.arena-select-open .flow151-badge{opacity:.22}
 
 
   function startPreFightFlow15_1(source='main_start'){
-    // Arena Select 15.1: hard route guard.
-    // Every public "Start" entry MUST go through:
-    // Main Menu -> Character Select -> Arena Select -> Fight.
-    if (gameState === 'fight' || gameState === 'paused') return;
+    // Arena Select 15.2: hard Start bridge.
+    // This function never depends on old clickmap coordinates or a fragile gameState check.
+    return forceOpenCharacterSelect15_2(source);
+  }
 
-    try { audio.ensure(); audio.ui(); } catch (_) {}
+  function forceOpenCharacterSelect15_2(source='start_bridge'){
+    try { audio?.ensure?.(); audio?.ui?.(); } catch (_) {}
     try { setPaused(false, true); } catch (_) {}
-    if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
+    try { if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; } } catch (_) {}
 
+    // Force the app back to a clean menu routing state, then show Character Select.
     gameState = 'menu';
     roundResolving = false;
     matchFinalized = false;
 
     const cs = document.getElementById('characterSelect');
     const as = document.getElementById('arenaSelect');
+    const result = document.getElementById('result');
+    const menu = document.getElementById('menu');
+    const badge = document.getElementById('flow151Badge');
+
     if (as) {
       as.classList.remove('show');
       as.setAttribute('aria-hidden','true');
       as.style.display = 'none';
     }
-    if (cs) {
-      cs.classList.remove('show');
-      cs.setAttribute('aria-hidden','true');
-      cs.style.display = 'none';
+    if (result) result.style.display = 'none';
+    if (menu) {
+      menu.removeAttribute('aria-hidden');
+      menu.style.removeProperty('display');
     }
 
     document.body.classList.remove(
       'is-fighting','fight-entering','menu-leaving','menu-returning',
-      'arena-select-open','character-select-open'
+      'arena-select-open','result-open'
     );
 
-    if (ui?.result) ui.result.style.display = 'none';
-    if (ui?.menu) {
-      ui.menu.removeAttribute('aria-hidden');
-      ui.menu.style.removeProperty('display');
+    if (!cs) {
+      console.error('Arena Select 15.2: characterSelect overlay missing');
+      if (badge) badge.textContent = 'FLOW 15.2 ERROR · CHARACTER SELECT MISSING';
+      return false;
+    }
+
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      const savedDiff = currentDifficulty14();
+      contentBundle.balance.aiDifficulty = difficultyToValue(savedDiff);
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      saveContentState();
+    } catch (err) {
+      console.warn('Arena Select 15.2: content state sync failed, opening UI anyway', err);
     }
 
     try { hideTelegramMainButton(); } catch (_) {}
-    trackEvent('pre_fight_flow_open', { source, patch: 'ARENA_SELECT_15_1_FLOW_LOCK' });
 
-    window.setTimeout(() => openCharacterSelect(source), 25);
+    cs.style.setProperty('display','flex','important');
+    cs.style.setProperty('z-index','9998','important');
+    cs.style.pointerEvents = 'auto';
+    cs.setAttribute('aria-hidden','false');
+    document.body.classList.add('character-select-open');
+    requestAnimationFrame(() => {
+      cs.classList.add('show');
+      try { updateCharacterSelectUI(); } catch (err) { console.warn('Arena Select 15.2: character UI update failed', err); }
+    });
+
+    if (badge) badge.textContent = 'FLOW 15.2 · CHARACTER SELECT OPEN';
+    try { trackEvent('pre_fight_flow_open', { source, patch: 'ARENA_SELECT_15_2_START_FIX' }); } catch (_) {}
+    return true;
   }
 
   function openCharacterSelect(source='menu'){
-    if (gameState !== 'menu' && gameState !== 'result') return;
+    // 15.2: selection must open even if old UI left gameState in a stale value.
+    if (gameState !== 'menu' && gameState !== 'result') gameState = 'menu';
     contentBundle.balance = contentBundle.balance || {};
     const savedDiff = currentDifficulty14();
     contentBundle.balance.aiDifficulty = difficultyToValue(savedDiff);
@@ -4990,11 +5078,21 @@ body.arena-select-open .flow151-badge{opacity:.22}
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', (event) => {
-        if (gameState !== 'menu') return;
         event.preventDefault();
-        event.stopImmediatePropagation();
-        startPreFightFlow15_1(source);
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+        forceOpenCharacterSelect15_2(source);
       }, true);
+      el.addEventListener('pointerup', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        forceOpenCharacterSelect15_2(source + '_pointer');
+      }, { capture:true, passive:false });
+      el.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        forceOpenCharacterSelect15_2(source + '_touch');
+      }, { capture:true, passive:false });
     };
 
     interceptStart('startBtn', 'main_start_button');
@@ -7943,7 +8041,7 @@ body.arena-select-open .flow151-badge{opacity:.22}
     if (ui.pauseMenuBtn) ui.pauseMenuBtn.addEventListener('click',()=>{ audio.ui(); setPaused(false, true); ui.result.style.display='none'; document.body.classList.remove('is-fighting','fight-entering','menu-leaving'); document.body.classList.add('menu-returning'); ui.menu.removeAttribute('aria-hidden'); ui.menu.style.removeProperty('display'); gameState='menu'; hideTelegramMainButton(); window.setTimeout(()=>document.body.classList.remove('menu-returning'),460); });
 
 
-    ui.startBtn.addEventListener('click',(event)=>{ event.preventDefault(); event.stopPropagation(); startPreFightFlow15_1('main_start_button_bubble_guard'); });
+    if (ui.startBtn) ui.startBtn.addEventListener('click',(event)=>{ event.preventDefault(); event.stopPropagation(); forceOpenCharacterSelect15_2('main_start_button_bubble_guard'); });
     ui.restartBtn.addEventListener('click',()=>{trackEvent('fight_start',{source:'restart'});audio.ui();newMatch();});
     ui.menuBtn.addEventListener('click',()=>{audio.ui();setPaused(false,true);if(roundEndTimer){clearTimeout(roundEndTimer);roundEndTimer=0;}ui.result.style.display='none';document.body.classList.remove('is-fighting','menu-leaving');document.body.classList.add('menu-returning');ui.menu.removeAttribute('aria-hidden');ui.menu.style.removeProperty('display');gameState='menu';hideTelegramMainButton();window.setTimeout(()=>document.body.classList.remove('menu-returning'),460);});
     ui.muteBtn.addEventListener('click',()=>{
@@ -9162,7 +9260,7 @@ function sessionId(){
       { id:'analytics',    x1:1.6,  y1:86.3, x2:21.5, y2:93.3, fn:()=>loadAnalytics() },
 
       // Main and top zones
-      { id:'start',        x1:30.0, y1:72.3, x2:66.4, y2:84.9, fn:()=>{ startPreFightFlow15_1('real_art_clickmap'); } },
+      { id:'start',        x1:30.0, y1:72.3, x2:66.4, y2:84.9, fn:()=>{ forceOpenCharacterSelect15_2('real_art_clickmap'); } },
       { id:'profileTop',   x1:23.0, y1:1.4,  x2:48.0, y2:7.8,  fn:()=>loadProfilePanel() },
       { id:'settingsTop',  x1:92.0, y1:1.0,  x2:97.7, y2:8.0,  fn:()=>loadSettingsPanel() },
 
@@ -9239,7 +9337,7 @@ function sessionId(){
         }
         if (tg.MainButton) {
           tg.MainButton.setText('ENTER ARENA');
-          tg.MainButton.onClick(()=>{ startPreFightFlow15_1('telegram_main_button'); });
+          tg.MainButton.onClick(()=>{ forceOpenCharacterSelect15_2('telegram_main_button'); });
           // Внутриигровая кнопка Telegram перекрывала нижнюю часть экрана и блокировала прокрутку меню на iPhone.
           // Оставляем собственные premium-кнопки внутри Mini App и скрываем системную MainButton.
           tg.MainButton.hide();
@@ -9959,7 +10057,41 @@ function sessionId(){
   }
 
 
+
+  function bindStartBridge15_2(){
+    const hardStart = document.getElementById('flow152ForceStart');
+    const open = (event, source) => {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      }
+      forceOpenCharacterSelect15_2(source);
+    };
+
+    if (hardStart) {
+      hardStart.addEventListener('click', e => open(e, 'flow152_force_button_click'), { capture:true });
+      hardStart.addEventListener('pointerup', e => open(e, 'flow152_force_button_pointer'), { capture:true, passive:false });
+      hardStart.addEventListener('touchend', e => open(e, 'flow152_force_button_touch'), { capture:true, passive:false });
+    }
+
+    // Last-resort delegate: any visible "start fight" entry opens Character Select.
+    document.addEventListener('click', (event) => {
+      const target = event.target?.closest?.('#startBtn,#realStartZone,#flow152ForceStart,[aria-label="Начать бой"]');
+      if (!target) return;
+      open(event, 'flow152_document_delegate');
+    }, true);
+
+    document.addEventListener('touchend', (event) => {
+      const target = event.target?.closest?.('#startBtn,#realStartZone,#flow152ForceStart,[aria-label="Начать бой"]');
+      if (!target) return;
+      open(event, 'flow152_document_delegate_touch');
+    }, { capture:true, passive:false });
+  }
+
+
   resize();
+  bindStartBridge15_2();
   bindCharacterSelect();
   bindArenaSelect();
   bindControls();
@@ -9968,7 +10100,8 @@ function sessionId(){
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
-  window.eralashStartFight = () => startPreFightFlow15_1('window_api');
+  window.eralashStartFight = () => forceOpenCharacterSelect15_2('window_api');
+  window.eralashOpenCharacterSelect = () => forceOpenCharacterSelect15_2('window_character_select');
   window.eralashOpenArenaSelect = () => openArenaSelect('window_api');
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });
