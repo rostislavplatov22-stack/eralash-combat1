@@ -1,3 +1,7 @@
+# EraLash Combat — Combat Clarity, Animation & Camera 21.0
+
+Рабочая версия 21.0 с readable combat poses, contact-point hit FX, cinematic duel camera, stage clarity cleanup и compact HUD timing.
+
 # EraLash Combat — Premium Character Select 14.0
 
 # CHARACTER SELECT 14.0 — Premium Character Select

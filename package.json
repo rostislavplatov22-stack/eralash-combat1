@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-physics-character-20-1-visual-hitfix-ready",
-  "version": "20.1.0",
+  "name": "eralash-combat-clarity-animation-camera-21-ready",
+  "version": "21.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Physics & Character Visual 20.1: fixes 20.0 character readability, restores cleaner fighter silhouettes, improves spacing and adds highly visible attack arcs / strike feedback."
+  "description": "EraLash Combat Clarity, Animation & Camera Rework 21.0: readable combat poses, contact-point hit FX, cinematic duel camera, stage focus cleanup, compact HUD timing and preserved 20.1 physics/readability."
 }

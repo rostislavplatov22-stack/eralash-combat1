@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Physics & Character Visual 20.1 readability hotfix with cleaner fighters and visible attack arcs, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Clarity, Animation & Camera Rework 21.0: readable combat poses, contact-point hits, cinematic duel camera, cleaner stage focus, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
@@ -4477,6 +4477,17 @@ body.arena-select-open .arena-select{
   let combatPhysics20Meta = '';
   let combatPhysics20Pulse = 0;
   let visualDepth20T = 0;
+  // Combat Clarity, Animation & Camera 21.0 — readable body poses, exact contact hits and cinematic duel framing.
+  let combatClarity21T = 0;
+  let combatClarity21Word = '';
+  let combatClarity21Meta = '';
+  let contactFX21 = [];
+  let stageClarity21IntroT = 0;
+  let cameraDirector21X = 0;
+  let cameraDirector21Y = 0;
+  let cameraDirector21Zoom = 1;
+  let cameraDirector21Punch = 0;
+  let cameraDirector21Lock = 0;
   let comboTrainer19T = 0;
   let comboTrainer19Word = '';
   let comboTrainer19Meta = '';
@@ -5835,6 +5846,12 @@ body.arena-select-open .arena-select{
 
   function newMatch(){
     syncArenaMood17();
+    stageClarity21IntroT = 3.25;
+    combatClarity21T = Math.max(combatClarity21T || 0, .85);
+    combatClarity21Word = 'COMBAT CLARITY 21.0';
+    combatClarity21Meta = 'readable poses · contact camera';
+    contactFX21.length = 0;
+    cameraDirector21Punch = Math.max(cameraDirector21Punch || 0, .22);
     matchFinalized = false;
     roundResolving = false;
     if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
@@ -6297,6 +6314,7 @@ body.arena-select-open .arena-select{
     const comboBoost19 = comboName ? (comboName === 'EXECUTION STRING' ? 1.10 : 1.06) : 1;
     f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type, dir: f.dir, whiffed: false, comboName, comboBoost19 };
     f.attackHasHit = false;
+    triggerAttackPose21(f, type);
     f.lastAttackType = type;
     f.aiComboQueued = '';
     f.comboT = .62;
@@ -6490,6 +6508,7 @@ body.arena-select-open .arena-select{
     else if (!blocked && atk.name === 'heavy') { cameraZoom = Math.max(cameraZoom,1.045); }
 
     spawnHitSpark(defender.x - facing*28, defender.y - (defender.collisionH || defender.h)*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
+    spawnCombatClarity21(attacker, defender, atk, blocked, dmg, counterHit);
     spawnPremiumImpact(attacker, defender, atk, blocked);
     spawnCombatImpact18(attacker, defender, atk, blocked, dmg, counterHit);
     spawnPhysicsImpact20(attacker, defender, atk, blocked);
@@ -7655,6 +7674,7 @@ body.arena-select-open .arena-select{
     if (hitStop > 0) {
       hitStop = Math.max(0, hitStop - dt);
       updateParticles(dt*.45);
+      updateCombatClarity21(dt*.55);
       updateHUD();
       return;
     }
@@ -7672,6 +7692,7 @@ body.arena-select-open .arena-select{
     combatPhysics20T = Math.max(0, (combatPhysics20T || 0) - dt);
     combatPhysics20Pulse = Math.max(0, (combatPhysics20Pulse || 0) - dt * 1.8);
     visualDepth20T += dt;
+    updateCombatClarity21(dt);
     comboTrainer19T = Math.max(0, comboTrainer19T - dt);
     updateUltimateCinematic(dt);
     cameraZoom = lerp(cameraZoom, 1, dt*2.6);
@@ -9110,10 +9131,45 @@ body.arena-select-open .arena-select{
   }
 
   
+
+  function drawCombatClarity21Overlay(){
+    if ((gameState !== 'fight' && gameState !== 'roundEnd') || combatClarity21T <= 0) return;
+    const a = clamp(combatClarity21T, 0, 1);
+    ctx.save();
+    const bw = clamp(w * .22, 230, 380);
+    const bh = 58;
+    const x = w*.5 - bw*.5;
+    const y = Math.max(80, h*.105);
+    ctx.globalAlpha = Math.min(.86, a);
+    const g = ctx.createLinearGradient(x,y,x+bw,y+bh);
+    g.addColorStop(0,'rgba(0,0,0,.72)');
+    g.addColorStop(.50,'rgba(75,18,18,.56)');
+    g.addColorStop(1,'rgba(0,0,0,.70)');
+    ctx.fillStyle = g;
+    ctx.strokeStyle = 'rgba(255,221,150,.38)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, x, y, bw, bh, 14, true, true);
+    ctx.font = '900 9px Inter, Arial';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,223,150,.84)';
+    ctx.fillText('COMBAT CLARITY · 21.0', x+bw*.5, y+10);
+    ctx.font = '1000 17px Inter, Arial';
+    ctx.fillStyle = '#fff3d1';
+    ctx.shadowColor = 'rgba(255,90,60,.48)';
+    ctx.shadowBlur = 12;
+    ctx.fillText((combatClarity21Word || 'CONTACT').slice(0, 28), x+bw*.5, y+28);
+    ctx.shadowBlur = 0;
+    ctx.font = '850 9px Inter, Arial';
+    ctx.fillStyle = 'rgba(245,240,230,.70)';
+    ctx.fillText((combatClarity21Meta || 'readable contact point').slice(0, 42), x+bw*.5, y+47);
+    ctx.restore();
+  }
+
   function drawCombatAI19Overlay(){
     if (gameState !== 'fight' && gameState !== 'roundEnd') return;
-    const showAi = combatAi19T > 0 || (enemy?.ai?.mindT || 0) > 0;
-    const showTrainer = comboTrainer19T > 0;
+    // 21.0 HUD cleanup: AI/trainer panels now appear only for meaningful windows, not as permanent visual noise.
+    const showAi = combatAi19T > .42 || (enemy?.ai?.mindT || 0) > .55;
+    const showTrainer = comboTrainer19T > .25 && (comboCount >= 2 || comboDamage > 0);
     if (!showAi && !showTrainer) return;
 
     ctx.save();
@@ -9206,40 +9262,42 @@ body.arena-select-open .arena-select{
       ctx.translate(-w*.5, -h*.52);
     }
     drawArena();
+    drawStageClarity21Layer('back');
     drawArenaMood17Layer('back');
     drawCombatDepth20Layer('back');
     ctx.restore();
 
-    let cameraShift = 0;
-    if (!EXACT_BLACK_CITADEL_ARENA && player && enemy) {
-      const actionMid = (player.x + enemy.x) * 0.5;
-      const desiredShift = w * 0.5 - actionMid;
-      const maxShift = w * ((window.matchMedia && window.matchMedia('(pointer:coarse)').matches) ? 0.10 : 0.14);
-      cameraShift = clamp(desiredShift, -maxShift, maxShift);
-    }
+    const camera21 = cameraDirector21();
+    let cameraShift = camera21.x || 0;
+    const cameraShiftY21 = camera21.y || 0;
+    const cameraZoom21 = camera21.zoom || 1;
 
     ctx.save();
-    ctx.translate(sx + cameraShift, sy);
-    if (cameraZoom > 1.002) {
+    ctx.translate(sx + cameraShift, sy + cameraShiftY21);
+    const liveZoom21 = Math.max(cameraZoom, cameraZoom21);
+    if (liveZoom21 > 1.002) {
       ctx.translate(w*.5, h*.52);
-      ctx.scale(cameraZoom, cameraZoom);
+      ctx.scale(liveZoom21, liveZoom21);
       ctx.translate(-w*.5, -h*.52);
     }
     const first = player.x < enemy.x ? player : enemy;
     const second = first === player ? enemy : player;
     drawCombatDepth20Layer('front');
-    // 20.1: atmosphere stays behind the fighters, impact particles stay in front.
-    // This fixes the "fighters became muddy" look from 20.0.
+    drawStageClarity21Layer('focus');
+    // 21.0: atmosphere stays behind readable fighter silhouettes; contact FX is drawn on top.
     drawArenaMood17Layer('front');
     drawFighter(first);
     drawFighter(second);
+    drawContactFX21();
     drawParticles();
+    drawStageClarity21Layer('front');
     ctx.restore();
 
     drawVignette();
     drawUltimateCinematic();
+    drawCombatClarity21Overlay();
     drawCombatAI19Overlay();
-    drawPhysics20Overlay();
+    if (combatPhysics20T > .35) drawPhysics20Overlay();
 
     if (cinematic > 0) {
       ctx.save();
@@ -11353,7 +11411,7 @@ function sessionId(){
     ctx.restore();
   }
 
-  function drawPremiumFighterArt(f){
+  function drawPremiumFighterArt20_1_core(f){
     // Sprite Combat 9.1: final renderer must use sprite sheets first.
     // Previous Fighter Rig 8.0 declaration was overriding the sprite renderer and causing invisible/static fighters.
     if (typeof drawSpriteSheetFighter === 'function' && drawSpriteSheetFighter(f)) return true;
@@ -11533,6 +11591,392 @@ function sessionId(){
   }
 
 
+
+
+
+  /* Combat Clarity, Animation & Camera Rework 21.0
+     Large gameplay-visual pass:
+     - readable body-language overlays for attack / block / hit / recovery
+     - contact-point FX in the exact collision zone
+     - camera director for duel framing, heavy hits and ultimate focus
+     - stage focus masks so the arena supports the fighters instead of swallowing them
+     - HUD timing cleanup to reduce permanent combat noise
+  */
+  function lowPowerCombat21(){
+    try {
+      return (window.matchMedia && window.matchMedia('(pointer:coarse)').matches) || w < 860 || h < 620;
+    } catch(_) { return false; }
+  }
+
+  function attackPhase21(f){
+    if (!f || f.state !== 'attack' || !f.attack) return '';
+    const t = f.stateT || 0;
+    if (t < f.attack.startup) return 'startup';
+    if (t <= f.attack.startup + f.attack.active) return 'active';
+    return 'recovery';
+  }
+
+  function attackPower21(name){
+    return name === 'ultimate' ? 1.55 : name === 'special' ? 1.30 : name === 'heavy' ? 1.10 : .82;
+  }
+
+  function attackLabel21(name){
+    return name === 'ultimate' ? 'ULTIMATE CONTACT' : name === 'special' ? 'SPECIAL CUT' : name === 'heavy' ? 'HEAVY IMPACT' : 'LIGHT CONFIRM';
+  }
+
+  function triggerAttackPose21(f, type){
+    if (!f) return;
+    const p = attackPower21(type);
+    f.pose21Type = type;
+    f.pose21T = type === 'ultimate' ? .80 : type === 'special' ? .54 : type === 'heavy' ? .44 : .30;
+    f.pose21Power = p;
+    f.pose21Flash = Math.max(f.pose21Flash || 0, type === 'ultimate' ? .75 : type === 'special' ? .48 : type === 'heavy' ? .34 : .20);
+  }
+
+  function combatContactPoint21(attacker, defender, atk, blocked=false){
+    const facing = attackDirection(attacker) || Math.sign(defender.x - attacker.x) || attacker.dir || 1;
+    const dh = (defender.collisionH || defender.h || fighterVisualHeight(defender));
+    const ah = (attacker.collisionH || attacker.h || fighterVisualHeight(attacker));
+    const midY = defender.y - dh * (atk?.name === 'ultimate' ? .64 : atk?.name === 'special' ? .58 : atk?.name === 'heavy' ? .54 : .50);
+    const crossX = defender.x - facing * Math.max(18, fighterBodyRadius(defender) * (blocked ? .28 : .36));
+    return { x: crossX, y: midY, dir: facing, h: Math.max(dh, ah) };
+  }
+
+  function spawnCombatClarity21(attacker, defender, atk, blocked=false, dmg=0, counter=false){
+    if (!attacker || !defender || !atk) return;
+    const p = combatContactPoint21(attacker, defender, atk, blocked);
+    const type = atk.name || 'light';
+    const power = attackPower21(type);
+    const color = blocked ? '#8edcff' : (attacker.colorB || (attacker.id === 'player' ? '#ff3048' : '#4ac8ff'));
+    const max = type === 'ultimate' ? .72 : type === 'special' ? .54 : type === 'heavy' ? .42 : .30;
+    const low = lowPowerCombat21();
+    contactFX21.push({
+      kind:'contact',
+      x:p.x, y:p.y, dir:p.dir, life:max, max,
+      color, type, blocked, counter, power,
+      radius: (type === 'ultimate' ? 148 : type === 'special' ? 112 : type === 'heavy' ? 88 : 58) * (low ? .82 : 1),
+      label: blocked ? 'BLOCK' : counter ? 'COUNTER' : attackLabel21(type),
+      dmg
+    });
+    if (!low && !blocked) {
+      contactFX21.push({
+        kind:'echo',
+        x:p.x - p.dir*24, y:p.y + 8, dir:p.dir, life:max*.82, max:max*.82,
+        color, type, power, radius:(type === 'ultimate' ? 210 : type === 'special' ? 154 : type === 'heavy' ? 118 : 76)
+      });
+    }
+    attacker.pose21T = Math.max(attacker.pose21T || 0, type === 'ultimate' ? .62 : type === 'special' ? .48 : type === 'heavy' ? .38 : .26);
+    attacker.pose21Type = type;
+    attacker.pose21Power = power;
+    attacker.pose21Flash = Math.max(attacker.pose21Flash || 0, .18 + power*.20);
+    defender.hitPose21T = Math.max(defender.hitPose21T || 0, blocked ? .25 : type === 'ultimate' ? .68 : type === 'special' ? .52 : type === 'heavy' ? .42 : .28);
+    defender.hitPose21Dir = p.dir;
+    defender.hitPose21Blocked = !!blocked;
+    defender.hitPose21Power = power;
+    defender.pose21Flash = Math.max(defender.pose21Flash || 0, blocked ? .18 : .28 + power*.18);
+    combatClarity21T = Math.max(combatClarity21T, type === 'ultimate' ? 1.00 : type === 'special' ? .78 : type === 'heavy' ? .58 : .38);
+    combatClarity21Word = blocked ? 'GUARD CONTACT' : counter ? 'COUNTER HIT' : attackLabel21(type);
+    combatClarity21Meta = blocked ? 'shield read · pushback visible' : `${Math.round(dmg || atk.damage || 0)} dmg · contact point locked`;
+    cameraDirector21Punch = Math.max(cameraDirector21Punch, blocked ? .18 : type === 'ultimate' ? 1 : type === 'special' ? .72 : type === 'heavy' ? .48 : .26);
+    cameraDirector21Lock = Math.max(cameraDirector21Lock, type === 'ultimate' ? .82 : type === 'special' ? .44 : type === 'heavy' ? .28 : .16);
+  }
+
+  function updateCombatClarity21(dt){
+    combatClarity21T = Math.max(0, combatClarity21T - dt);
+    stageClarity21IntroT = Math.max(0, stageClarity21IntroT - dt);
+    cameraDirector21Punch = Math.max(0, cameraDirector21Punch - dt * 2.2);
+    cameraDirector21Lock = Math.max(0, cameraDirector21Lock - dt);
+    for (const f of [player, enemy]) {
+      if (!f) continue;
+      f.pose21T = Math.max(0, (f.pose21T || 0) - dt);
+      f.hitPose21T = Math.max(0, (f.hitPose21T || 0) - dt);
+      f.pose21Flash = Math.max(0, (f.pose21Flash || 0) - dt * 2.8);
+    }
+    for (let i=contactFX21.length-1;i>=0;i--) {
+      contactFX21[i].life -= dt;
+      if (contactFX21[i].life <= 0) contactFX21.splice(i,1);
+    }
+    updateCombatHUDTiming21();
+  }
+
+  function cameraDirector21(){
+    if ((gameState !== 'fight' && gameState !== 'roundEnd') || !player || !enemy) {
+      cameraDirector21X = lerp(cameraDirector21X, 0, .12);
+      cameraDirector21Y = lerp(cameraDirector21Y, 0, .12);
+      cameraDirector21Zoom = lerp(cameraDirector21Zoom, 1, .16);
+      return { x:cameraDirector21X, y:cameraDirector21Y, zoom:cameraDirector21Zoom };
+    }
+    const mid = (player.x + enemy.x) * .5;
+    const dist = Math.abs(player.x - enemy.x);
+    const exact = EXACT_BLACK_CITADEL_ARENA;
+    const maxX = w * (lowPowerCombat21() ? .075 : .105);
+    const desiredX = clamp(w*.5 - mid, -maxX, maxX);
+    const desiredY = cameraDirector21Punch > .12 ? -Math.min(16, cameraDirector21Punch*18) : 0;
+    const closeZoom = dist < w*.24 ? .022 : dist > w*.48 ? -.015 : .006;
+    const punchZoom = cameraDirector21Punch * (lowPowerCombat21() ? .025 : .045);
+    const ultimateZoom = cameraDirector21Lock > .35 ? .035 : 0;
+    const desiredZoom = exact ? 1 + closeZoom + punchZoom + ultimateZoom : Math.max(1, cameraZoom, 1 + closeZoom + punchZoom + ultimateZoom);
+    cameraDirector21X = lerp(cameraDirector21X, desiredX, .10);
+    cameraDirector21Y = lerp(cameraDirector21Y, desiredY, .16);
+    cameraDirector21Zoom = lerp(cameraDirector21Zoom, clamp(desiredZoom, .985, lowPowerCombat21() ? 1.065 : 1.095), .12);
+    return { x:cameraDirector21X, y:cameraDirector21Y, zoom:cameraDirector21Zoom };
+  }
+
+  function updateCombatHUDTiming21(){
+    try {
+      if (ui?.arenaMoodBadge17) {
+        const show = (gameState === 'fight' || gameState === 'roundEnd') && stageClarity21IntroT > 0;
+        ui.arenaMoodBadge17.style.opacity = show ? '1' : '0';
+        ui.arenaMoodBadge17.style.transform = show ? 'translateY(0)' : 'translateY(-8px)';
+        ui.arenaMoodBadge17.style.pointerEvents = 'none';
+        ui.arenaMoodBadge17.setAttribute('aria-hidden', show ? 'false' : 'true');
+      }
+      if (ui?.impactBeat18) {
+        const showImpact = combatImpact18T > .16 || combatClarity21T > .30;
+        ui.impactBeat18.style.opacity = showImpact ? '1' : '0';
+        ui.impactBeat18.style.pointerEvents = 'none';
+        if (combatClarity21T > .30) {
+          ui.impactWord18.textContent = combatClarity21Word || 'CONTACT';
+          ui.impactMeta18.textContent = combatClarity21Meta || 'readable hit point';
+        }
+      }
+    } catch(_) {}
+  }
+
+  function drawStageClarity21Layer(layer='back'){
+    if ((gameState !== 'fight' && gameState !== 'roundEnd') || !player || !enemy) return;
+    const r = EXACT_BLACK_CITADEL_ARENA ? getExactArenaStageRect() : {x:0,y:0,w,h};
+    const midX = clamp((player.x + enemy.x) * .5, r.x + r.w*.18, r.x + r.w*.82);
+    const midY = groundY - h*.18;
+    ctx.save();
+    if (layer === 'back') {
+      // Darken busy architecture and keep the fight lane readable.
+      ctx.globalCompositeOperation = 'multiply';
+      const shade = ctx.createRadialGradient(midX, midY, r.w*.10, midX, midY, r.w*.56);
+      shade.addColorStop(0,'rgba(255,255,255,1)');
+      shade.addColorStop(.34,'rgba(230,230,230,.96)');
+      shade.addColorStop(.72,'rgba(120,120,120,.82)');
+      shade.addColorStop(1,'rgba(35,35,35,.72)');
+      ctx.fillStyle = shade;
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+
+      ctx.globalCompositeOperation = 'screen';
+      const floor = ctx.createRadialGradient(midX, groundY - 36, 12, midX, groundY - 26, r.w*.30);
+      floor.addColorStop(0,'rgba(255,236,190,.115)');
+      floor.addColorStop(.38,'rgba(120,170,255,.040)');
+      floor.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = floor;
+      ctx.beginPath();
+      ctx.ellipse(midX, groundY - 26, r.w*.26, h*.105, 0, 0, Math.PI*2);
+      ctx.fill();
+    } else if (layer === 'focus') {
+      // Thin combat stage plate below the fighters, behind bodies.
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = .38;
+      const g = ctx.createRadialGradient(midX, groundY - 8, 0, midX, groundY - 8, r.w*.24);
+      g.addColorStop(0,'rgba(255,229,160,.18)');
+      g.addColorStop(.54,'rgba(95,160,255,.055)');
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(midX, groundY - 6, r.w*.22, h*.055, 0, 0, Math.PI*2);
+      ctx.fill();
+    } else if (layer === 'front') {
+      // Clean foreground lower band; avoids fog eating feet while preserving cinematic depth.
+      const bottom = ctx.createLinearGradient(0, groundY-h*.08, 0, h);
+      bottom.addColorStop(0,'rgba(0,0,0,0)');
+      bottom.addColorStop(.72,'rgba(0,0,0,.12)');
+      bottom.addColorStop(1,'rgba(0,0,0,.36)');
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = bottom;
+      ctx.fillRect(0, groundY-h*.10, w, h-(groundY-h*.10));
+    }
+    ctx.restore();
+  }
+
+  function drawContactFX21(){
+    if (!contactFX21.length) return;
+    const low = lowPowerCombat21();
+    for (const p of contactFX21) {
+      const a = clamp(p.life / Math.max(.001,p.max), 0, 1);
+      const k = 1 - a;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const color = p.color || '#fff0b7';
+      const r = p.radius * (.45 + k*.72);
+      if (p.kind === 'echo') {
+        ctx.globalAlpha = a * .30;
+        ctx.strokeStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 18*a;
+        ctx.lineWidth = Math.max(2, 7*a*p.power);
+        ctx.beginPath();
+        ctx.ellipse(p.x - p.dir*r*.10, p.y, r*.55, r*.22, p.dir*.25, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
+
+      // Exact contact star.
+      ctx.globalAlpha = a * (p.blocked ? .68 : .90);
+      ctx.strokeStyle = p.blocked ? '#9eeaff' : '#fff2d0';
+      ctx.fillStyle = p.blocked ? 'rgba(120,220,255,.28)' : 'rgba(255,242,208,.34)';
+      ctx.shadowColor = p.blocked ? '#8edcff' : color;
+      ctx.shadowBlur = (low ? 16 : 28) * a;
+      ctx.lineWidth = Math.max(2.4, (p.type === 'ultimate' ? 8 : p.type === 'special' ? 6 : p.type === 'heavy' ? 4.5 : 3.2) * a);
+      ctx.beginPath();
+      for (let i=0;i<8;i++){
+        const ang = i * Math.PI/4 + (p.dir > 0 ? 0 : Math.PI);
+        const len = (i%2 ? r*.28 : r*.48) * a;
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + Math.cos(ang)*len, p.y + Math.sin(ang)*len);
+      }
+      ctx.stroke();
+
+      // Directional readable slice.
+      ctx.lineCap = 'round';
+      ctx.lineWidth = Math.max(3, (p.type === 'ultimate' ? 18 : p.type === 'special' ? 13 : p.type === 'heavy' ? 10 : 6) * a);
+      ctx.beginPath();
+      ctx.moveTo(p.x - p.dir*r*.52, p.y + r*.12);
+      ctx.quadraticCurveTo(p.x + p.dir*r*.08, p.y - r*.42, p.x + p.dir*r*.62, p.y - r*.04);
+      ctx.stroke();
+
+      // Contact point core.
+      const core = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*.26);
+      core.addColorStop(0,p.blocked ? 'rgba(180,245,255,.88)' : 'rgba(255,255,255,.88)');
+      core.addColorStop(.45, p.blocked ? 'rgba(80,190,255,.26)' : 'rgba(255,80,62,.28)');
+      core.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = core;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,r*.26,0,Math.PI*2);
+      ctx.fill();
+
+      if (!low && a > .25) {
+        ctx.globalAlpha = a*.86;
+        ctx.font = `1000 ${Math.round(10 + p.power*4)}px Inter, Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = p.blocked ? '#d9f8ff' : '#fff3d1';
+        ctx.fillText((p.label || 'CONTACT').slice(0,16), p.x, p.y - r*.52);
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawCombatPose21Overlay(f){
+    if (!f || (gameState !== 'fight' && gameState !== 'roundEnd')) return;
+    const attacking = f.state === 'attack' && f.attack;
+    const blocking = f.state === 'block';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown' || (f.hitPose21T || 0) > 0;
+    const phase = attackPhase21(f);
+    if (!attacking && !blocking && !hurt && !(f.pose21T > 0)) return;
+
+    const dir = f.dir || 1;
+    const heavy = isHeavyFighter20(f);
+    const fh = fighterVisualHeight(f);
+    const fw = Math.max(110, fighterVisualWidth(f) * (heavy ? 1.20 : 1.08));
+    const type = f.pose21Type || f.attack?.name || 'light';
+    const power = attackPower21(type);
+    const x = f.x;
+    const y = f.y;
+    const color = f.colorB || (f.id === 'player' ? '#ff3048' : '#4ac8ff');
+    const alphaPose = clamp((f.pose21T || 0) * 2.4 + (f.pose21Flash || 0), 0, 1);
+    const hitA = clamp((f.hitPose21T || 0) * 2.8, 0, 1);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    if (attacking || f.pose21T > 0) {
+      // Body-language lines: startup pulls back, active lunges forward, recovery drops low.
+      const recoil = phase === 'startup' ? -.26 : phase === 'recovery' ? -.06 : .30;
+      const shoulderX = x + dir * fw * (.08 + recoil);
+      const shoulderY = y - fh * (heavy ? .63 : .60);
+      const handX = x + dir * fw * (type === 'ultimate' ? .67 : type === 'special' ? .58 : type === 'heavy' ? .50 : .42);
+      const handY = y - fh * (type === 'ultimate' ? .65 : type === 'special' ? .59 : type === 'heavy' ? .55 : .50);
+      ctx.globalAlpha = .18 + alphaPose * .42;
+      ctx.strokeStyle = type === 'ultimate' ? '#fff0b7' : color;
+      ctx.shadowColor = type === 'ultimate' ? '#fff0b7' : color;
+      ctx.shadowBlur = 16 + power*10;
+      ctx.lineWidth = heavy ? 5 : 3.4;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x - dir*fw*.12, y - fh*.72);
+      ctx.lineTo(shoulderX, shoulderY);
+      ctx.lineTo(handX, handY);
+      ctx.stroke();
+
+      // Recovery/active pose wedge under the character so the action state is readable.
+      ctx.globalAlpha = phase === 'recovery' ? .18 : .24 + alphaPose*.18;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x - dir*fw*.18, y - 4);
+      ctx.lineTo(x + dir*fw*(phase === 'startup' ? .10 : .46), y - fh*(phase === 'active' ? .12 : .08));
+      ctx.lineTo(x + dir*fw*.28, y + 8);
+      ctx.closePath();
+      ctx.fill();
+
+      if (phase === 'startup' && (type === 'heavy' || type === 'special' || type === 'ultimate')) {
+        ctx.globalAlpha = .42;
+        ctx.font = `1000 ${heavy ? 12 : 11}px Inter, Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#fff0b7';
+        ctx.fillText(type === 'ultimate' ? 'LOCK' : 'WIND-UP', x, y - fh*.88);
+      }
+    }
+
+    if (blocking) {
+      ctx.globalAlpha = .70;
+      const shieldX = x + dir * fw * .24;
+      const shieldY = y - fh*.52;
+      ctx.strokeStyle = heavy ? '#8edcff' : '#ffd27a';
+      ctx.fillStyle = heavy ? 'rgba(90,210,255,.16)' : 'rgba(255,210,118,.12)';
+      ctx.shadowColor = heavy ? '#8edcff' : '#ffd27a';
+      ctx.shadowBlur = 26;
+      ctx.lineWidth = heavy ? 4.5 : 3.5;
+      ctx.beginPath();
+      ctx.ellipse(shieldX, shieldY, fw*.20, fh*.27, dir*.10, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.globalAlpha = .35;
+      for (let i=0;i<3;i++){
+        ctx.beginPath();
+        ctx.ellipse(shieldX, shieldY, fw*(.10+i*.045), fh*(.14+i*.045), dir*.10, 0, Math.PI*2);
+        ctx.stroke();
+      }
+    }
+
+    if (hurt) {
+      const hdir = f.hitPose21Dir || -dir;
+      ctx.globalAlpha = .18 + hitA*.46;
+      ctx.fillStyle = f.hitPose21Blocked ? '#8edcff' : '#ff5161';
+      ctx.shadowColor = f.hitPose21Blocked ? '#8edcff' : '#ff5161';
+      ctx.shadowBlur = 24 * Math.max(.3,hitA);
+      ctx.beginPath();
+      ctx.moveTo(x - hdir*fw*.10, y - fh*.76);
+      ctx.lineTo(x - hdir*fw*.52, y - fh*.60);
+      ctx.lineTo(x - hdir*fw*.18, y - fh*.38);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.globalAlpha = .22 + hitA*.34;
+      ctx.strokeStyle = '#fff3ec';
+      ctx.lineWidth = 2.2 + hitA*2.2;
+      for (let i=0;i<3;i++){
+        ctx.beginPath();
+        ctx.moveTo(x - hdir*fw*(.10+i*.07), y - fh*(.47+i*.08));
+        ctx.lineTo(x - hdir*fw*(.28+i*.09), y - fh*(.44+i*.09));
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function drawPremiumFighterArt(f){
+    const ok = drawPremiumFighterArt20_1_core(f);
+    if (ok) drawCombatPose21Overlay(f);
+    return ok;
+  }
 
   /* Arena Flow 16.3 — Start Flow Layer Guard
      Hardens the whole launch chain:
