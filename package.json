@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-ai-combo-19-ready",
-  "version": "19.0.0",
+  "name": "eralash-combat-physics-character-20-ready",
+  "version": "20.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat AI & Combo 19.0: adds tactical AI, planned combo routes, guard-break pressure, improved combo trainer HUD, difficulty tuning, whiff punish logic and mobile-safe combat behavior."
+  "description": "EraLash Combat Physics & Character Visual 20.0: adds body-weight combat physics, enhanced ground friction, stronger separation, contact shadows, rim lights, breathing poses, fighter role visual tuning and mobile-safe character clarity."
 }

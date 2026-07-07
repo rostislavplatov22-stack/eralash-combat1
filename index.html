@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Impact 18.0 premium hit feedback system, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
+  <meta name="description" content="EraLash Combat — premium Telegram Mini App fighting game with Combat Physics & Character Visual 20.0 premium body-weight physics, fighter readability and hit feedback system, cinematic combat framing, missions, boss rush, achievements, liveops, Stars shop and season systems." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Combat Impact 18.0</title>
+  <title>EraLash Combat — Physics & Character Visual 20.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -4471,6 +4471,12 @@ body.arena-select-open .arena-select{
   let combatAi19T = 0;
   let combatAi19Word = '';
   let combatAi19Meta = '';
+  // Combat Physics & Character Visual 20.0 — body weight, ground contact, rim readability and premium character presence.
+  let combatPhysics20T = 0;
+  let combatPhysics20Word = '';
+  let combatPhysics20Meta = '';
+  let combatPhysics20Pulse = 0;
+  let visualDepth20T = 0;
   let comboTrainer19T = 0;
   let comboTrainer19Word = '';
   let comboTrainer19Meta = '';
@@ -4843,9 +4849,11 @@ body.arena-select-open .arena-select{
   }
 
   function fighterSpacing(f, opponent){
-    const own = Math.max(54, (f.collisionW || f.w || 90) * .56);
-    const other = Math.max(54, (opponent.collisionW || opponent.w || 90) * .56);
-    return own + other + (USE_PREMIUM_FIGHTER_ART ? 82 : 20);
+    const own = Math.max(54, (f.collisionW || f.w || 90) * (USE_PREMIUM_FIGHTER_ART ? .60 : .56));
+    const other = Math.max(54, (opponent.collisionW || opponent.w || 90) * (USE_PREMIUM_FIGHTER_ART ? .60 : .56));
+    const stance = ((f.stanceWidth20 || 1) + (opponent.stanceWidth20 || 1)) * (USE_PREMIUM_FIGHTER_ART ? 18 : 4);
+    const pressureGap = (f.state === 'attack' || opponent.state === 'attack') ? 18 : 30;
+    return own + other + (USE_PREMIUM_FIGHTER_ART ? 92 : 20) + stance + pressureGap;
   }
 
   function isAttackActive(f){
@@ -4938,7 +4946,21 @@ body.arena-select-open .arena-select{
       h: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 330 : 300) : Number(cfg.height || (isWarden ? 188 : 172)),
       collisionW: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 120 : 88) : Number(cfg.width || (isWarden ? 90 : 78)),
       collisionH: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 275 : 245) : Number(cfg.height || (isWarden ? 188 : 172)),
-      mass: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 1.34 : 1.08) : 1,
+      mass: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 1.42 : 1.04) : 1,
+      bodyWeight20: isWarden ? 1.46 : 1.02,
+      weightClass20: isWarden ? 'TANK' : 'ASSASSIN',
+      traction20: isWarden ? .78 : .84,
+      pushResist20: isWarden ? 1.38 : 1.00,
+      stanceWidth20: isWarden ? 1.18 : .96,
+      rimPower20: isWarden ? .34 : .42,
+      breathSeed20: Math.random() * Math.PI * 2,
+      bodyLean20: 0,
+      impactRecoil20: 0,
+      impactDir20: 0,
+      damageVisual20: 0,
+      groundContact20: 1,
+      footPlant20: 0,
+      wallPressure20: 0,
       dir: isPlayer ? 1 : -1,
 
       hp,
@@ -5010,13 +5032,15 @@ body.arena-select-open .arena-select{
       stats: {
         // Physics 11.0: footwork is tuned around acceleration, traction and real stop distance.
         // Raven is faster and more responsive; Warden is heavier and more stable.
-        speed: Math.round((isWarden ? 420 : 500) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.15 : 1.9)),
-        accel: Math.round((isWarden ? 2850 : 3650) + baseSpeed * 10.5),
-        airAccel: Math.round((isWarden ? 760 : 1020) + baseSpeed * 3.1),
-        brake: isWarden ? .68 : .74,
-        turnBrake: isWarden ? .48 : .54,
-        jump: Number(cfg.jump || (isWarden ? 760 : 900)),
-        gravityScale: isWarden ? 1.12 : 1.00,
+        speed: Math.round((isWarden ? 395 : 515) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.08 : 1.9)),
+        accel: Math.round((isWarden ? 2500 : 3900) + baseSpeed * (isWarden ? 8.9 : 11.6)),
+        airAccel: Math.round((isWarden ? 560 : 840) + baseSpeed * 2.55),
+        brake: isWarden ? .62 : .76,
+        turnBrake: isWarden ? .40 : .57,
+        traction20: isWarden ? .80 : .88,
+        stopPower20: isWarden ? 1.22 : 1.05,
+        jump: Number(cfg.jump || (isWarden ? 720 : 910)),
+        gravityScale: isWarden ? 1.18 : 1.02,
         hp,
         power: basePower,
         defense: baseDefense
@@ -5055,40 +5079,40 @@ body.arena-select-open .arena-select{
   const attacks = {
     // Physics 11.0 — attack data now drives timing, root motion, counter hits and whiff recovery.
     light: {
-      name:'light', startup:.070, active:.080, recovery:.155,
+      name:'light', startup:.062, active:.074, recovery:.145,
       damage:7, blockDamage:2, guardDamage:9,
-      range:205, height:150, y:-248,
-      kb:390, lift:-56, pushback:78, attackerBrake:.66,
-      hitStop:.060, hitstun:.24, energyGain:9, cost:0,
-      lunge:170, whiffBrake:.60, priority:1, counterBonus:1.18,
-      cancelWindow:[.12,.29], chain:['light','heavy','special']
+      range:198, height:148, y:-248,
+      kb:330, lift:-42, pushback:70, attackerBrake:.70,
+      hitStop:.056, hitstun:.22, energyGain:9, cost:0,
+      lunge:145, whiffBrake:.64, priority:1, counterBonus:1.18,
+      cancelWindow:[.11,.27], chain:['light','heavy','special']
     },
     heavy: {
-      name:'heavy', startup:.155, active:.105, recovery:.305,
-      damage:16, blockDamage:5, guardDamage:20,
-      range:280, height:178, y:-268,
-      kb:650, lift:-140, pushback:122, attackerBrake:.50,
-      hitStop:.115, hitstun:.39, energyGain:14, cost:0,
-      lunge:245, whiffBrake:.48, priority:2, counterBonus:1.28,
-      cancelWindow:[.20,.43], chain:['special']
+      name:'heavy', startup:.172, active:.110, recovery:.320,
+      damage:17, blockDamage:5, guardDamage:22,
+      range:286, height:184, y:-270,
+      kb:720, lift:-150, pushback:142, attackerBrake:.46,
+      hitStop:.128, hitstun:.43, energyGain:14, cost:0,
+      lunge:232, whiffBrake:.44, priority:2, counterBonus:1.30,
+      cancelWindow:[.21,.45], chain:['special']
     },
     special: {
-      name:'special', startup:.210, active:.145, recovery:.380,
-      damage:24, blockDamage:8, guardDamage:31,
-      range:318, height:194, y:-292,
-      kb:760, lift:-190, pushback:130, attackerBrake:.45,
-      hitStop:.170, hitstun:.55, energyGain:0, cost:42,
-      lunge:250, whiffBrake:.42, priority:3, counterBonus:1.34,
-      cancelWindow:[.30,.52], chain:[]
+      name:'special', startup:.220, active:.150, recovery:.390,
+      damage:25, blockDamage:8, guardDamage:33,
+      range:326, height:198, y:-292,
+      kb:835, lift:-205, pushback:148, attackerBrake:.42,
+      hitStop:.182, hitstun:.60, energyGain:0, cost:42,
+      lunge:258, whiffBrake:.40, priority:3, counterBonus:1.36,
+      cancelWindow:[.31,.54], chain:[]
     },
     ultimate: {
-      name:'ultimate', startup:.360, active:.220, recovery:.560,
-      damage:40, blockDamage:13, guardDamage:45,
-      range:410, height:235, y:-330,
-      kb:1040, lift:-265, pushback:170, attackerBrake:.34,
-      hitStop:.305, hitstun:.78, energyGain:0, cost:100,
-      lunge:320, whiffBrake:.38, priority:4, counterBonus:1.45,
-      cancelWindow:[.42,.70], chain:[]
+      name:'ultimate', startup:.380, active:.235, recovery:.575,
+      damage:42, blockDamage:14, guardDamage:48,
+      range:420, height:242, y:-330,
+      kb:1120, lift:-285, pushback:195, attackerBrake:.30,
+      hitStop:.330, hitstun:.84, energyGain:0, cost:100,
+      lunge:338, whiffBrake:.36, priority:4, counterBonus:1.48,
+      cancelWindow:[.44,.72], chain:[]
     }
   };
 
@@ -5130,6 +5154,10 @@ body.arena-select-open .arena-select{
     combatAi19T = 0;
     combatAi19Word = '';
     combatAi19Meta = '';
+    combatPhysics20T = 1.05;
+    combatPhysics20Word = 'BODY WEIGHT ONLINE';
+    combatPhysics20Meta = 'ground contact + fighter clarity';
+    combatPhysics20Pulse = .8;
     comboTrainer19T = 0;
     comboTrainer19Word = '';
     comboTrainer19Meta = '';
@@ -6400,17 +6428,23 @@ body.arena-select-open .arena-select{
     defender.pressureT = blocked ? .42 : .68;
     defender.invuln = atk.name === 'ultimate' ? .16 : .08;
 
-    const massScale = 1 / Math.max(.8, defender.mass || 1);
-    const effectiveKb = blocked ? (atk.kb*.27) : atk.kb * (counterHit ? 1.16 : 1);
+    const defenderWeight = fighterWeight20(defender);
+    const attackerWeight = fighterWeight20(attacker);
+    const massScale = 1 / Math.max(.82, defenderWeight * (defender.pushResist20 || 1) * (blocked ? 1.18 : 1));
+    const forceScale = (attackerWeight > 1.18 ? 1.08 : .98) * (counterHit ? 1.16 : 1);
+    const effectiveKb = blocked ? (atk.kb*.24) : atk.kb * forceScale;
     defender.vx = facing * effectiveKb * massScale;
-    defender.vy = blocked ? -28 : (atk.lift || -70) * massScale * (counterHit ? 1.10 : 1);
-    // Real Physics 7.2: impact displacement happens on the same frame as the hit.
-    // This makes hits visible immediately instead of feeling like static art.
-    defender.x += facing * (blocked ? 18 : atk.name === 'ultimate' ? 78 : atk.name === 'special' ? 58 : atk.name === 'heavy' ? 48 : 30) * massScale;
+    defender.vy = blocked ? -22 : (atk.lift || -70) * massScale * (counterHit ? 1.12 : 1);
+    // Combat Physics 20.0: displacement uses weight/resistance, so hits have visible body transfer without sliding.
+    const displacement20 = (blocked ? 14 : atk.name === 'ultimate' ? 82 : atk.name === 'special' ? 62 : atk.name === 'heavy' ? 52 : 26) * massScale;
+    defender.x += facing * displacement20;
 
-    attacker.vx -= facing * (atk.pushback || 60) / Math.max(.9, attacker.mass || 1);
-    attacker.x -= facing * Math.min(44, (atk.pushback || 60) * .28);
+    const recoilScale20 = Math.max(.76, 1 / Math.max(.92, attackerWeight * .72));
+    attacker.vx -= facing * (atk.pushback || 60) * recoilScale20 / Math.max(.9, attacker.mass || 1);
+    attacker.x -= facing * Math.min(48, (atk.pushback || 60) * .25 * recoilScale20);
     attacker.vx *= atk.attackerBrake || .7;
+    attacker.bodyLean20 = (attacker.bodyLean20 || 0) - facing * (atk.name === 'ultimate' ? .11 : atk.name === 'special' ? .08 : atk.name === 'heavy' ? .06 : .035);
+    defender.bodyLean20 = (defender.bodyLean20 || 0) + facing * (blocked ? .05 : atk.name === 'ultimate' ? .18 : atk.name === 'special' ? .13 : atk.name === 'heavy' ? .10 : .06);
 
     const bounds = stageBounds();
     const wallPad = Math.max(48, fighterBodyRadius(defender) * .55);
@@ -6418,6 +6452,7 @@ body.arena-select-open .arena-select{
       defender.x = clamp(defender.x, bounds.left + wallPad, bounds.right - wallPad);
       defender.vx *= -.32;
       defender.vy = Math.min(defender.vy, -135);
+      defender.wallPressure20 = .75;
       shake = Math.max(shake, 13);
       hitStop = Math.max(hitStop, .105);
       floatingText('WALL', defender.x, defender.y - defender.h*.78, '#ffd27a');
@@ -6456,6 +6491,7 @@ body.arena-select-open .arena-select{
     spawnHitSpark(defender.x - facing*28, defender.y - (defender.collisionH || defender.h)*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
     spawnPremiumImpact(attacker, defender, atk, blocked);
     spawnCombatImpact18(attacker, defender, atk, blocked, dmg, counterHit);
+    spawnPhysicsImpact20(attacker, defender, atk, blocked);
     registerCombatResult19(attacker, defender, atk, blocked, dmg, counterHit);
     spawnSlashWave(attacker, defender, atk.name);
     spawnFootDust(defender, blocked ? 4 : atk.name === 'ultimate' ? 16 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5, blocked ? '#8edcff' : attacker.colorB);
@@ -6915,6 +6951,173 @@ body.arena-select-open .arena-select{
     return { left: w * .08, right: w * .92, center: w * .5 };
   }
 
+
+  function setPhysicsBeat20(word, meta='', time=.78){
+    combatPhysics20T = Math.max(combatPhysics20T || 0, time);
+    combatPhysics20Word = word || 'PHYSICS';
+    combatPhysics20Meta = meta || '';
+    combatPhysics20Pulse = 1;
+  }
+
+  function fighterWeight20(f){
+    return Math.max(.86, Number(f?.bodyWeight20 || f?.mass || 1));
+  }
+
+  function isHeavyFighter20(f){
+    return !!(f && (fighterIsWarden(f) || String(f.weightClass20 || '').toUpperCase() === 'TANK'));
+  }
+
+  function applyCombatPhysics20(f, opponent, dt){
+    if (!f) return;
+    const grounded = isGrounded(f);
+    const weight = fighterWeight20(f);
+    const targetLean = clamp((f.vx || 0) / (isHeavyFighter20(f) ? 680 : 610), -.22, .22)
+      + (f.impactDir20 || 0) * (f.impactRecoil20 || 0) * .18
+      + (f.state === 'block' ? -f.dir * .055 : 0)
+      + (f.state === 'attack' ? f.dir * .035 : 0);
+    f.bodyLean20 += (targetLean - (f.bodyLean20 || 0)) * Math.min(1, dt * (grounded ? 10 : 5.5));
+    f.impactRecoil20 = Math.max(0, (f.impactRecoil20 || 0) - dt * 3.6);
+    f.damageVisual20 = Math.max(0, (f.damageVisual20 || 0) - dt * 1.45);
+    f.wallPressure20 = Math.max(0, (f.wallPressure20 || 0) - dt * 1.8);
+    f.groundContact20 += ((grounded ? 1 : 0) - (f.groundContact20 || 0)) * Math.min(1, dt * 12);
+    f.footPlant20 = Math.max(0, (f.footPlant20 || 0) - dt);
+    if (grounded) {
+      const speed = Math.abs(f.vx || 0);
+      const planted = speed < 72 && f.state !== 'attack' && f.state !== 'hitstun';
+      if (planted) f.vx *= Math.pow(.88 / Math.max(.92, weight), dt * 60);
+      if (f.state === 'block') f.vx *= Math.pow(.78, dt * 60);
+      if (f.landingLag > 0) f.vx *= Math.pow(.72, dt * 60);
+      if (speed > 250 && (f.footPlant20 || 0) <= 0) {
+        f.footPlant20 = isHeavyFighter20(f) ? .16 : .12;
+        spawnFootDust(f, isHeavyFighter20(f) ? 2 : 1, isHeavyFighter20(f) ? 'rgba(96,190,255,.22)' : 'rgba(220,54,68,.20)');
+      }
+    } else {
+      // Air control is intentionally reduced so jumps feel physical instead of floaty.
+      f.vx *= Math.pow(.986 - Math.min(.012, (weight - 1) * .010), dt * 60);
+    }
+    if (opponent && Math.abs(f.x - opponent.x) < fighterSpacing(f, opponent) * .58 && grounded) {
+      f.contactPressure = Math.min(1, (f.contactPressure || 0) + dt * 1.4);
+    }
+  }
+
+  function spawnPhysicsImpact20(attacker, defender, atk, blocked=false){
+    const heavyHit = atk && (atk.name === 'heavy' || atk.name === 'special' || atk.name === 'ultimate');
+    const dir = attackDirection(attacker) || Math.sign(defender.x - attacker.x) || 1;
+    const baseY = defender.y - (defender.collisionH || defender.h || 220) * .58;
+    if (heavyHit || blocked) {
+      setPhysicsBeat20(blocked ? 'BLOCK PUSHBACK' : (atk.name === 'ultimate' ? 'BODY BREAK' : 'WEIGHT IMPACT'), blocked ? 'guard absorbs force' : `${attacker.weightClass20 || 'FIGHTER'} FORCE`, atk.name === 'ultimate' ? 1.05 : .72);
+    }
+    defender.impactRecoil20 = Math.max(defender.impactRecoil20 || 0, blocked ? .45 : atk.name === 'ultimate' ? 1 : atk.name === 'special' ? .82 : atk.name === 'heavy' ? .68 : .38);
+    defender.impactDir20 = dir;
+    defender.damageVisual20 = Math.max(defender.damageVisual20 || 0, blocked ? .22 : atk.name === 'ultimate' ? 1 : atk.name === 'special' ? .78 : atk.name === 'heavy' ? .58 : .34);
+    attacker.impactRecoil20 = Math.max(attacker.impactRecoil20 || 0, atk.name === 'ultimate' ? .55 : atk.name === 'special' ? .42 : atk.name === 'heavy' ? .32 : .18);
+    attacker.impactDir20 = -dir;
+    const ringCount = blocked ? 4 : heavyHit ? 9 : 5;
+    for (let i=0;i<ringCount;i++){
+      particles.push({
+        kind:'dust',
+        x:defender.x - dir*(18 + i*3) + (Math.random()-.5)*44,
+        y:baseY + (Math.random()-.5)*44,
+        vx:-dir*(70+i*16) + (Math.random()-.5)*70,
+        vy:-40-Math.random()*90,
+        life:.26 + Math.random()*.22,
+        max:.42,
+        color: blocked ? 'rgba(142,220,255,.36)' : (attacker.colorB || '#d9b76a') + '77',
+        size:(heavyHit ? 15 : 9) + Math.random()*22
+      });
+    }
+    if (heavyHit && isGrounded(defender)) {
+      for (let i=0;i<7;i++){
+        particles.push({
+          kind:'shockwave',
+          x:defender.x - dir*(8+i*10),
+          y:defender.y+3,
+          vx:-dir*(60+i*18),
+          vy:0,
+          life:.20+i*.018,
+          max:.24+i*.018,
+          size:22+i*7,
+          color: attacker.colorB || '#d9b76a'
+        });
+      }
+    }
+  }
+
+  function drawCombatDepth20Layer(layer='back'){
+    if (gameState !== 'fight' && gameState !== 'roundEnd') return;
+    const t = performance.now()/1000;
+    const mobile = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const mood = typeof arenaMood17 === 'function' ? arenaMood17() : null;
+    const colorA = mood?.gradeA || 'rgba(217,183,106,.10)';
+    const colorB = mood?.edge || 'rgba(201,40,50,.14)';
+    ctx.save();
+    if (layer === 'back') {
+      ctx.globalCompositeOperation = 'screen';
+      const scan = ctx.createLinearGradient(0, h*.12, 0, h*.78);
+      scan.addColorStop(0, 'rgba(255,255,255,0)');
+      scan.addColorStop(.52, colorA);
+      scan.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = scan;
+      ctx.globalAlpha = mobile ? .20 : .30;
+      ctx.fillRect(0,0,w,h);
+      ctx.globalAlpha = mobile ? .13 : .20;
+      ctx.fillStyle = colorB;
+      const drift = Math.sin(t*.38)*w*.025;
+      ctx.beginPath();
+      ctx.ellipse(w*.52 + drift, h*.46, w*.42, h*.18, -.08, 0, Math.PI*2);
+      ctx.fill();
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      const floorFog = ctx.createLinearGradient(0, groundY - h*.12, 0, h);
+      floorFog.addColorStop(0, 'rgba(0,0,0,0)');
+      floorFog.addColorStop(.35, mobile ? 'rgba(7,9,12,.14)' : 'rgba(7,9,12,.22)');
+      floorFog.addColorStop(1, mobile ? 'rgba(0,0,0,.20)' : 'rgba(0,0,0,.30)');
+      ctx.fillStyle = floorFog;
+      ctx.fillRect(0, groundY - h*.14, w, h*.20);
+      if (!mobile) {
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = .14 + Math.sin(t*.9)*.025;
+        ctx.fillStyle = colorA;
+        ctx.fillRect(0, groundY - 2, w, 3);
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawPhysics20Overlay(){
+    if (combatPhysics20T <= 0) return;
+    const a = clamp(combatPhysics20T / 1.05, 0, 1);
+    ctx.save();
+    ctx.globalAlpha = a;
+    const boxW = Math.min(330, w*.42);
+    const x = w - boxW - 22;
+    const y = Math.max(88, h*.16);
+    const grad = ctx.createLinearGradient(x, y, x+boxW, y+70);
+    grad.addColorStop(0, 'rgba(5,8,12,.78)');
+    grad.addColorStop(.55, 'rgba(32,12,14,.52)');
+    grad.addColorStop(1, 'rgba(5,8,12,.72)');
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = 'rgba(217,183,106,.44)';
+    roundRect(ctx, x, y, boxW, 70, 14, true, true);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = a*.55;
+    ctx.fillStyle = 'rgba(217,183,106,.16)';
+    ctx.fillRect(x+10, y+12, boxW-20, 2);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = a;
+    ctx.fillStyle = '#8edcff';
+    ctx.font = '900 11px Inter, Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('PHYSICS + CHARACTER 20.0', x+18, y+20);
+    ctx.fillStyle = '#fff3d1';
+    ctx.font = '950 18px Cinzel, Georgia, serif';
+    ctx.fillText((combatPhysics20Word || 'BODY WEIGHT').toUpperCase(), x+18, y+43);
+    ctx.fillStyle = 'rgba(245,240,230,.72)';
+    ctx.font = '800 10px Inter, Arial';
+    ctx.fillText((combatPhysics20Meta || 'grounded force').toUpperCase(), x+18, y+59);
+    ctx.restore();
+  }
+
   function clampToStage(f){
     const b = stageBounds();
     const pad = USE_PREMIUM_FIGHTER_ART ? Math.max(48, fighterBodyRadius(f)*.70) : f.w*.35;
@@ -6933,29 +7136,34 @@ body.arena-select-open .arena-select{
     if (dist < minDist) {
       const dir = pCenter < eCenter ? -1 : 1;
       const overlap = minDist - dist;
-      const pMass = player.mass || 1;
-      const eMass = enemy.mass || 1;
+      const pMass = fighterWeight20(player) * (player.pushResist20 || 1);
+      const eMass = fighterWeight20(enemy) * (enemy.pushResist20 || 1);
       const total = pMass + eMass;
-      const pMove = overlap * (eMass / total) * .62;
-      const eMove = overlap * (pMass / total) * .62;
+      const attackSoftener = (player.state === 'attack' || enemy.state === 'attack') ? .74 : .88;
+      const pMove = overlap * (eMass / total) * attackSoftener;
+      const eMove = overlap * (pMass / total) * attackSoftener;
 
-      // Physics 11.0: separation is positional first, velocity second.
-      // That keeps the fighters from vibrating or exploding apart on contact.
+      // Physics 20.0: heavier fighters own more space, but separation is still smooth.
       player.x += dir * pMove;
       enemy.x -= dir * eMove;
 
-      const impulse = Math.min(120, overlap * 5.2);
+      const impulse = Math.min(170, overlap * 6.4);
       player.vx += dir * impulse / Math.max(.9, pMass);
       enemy.vx -= dir * impulse / Math.max(.9, eMass);
-      player.vx *= .82;
-      enemy.vx *= .82;
-      player.contactPressure = Math.min(1, (player.contactPressure || 0) + .10);
-      enemy.contactPressure = Math.min(1, (enemy.contactPressure || 0) + .10);
+      player.vx *= Math.pow(.76, 1 / Math.max(.9, pMass));
+      enemy.vx *= Math.pow(.76, 1 / Math.max(.9, eMass));
+      player.contactPressure = Math.min(1, (player.contactPressure || 0) + .16);
+      enemy.contactPressure = Math.min(1, (enemy.contactPressure || 0) + .16);
+      player.bodyLean20 = (player.bodyLean20 || 0) + dir * Math.min(.08, overlap * .0009);
+      enemy.bodyLean20 = (enemy.bodyLean20 || 0) - dir * Math.min(.08, overlap * .0009);
+      if (overlap > minDist * .18 && gameState === 'fight') {
+        combatPhysics20Pulse = Math.max(combatPhysics20Pulse || 0, .25);
+      }
       clampToStage(player);
       clampToStage(enemy);
     } else {
-      player.contactPressure = Math.max(0, (player.contactPressure || 0) - .05);
-      enemy.contactPressure = Math.max(0, (enemy.contactPressure || 0) - .05);
+      player.contactPressure = Math.max(0, (player.contactPressure || 0) - .06);
+      enemy.contactPressure = Math.max(0, (enemy.contactPressure || 0) - .06);
     }
   }
 
@@ -6963,15 +7171,18 @@ body.arena-select-open .arena-select{
     f.walkIntent = axis;
     if (!axis) return;
     const grounded = isGrounded(f);
+    const weight = fighterWeight20(f);
     const accel = grounded ? f.stats.accel : f.stats.airAccel;
     const blockPenalty = f.state === 'block' ? .30 : 1;
     const attackPenalty = f.state === 'attack' ? .10 : 1;
     const landingPenalty = f.landingLag > 0 ? .35 : 1;
+    const weightPenalty = grounded ? (1 / Math.max(.92, weight * .94)) : (1 / Math.max(1.05, weight * 1.08));
     if (Math.sign(f.vx) && Math.sign(f.vx) !== Math.sign(axis) && grounded) {
       f.vx *= Math.pow(f.stats.turnBrake || .52, dt * 60);
+      if (Math.abs(f.vx) > 260) spawnFootDust(f, 1, 'rgba(217,183,106,.22)');
     }
-    f.vx += axis * accel * blockPenalty * attackPenalty * landingPenalty * dt;
-    const max = f.stats.speed * (grounded ? 1 : .78) * (f.state === 'block' ? .40 : 1);
+    f.vx += axis * accel * blockPenalty * attackPenalty * landingPenalty * weightPenalty * dt;
+    const max = f.stats.speed * (grounded ? 1 : .64) * (f.state === 'block' ? .40 : 1) / Math.max(.96, weight * .04 + .96);
     f.vx = clamp(f.vx, -max, max);
   }
 
@@ -6990,6 +7201,7 @@ body.arena-select-open .arena-select{
     f.guardBreakCd = Math.max(0, (f.guardBreakCd || 0) - dt);
     f.guardBrokenT = Math.max(0, (f.guardBrokenT || 0) - dt);
     f.blockStress19 = Math.max(0, (f.blockStress19 || 0) - dt * 18);
+    applyCombatPhysics20(f, opponent, dt);
     f.comboSeqT = Math.max(0, (f.comboSeqT || 0) - dt);
     f.comboNameT = Math.max(0, (f.comboNameT || 0) - dt);
     if (f.comboSeqT <= 0) { f.comboSeq = []; f.currentComboName = ''; }
@@ -7091,11 +7303,14 @@ body.arena-select-open .arena-select{
     }
 
     const grounded = isGrounded(f);
+    const weight = fighterWeight20(f);
     const baseFriction = grounded
-      ? (f.state === 'block' ? .66 : f.state === 'attack' ? .84 : f.landingLag > 0 ? .68 : (f.stats.brake || .74))
+      ? (f.state === 'block' ? .60 : f.state === 'attack' ? .82 : f.landingLag > 0 ? .64 : (f.stats.brake || .74))
       : .972;
-    f.vx *= Math.pow(baseFriction, dt*60);
-    if (Math.abs(f.vx) < 7) f.vx = 0;
+    const traction = grounded ? Math.min(.94, baseFriction * (f.stats.traction20 || f.traction20 || .82)) : baseFriction;
+    const stopPower = grounded ? (f.stats.stopPower20 || 1) * Math.max(.92, weight) : 1;
+    f.vx *= Math.pow(traction, dt*60*stopPower);
+    if (Math.abs(f.vx) < (grounded ? 10 : 7)) f.vx = 0;
     clampToStage(f);
 
     if (USE_PREMIUM_FIGHTER_ART && gameState === 'fight' && grounded && Math.abs(f.vx) > 135 && Math.random() < dt * 11) {
@@ -7453,6 +7668,9 @@ body.arena-select-open .arena-select{
     combatFeel10T = Math.max(0, combatFeel10T - dt);
     combatImpact18T = Math.max(0, combatImpact18T - dt);
     combatAi19T = Math.max(0, combatAi19T - dt);
+    combatPhysics20T = Math.max(0, (combatPhysics20T || 0) - dt);
+    combatPhysics20Pulse = Math.max(0, (combatPhysics20Pulse || 0) - dt * 1.8);
+    visualDepth20T += dt;
     comboTrainer19T = Math.max(0, comboTrainer19T - dt);
     updateUltimateCinematic(dt);
     cameraZoom = lerp(cameraZoom, 1, dt*2.6);
@@ -8039,22 +8257,33 @@ body.arena-select-open .arena-select{
     const hexA = (c,a)=> (typeof c === 'string' && c[0] === '#' && c.length === 7) ? c + a : c;
     const coreB = hurt ? '#ff5161' : (f.colorB || (isEnemy ? '#3eb6ff' : '#c92832'));
     const accent = f.accent || (isEnemy ? '#d7dff0' : '#d9b76a');
+    const heavyBody20 = isHeavyFighter20(f);
+    const breath20 = Math.sin(time/720 + (f.breathSeed20 || 0));
+    const damage20 = clamp(f.damageVisual20 || 0, 0, 1);
+    const recoil20 = clamp(f.impactRecoil20 || 0, 0, 1);
+    const contact20 = clamp(f.groundContact20 || 0, 0, 1);
+    const wall20 = clamp(f.wallPressure20 || 0, 0, 1);
 
-    const walkCycle = Math.sin(time / 58);
-    const bob = f.state === 'idle' ? Math.sin(time/230)*4.2 : f.state === 'walk' ? Math.abs(walkCycle)*13.0 : 0;
+    const walkCycle = Math.sin(time / (heavyBody20 ? 72 : 58));
+    const bob = f.state === 'idle' ? breath20*(heavyBody20 ? 2.4 : 4.8) : f.state === 'walk' ? Math.abs(walkCycle)*(heavyBody20 ? 9.5 : 14.0) : 0;
     const attackPunch = attacking ? Math.sin(tAttack * Math.PI) : 0;
-    const attackLunge = dir * attackPunch * (atkName === 'ultimate' ? 44 : atkName === 'special' ? 34 : atkName === 'heavy' ? 28 : 18);
+    const attackLunge = dir * attackPunch * (atkName === 'ultimate' ? 48 : atkName === 'special' ? 37 : atkName === 'heavy' ? 29 : 17);
     const dodgeSlide = dodging ? -dir * 34 * Math.max(0, 1 - f.stateT/.26) : 0;
-    const poseX = attackLunge + dodgeSlide + (f.state === 'walk' ? Math.sin(time/72) * 16 : 0);
-    const poseY = attacking ? -attackPunch * 13 : 0;
-    const lean = clamp((f.vx || 0) / 440, -0.24, 0.24) + (hurt ? -0.20 : 0) + (dodging ? -0.26 : 0) + (attacking ? dir*.095*attackPunch : 0);
-    const strideSquashX = f.state === 'walk' ? 1 + Math.abs(walkCycle) * .035 : 1;
-    const strideSquashY = f.state === 'walk' ? 1 - Math.abs(walkCycle) * .018 : 1;
-    const attackSquashX = attacking ? 1 + attackPunch * .075 : 1;
-    const attackSquashY = attacking ? 1 - attackPunch * .035 : 1;
+    const recoilPose20 = -(f.impactDir20 || 0) * recoil20 * (heavyBody20 ? 22 : 31);
+    const poseX = attackLunge + dodgeSlide + recoilPose20 + (f.state === 'walk' ? Math.sin(time/72) * (heavyBody20 ? 10 : 16) : 0);
+    const poseY = attacking ? -attackPunch * 13 : (damage20 ? -damage20*7 : 0);
+    const lean = clamp((f.vx || 0) / (heavyBody20 ? 620 : 440), -0.24, 0.24) + (f.bodyLean20 || 0) + (hurt ? -0.20 : 0) + (dodging ? -0.26 : 0) + (attacking ? dir*.095*attackPunch : 0);
+    const strideSquashX = f.state === 'walk' ? 1 + Math.abs(walkCycle) * (heavyBody20 ? .020 : .038) : 1;
+    const strideSquashY = f.state === 'walk' ? 1 - Math.abs(walkCycle) * (heavyBody20 ? .010 : .020) : 1;
+    const breatheSquashX = f.state === 'idle' ? 1 + breath20 * (heavyBody20 ? .006 : .010) : 1;
+    const breatheSquashY = f.state === 'idle' ? 1 - breath20 * (heavyBody20 ? .005 : .008) : 1;
+    const attackSquashX = attacking ? 1 + attackPunch * (heavyBody20 ? .055 : .082) : 1;
+    const attackSquashY = attacking ? 1 - attackPunch * (heavyBody20 ? .025 : .040) : 1;
 
     let spriteH = coarse ? clamp(h * .40, 245, 405) : clamp(h * .47, 350, 490);
     if (isEnemy) spriteH *= coarse ? 1.06 : 1.09;
+    if (heavyBody20) spriteH *= coarse ? 1.035 : 1.055;
+    else spriteH *= coarse ? .995 : 1.015;
     if (atkName === 'ultimate') spriteH *= 1.018;
     const spriteW = spriteH * aspect;
 
@@ -8073,29 +8302,46 @@ body.arena-select-open .arena-select{
 
     // Heavy grounded contact shadow, drawn in world space.
     ctx.save();
-    const shadowW = finalW * (isEnemy ? .64 : .58);
+    const shadowW = finalW * (isEnemy ? .68 : .60) * (heavyBody20 ? 1.16 : 1);
     const shadow = ctx.createRadialGradient(x, y + 7, 8, x, y + 7, shadowW);
-    shadow.addColorStop(0,'rgba(0,0,0,.86)');
-    shadow.addColorStop(.42,'rgba(0,0,0,.42)');
+    shadow.addColorStop(0,`rgba(0,0,0,${.78 + contact20*.15})`);
+    shadow.addColorStop(.42,`rgba(0,0,0,${.34 + contact20*.15})`);
     shadow.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = shadow;
     ctx.beginPath();
-    ctx.ellipse(x, y + 9, shadowW, 24, 0, 0, Math.PI*2);
+    ctx.ellipse(x, y + 9, shadowW, heavyBody20 ? 29 : 24, 0, 0, Math.PI*2);
     ctx.fill();
+    if (contact20 > .2) {
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = .10 + contact20*.12;
+      ctx.strokeStyle = hexA(accent,'66');
+      ctx.lineWidth = heavyBody20 ? 3 : 2;
+      ctx.beginPath();
+      ctx.ellipse(x, y + 6, shadowW*.56, heavyBody20 ? 10 : 8, 0, 0, Math.PI*2);
+      ctx.stroke();
+    }
     ctx.restore();
 
-    // Premium colored back aura for readability on the dark arena.
+    // Premium colored back aura and rim lift for readability on the dark arena.
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = hurt ? .34 : (isEnemy ? .18 : .20);
-    const aura = ctx.createRadialGradient(x, y - finalH*.58, 10, x, y - finalH*.58, finalW*.72);
-    aura.addColorStop(0, hexA(coreB,'72'));
-    aura.addColorStop(.48, hexA(accent,'20'));
+    ctx.globalAlpha = hurt ? .40 : (isEnemy ? .20 : .22) + (f.rimPower20 || .3)*.12 + damage20*.18;
+    const aura = ctx.createRadialGradient(x, y - finalH*.58, 10, x, y - finalH*.58, finalW*.78);
+    aura.addColorStop(0, hexA(coreB,'82'));
+    aura.addColorStop(.48, hexA(accent,'26'));
     aura.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = aura;
     ctx.beginPath();
-    ctx.ellipse(x, y - finalH*.56, finalW*.60, finalH*.45, 0, 0, Math.PI*2);
+    ctx.ellipse(x, y - finalH*.56, finalW*.64, finalH*.48, 0, 0, Math.PI*2);
     ctx.fill();
+    ctx.strokeStyle = hexA(coreB,'88');
+    ctx.shadowColor = hexA(coreB,'aa');
+    ctx.shadowBlur = 20 + (f.rimPower20 || .3)*26;
+    ctx.lineWidth = heavyBody20 ? 3.2 : 2.4;
+    ctx.globalAlpha = (hurt ? .22 : .16) + (f.rimPower20 || .3)*.16;
+    ctx.beginPath();
+    ctx.ellipse(x, y - finalH*.55, finalW*.50, finalH*.42, 0, Math.PI*.72, Math.PI*1.28);
+    ctx.stroke();
     ctx.restore();
 
     // Attack trail behind/around the sprite.
@@ -8128,24 +8374,41 @@ body.arena-select-open .arena-select{
     // Draw full body character art.
     ctx.save();
     ctx.translate(x, y);
-    ctx.scale(dir * strideSquashX * attackSquashX, strideSquashY * attackSquashY);
+    ctx.scale(dir * strideSquashX * attackSquashX * breatheSquashX, strideSquashY * attackSquashY * breatheSquashY);
     ctx.rotate(lean);
-    if (hurt) {
-      ctx.filter = 'brightness(1.35) saturate(1.2)';
+    if (hurt || damage20 > .05) {
+      ctx.filter = `brightness(${1.08 + damage20*.34}) saturate(${1.08 + damage20*.22}) contrast(${1.02 + damage20*.10})`;
     }
     const drawX = -finalW*.5 + xOffset;
     const drawY = -finalH;
     ctx.drawImage(img, drawX, drawY, finalW, finalH);
     ctx.filter = 'none';
 
-    // Soft hit flash directly on top of sprite.
-    if (hurt) {
+    // Soft hit flash and damage glints directly on top of sprite.
+    if (hurt || damage20 > .04) {
       ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = .22;
+      ctx.globalAlpha = .16 + damage20*.20;
       ctx.fillStyle = '#fff3ec';
       ctx.beginPath();
       ctx.ellipse(xOffset, -finalH*.54, finalW*.42, finalH*.42, 0, 0, Math.PI*2);
       ctx.fill();
+
+      if (damage20 > .10) {
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.strokeStyle = hexA(coreB,'cc');
+        ctx.shadowColor = hexA(coreB,'cc');
+        ctx.shadowBlur = 12;
+        ctx.lineWidth = Math.max(2, finalW*.009);
+        for (let i=0;i<3;i++){
+          const yy = -finalH*(.42 + i*.11);
+          const xx = xOffset + (i-1)*finalW*.08;
+          ctx.beginPath();
+          ctx.moveTo(xx - finalW*.08, yy);
+          ctx.lineTo(xx + finalW*.04, yy - finalH*.04);
+          ctx.lineTo(xx + finalW*.10, yy - finalH*.02);
+          ctx.stroke();
+        }
+      }
     }
 
     // Block shield around guard side.
@@ -8195,6 +8458,12 @@ body.arena-select-open .arena-select{
     ctx.shadowColor = 'rgba(0,0,0,.85)';
     ctx.shadowBlur = 8;
     ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'SHADOW RAVEN')).slice(0,16).toUpperCase(), x, y+27);
+    if (!coarse) {
+      ctx.globalAlpha = .72;
+      ctx.fillStyle = heavyBody20 ? '#8edcff' : '#ff8c8c';
+      ctx.font = '900 8px Inter, Arial';
+      ctx.fillText((f.weightClass20 || (heavyBody20 ? 'TANK' : 'ASSASSIN')).toUpperCase(), x, y+43);
+    }
     ctx.restore();
 
     return true;
@@ -8845,6 +9114,7 @@ body.arena-select-open .arena-select{
     }
     drawArena();
     drawArenaMood17Layer('back');
+    drawCombatDepth20Layer('back');
     ctx.restore();
 
     let cameraShift = 0;
@@ -8864,6 +9134,7 @@ body.arena-select-open .arena-select{
     }
     const first = player.x < enemy.x ? player : enemy;
     const second = first === player ? enemy : player;
+    drawCombatDepth20Layer('front');
     drawFighter(first);
     drawFighter(second);
     drawParticles();
@@ -8873,6 +9144,7 @@ body.arena-select-open .arena-select{
     drawVignette();
     drawUltimateCinematic();
     drawCombatAI19Overlay();
+    drawPhysics20Overlay();
 
     if (cinematic > 0) {
       ctx.save();
@@ -10367,6 +10639,173 @@ function sessionId(){
       };
     }
     return { left: w * .22, right: w * .78, center: w * .5 };
+  }
+
+
+  function setPhysicsBeat20(word, meta='', time=.78){
+    combatPhysics20T = Math.max(combatPhysics20T || 0, time);
+    combatPhysics20Word = word || 'PHYSICS';
+    combatPhysics20Meta = meta || '';
+    combatPhysics20Pulse = 1;
+  }
+
+  function fighterWeight20(f){
+    return Math.max(.86, Number(f?.bodyWeight20 || f?.mass || 1));
+  }
+
+  function isHeavyFighter20(f){
+    return !!(f && (fighterIsWarden(f) || String(f.weightClass20 || '').toUpperCase() === 'TANK'));
+  }
+
+  function applyCombatPhysics20(f, opponent, dt){
+    if (!f) return;
+    const grounded = isGrounded(f);
+    const weight = fighterWeight20(f);
+    const targetLean = clamp((f.vx || 0) / (isHeavyFighter20(f) ? 680 : 610), -.22, .22)
+      + (f.impactDir20 || 0) * (f.impactRecoil20 || 0) * .18
+      + (f.state === 'block' ? -f.dir * .055 : 0)
+      + (f.state === 'attack' ? f.dir * .035 : 0);
+    f.bodyLean20 += (targetLean - (f.bodyLean20 || 0)) * Math.min(1, dt * (grounded ? 10 : 5.5));
+    f.impactRecoil20 = Math.max(0, (f.impactRecoil20 || 0) - dt * 3.6);
+    f.damageVisual20 = Math.max(0, (f.damageVisual20 || 0) - dt * 1.45);
+    f.wallPressure20 = Math.max(0, (f.wallPressure20 || 0) - dt * 1.8);
+    f.groundContact20 += ((grounded ? 1 : 0) - (f.groundContact20 || 0)) * Math.min(1, dt * 12);
+    f.footPlant20 = Math.max(0, (f.footPlant20 || 0) - dt);
+    if (grounded) {
+      const speed = Math.abs(f.vx || 0);
+      const planted = speed < 72 && f.state !== 'attack' && f.state !== 'hitstun';
+      if (planted) f.vx *= Math.pow(.88 / Math.max(.92, weight), dt * 60);
+      if (f.state === 'block') f.vx *= Math.pow(.78, dt * 60);
+      if (f.landingLag > 0) f.vx *= Math.pow(.72, dt * 60);
+      if (speed > 250 && (f.footPlant20 || 0) <= 0) {
+        f.footPlant20 = isHeavyFighter20(f) ? .16 : .12;
+        spawnFootDust(f, isHeavyFighter20(f) ? 2 : 1, isHeavyFighter20(f) ? 'rgba(96,190,255,.22)' : 'rgba(220,54,68,.20)');
+      }
+    } else {
+      // Air control is intentionally reduced so jumps feel physical instead of floaty.
+      f.vx *= Math.pow(.986 - Math.min(.012, (weight - 1) * .010), dt * 60);
+    }
+    if (opponent && Math.abs(f.x - opponent.x) < fighterSpacing(f, opponent) * .58 && grounded) {
+      f.contactPressure = Math.min(1, (f.contactPressure || 0) + dt * 1.4);
+    }
+  }
+
+  function spawnPhysicsImpact20(attacker, defender, atk, blocked=false){
+    const heavyHit = atk && (atk.name === 'heavy' || atk.name === 'special' || atk.name === 'ultimate');
+    const dir = attackDirection(attacker) || Math.sign(defender.x - attacker.x) || 1;
+    const baseY = defender.y - (defender.collisionH || defender.h || 220) * .58;
+    if (heavyHit || blocked) {
+      setPhysicsBeat20(blocked ? 'BLOCK PUSHBACK' : (atk.name === 'ultimate' ? 'BODY BREAK' : 'WEIGHT IMPACT'), blocked ? 'guard absorbs force' : `${attacker.weightClass20 || 'FIGHTER'} FORCE`, atk.name === 'ultimate' ? 1.05 : .72);
+    }
+    defender.impactRecoil20 = Math.max(defender.impactRecoil20 || 0, blocked ? .45 : atk.name === 'ultimate' ? 1 : atk.name === 'special' ? .82 : atk.name === 'heavy' ? .68 : .38);
+    defender.impactDir20 = dir;
+    defender.damageVisual20 = Math.max(defender.damageVisual20 || 0, blocked ? .22 : atk.name === 'ultimate' ? 1 : atk.name === 'special' ? .78 : atk.name === 'heavy' ? .58 : .34);
+    attacker.impactRecoil20 = Math.max(attacker.impactRecoil20 || 0, atk.name === 'ultimate' ? .55 : atk.name === 'special' ? .42 : atk.name === 'heavy' ? .32 : .18);
+    attacker.impactDir20 = -dir;
+    const ringCount = blocked ? 4 : heavyHit ? 9 : 5;
+    for (let i=0;i<ringCount;i++){
+      particles.push({
+        kind:'dust',
+        x:defender.x - dir*(18 + i*3) + (Math.random()-.5)*44,
+        y:baseY + (Math.random()-.5)*44,
+        vx:-dir*(70+i*16) + (Math.random()-.5)*70,
+        vy:-40-Math.random()*90,
+        life:.26 + Math.random()*.22,
+        max:.42,
+        color: blocked ? 'rgba(142,220,255,.36)' : (attacker.colorB || '#d9b76a') + '77',
+        size:(heavyHit ? 15 : 9) + Math.random()*22
+      });
+    }
+    if (heavyHit && isGrounded(defender)) {
+      for (let i=0;i<7;i++){
+        particles.push({
+          kind:'shockwave',
+          x:defender.x - dir*(8+i*10),
+          y:defender.y+3,
+          vx:-dir*(60+i*18),
+          vy:0,
+          life:.20+i*.018,
+          max:.24+i*.018,
+          size:22+i*7,
+          color: attacker.colorB || '#d9b76a'
+        });
+      }
+    }
+  }
+
+  function drawCombatDepth20Layer(layer='back'){
+    if (gameState !== 'fight' && gameState !== 'roundEnd') return;
+    const t = performance.now()/1000;
+    const mobile = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const mood = typeof arenaMood17 === 'function' ? arenaMood17() : null;
+    const colorA = mood?.gradeA || 'rgba(217,183,106,.10)';
+    const colorB = mood?.edge || 'rgba(201,40,50,.14)';
+    ctx.save();
+    if (layer === 'back') {
+      ctx.globalCompositeOperation = 'screen';
+      const scan = ctx.createLinearGradient(0, h*.12, 0, h*.78);
+      scan.addColorStop(0, 'rgba(255,255,255,0)');
+      scan.addColorStop(.52, colorA);
+      scan.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = scan;
+      ctx.globalAlpha = mobile ? .20 : .30;
+      ctx.fillRect(0,0,w,h);
+      ctx.globalAlpha = mobile ? .13 : .20;
+      ctx.fillStyle = colorB;
+      const drift = Math.sin(t*.38)*w*.025;
+      ctx.beginPath();
+      ctx.ellipse(w*.52 + drift, h*.46, w*.42, h*.18, -.08, 0, Math.PI*2);
+      ctx.fill();
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      const floorFog = ctx.createLinearGradient(0, groundY - h*.12, 0, h);
+      floorFog.addColorStop(0, 'rgba(0,0,0,0)');
+      floorFog.addColorStop(.35, mobile ? 'rgba(7,9,12,.14)' : 'rgba(7,9,12,.22)');
+      floorFog.addColorStop(1, mobile ? 'rgba(0,0,0,.20)' : 'rgba(0,0,0,.30)');
+      ctx.fillStyle = floorFog;
+      ctx.fillRect(0, groundY - h*.14, w, h*.20);
+      if (!mobile) {
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = .14 + Math.sin(t*.9)*.025;
+        ctx.fillStyle = colorA;
+        ctx.fillRect(0, groundY - 2, w, 3);
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawPhysics20Overlay(){
+    if (combatPhysics20T <= 0) return;
+    const a = clamp(combatPhysics20T / 1.05, 0, 1);
+    ctx.save();
+    ctx.globalAlpha = a;
+    const boxW = Math.min(330, w*.42);
+    const x = w - boxW - 22;
+    const y = Math.max(88, h*.16);
+    const grad = ctx.createLinearGradient(x, y, x+boxW, y+70);
+    grad.addColorStop(0, 'rgba(5,8,12,.78)');
+    grad.addColorStop(.55, 'rgba(32,12,14,.52)');
+    grad.addColorStop(1, 'rgba(5,8,12,.72)');
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = 'rgba(217,183,106,.44)';
+    roundRect(ctx, x, y, boxW, 70, 14, true, true);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = a*.55;
+    ctx.fillStyle = 'rgba(217,183,106,.16)';
+    ctx.fillRect(x+10, y+12, boxW-20, 2);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = a;
+    ctx.fillStyle = '#8edcff';
+    ctx.font = '900 11px Inter, Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('PHYSICS + CHARACTER 20.0', x+18, y+20);
+    ctx.fillStyle = '#fff3d1';
+    ctx.font = '950 18px Cinzel, Georgia, serif';
+    ctx.fillText((combatPhysics20Word || 'BODY WEIGHT').toUpperCase(), x+18, y+43);
+    ctx.fillStyle = 'rgba(245,240,230,.72)';
+    ctx.font = '800 10px Inter, Arial';
+    ctx.fillText((combatPhysics20Meta || 'grounded force').toUpperCase(), x+18, y+59);
+    ctx.restore();
   }
 
   function clampToStage(f){
