@@ -83,6 +83,8 @@
     .control-btn.big{width:68px;height:68px}
     .control-btn.special{border-color:rgba(217,183,106,.6);color:#ffe1a0;background:linear-gradient(180deg,rgba(217,183,106,.22),rgba(217,183,106,.08))}
     .control-btn.ultimate{border-color:rgba(255,75,92,.72);color:#ffd5d9;background:linear-gradient(180deg,rgba(255,75,92,.24),rgba(217,183,106,.08));box-shadow:0 0 26px rgba(201,40,50,.16),inset 0 0 0 1px rgba(255,255,255,.045)}
+    .control-btn.ultimate.ready{border-color:rgba(255,232,145,.95);color:#fff0b7;background:linear-gradient(180deg,rgba(255,232,145,.34),rgba(201,40,50,.22));box-shadow:0 0 34px rgba(255,232,145,.34),0 0 54px rgba(201,40,50,.22),inset 0 0 0 1px rgba(255,255,255,.08);animation:ultimateReady13 1.05s ease-in-out infinite alternate}
+    @keyframes ultimateReady13{from{filter:brightness(1);transform:translateY(0) scale(1)}to{filter:brightness(1.35);transform:translateY(-1px) scale(1.035)}}
     .control-btn.dodge{border-color:rgba(255,255,255,.28);color:#e9f5ff;background:linear-gradient(180deg,rgba(62,182,255,.16),rgba(255,255,255,.055))}
     .control-btn.block{color:#bde8ff;border-color:rgba(62,182,255,.45)}
     .control-btn.active{transform:translateY(2px) scale(.96);background:linear-gradient(180deg,rgba(217,183,106,.3),rgba(255,255,255,.08));box-shadow:0 0 24px rgba(217,183,106,.23)}
@@ -3266,6 +3268,12 @@ body.combat-feel-10 .pause-btn{
   let lastHitAt = 0;
   let roundIntroTimer = 0;
   let combatFeel10T = 0;
+  let ultimateCineT = 0;
+  let ultimateCineMax = 0;
+  let ultimateCineKind = '';
+  let ultimateCineAttacker = null;
+  let ultimateCineDefender = null;
+  let ultimateCineFinisher = false;
   let telegramContext = { insideTelegram:false, user:null, initData:'' };
   let pendingStarsItemId = '';
   let appProfile = loadProfile();
@@ -3296,8 +3304,9 @@ body.combat-feel-10 .pause-btn{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '12.0 AI COMBOS';
-  const AI_COMBOS_PATCH = '12.0 AI COMBOS';
+  const REAL_PHYSICS_PATCH = '13.0 ULTIMATE FINISHER';
+  const AI_COMBOS_PATCH = '13.0 ULTIMATE FINISHER';
+  const ULTIMATE_FINISHER_PATCH = '13.0 ULTIMATE FINISHER';
 
   const AI_PROFILES = {
     easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
@@ -3583,6 +3592,9 @@ body.combat-feel-10 .pause-btn{
       hpDelay: hp,
       maxHp: hp,
       energy: Number(cfg.energy || (isPlayer ? 35 : 30)),
+      ultimateName: cfg.ultimateName || (isPlayer ? 'RIFT EXECUTION' : 'TITAN JUDGEMENT'),
+      finisherName: isPlayer ? 'RIFT EXECUTION' : 'TITAN JUDGEMENT',
+      ultimateCd: 0,
       stamina: 100,
 
       state: 'idle',
@@ -3747,9 +3759,16 @@ body.combat-feel-10 .pause-btn{
     comboCount = 0;
     comboTimer = 0;
     comboDamage = 0;
+    ultimateCineT = 0;
+    ultimateCineMax = 0;
+    ultimateCineKind = '';
+    ultimateCineAttacker = null;
+    ultimateCineDefender = null;
+    ultimateCineFinisher = false;
     updateComboTag();
+    syncUltimateButton();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'AI + COMBOS 12.0 · SMART WARDEN');
+    showCallout('ROUND ' + roundIndex, 'ULTIMATE / FINISHER 13.0');
     if (roundIntroTimer) clearTimeout(roundIntroTimer);
     roundIntroTimer = window.setTimeout(()=>{
       if (gameState === 'fight' && !roundResolving) { showCallout('FIGHT', 'Make every hit count'); audio.round(); }
@@ -4093,6 +4112,120 @@ body.combat-feel-10 .pause-btn{
     }
   }
 
+  function ultimateDisplayName(f){
+    if (!f) return 'ULTIMATE';
+    return f.id === 'player' ? 'RIFT EXECUTION' : 'TITAN JUDGEMENT';
+  }
+
+  function finisherDisplayName(f){
+    if (!f) return 'FINISHER';
+    return f.id === 'player' ? 'RIFT EXECUTION' : 'TITAN JUDGEMENT';
+  }
+
+  function syncUltimateButton(){
+    const btn = document.querySelector('[data-input="ultimate"]');
+    if (!btn || !player) return;
+    const ready = gameState === 'fight' && !roundResolving && player.energy >= attacks.ultimate.cost;
+    btn.classList.toggle('ready', !!ready);
+    btn.textContent = ready ? 'ULT!' : 'ULT';
+  }
+
+  function spawnUltimateCharge(f){
+    if (!f) return;
+    for(let i=0;i<30;i++){
+      const a = (i / 30) * Math.PI * 2;
+      const r = 54 + Math.random()*110;
+      particles.push({
+        kind:'ember',
+        x:f.x + Math.cos(a)*r,
+        y:f.y - (f.collisionH || f.h)*(.48 + Math.random()*.26) + Math.sin(a)*r*.34,
+        vx:-Math.cos(a)*(80+Math.random()*180),
+        vy:-60-Math.random()*160,
+        life:.52 + Math.random()*.36,
+        max:.88,
+        color:i%2 ? (f.colorB || '#fff0b7') : '#fff0b7',
+        size:3+Math.random()*8
+      });
+    }
+    for(let i=0;i<4;i++){
+      particles.push({kind:'shockwave', x:f.x, y:f.y-110-i*24, vx:0, vy:0, life:.42+i*.07, max:.42+i*.07, size:90+i*46, color:i%2 ? f.colorB : '#fff0b7'});
+    }
+    spawnAura(f, '#fff0b7');
+    spawnAura(f, f.colorB);
+  }
+
+  function triggerUltimateCinematic(attacker, defender, finishing=false){
+    if (!attacker || !defender) return;
+    ultimateCineT = finishing ? 1.65 : .92;
+    ultimateCineMax = ultimateCineT;
+    ultimateCineKind = attacker.id === 'player' ? 'raven' : 'warden';
+    ultimateCineAttacker = attacker;
+    ultimateCineDefender = defender;
+    ultimateCineFinisher = !!finishing;
+    combatFeel10T = Math.max(combatFeel10T, finishing ? 1.45 : .95);
+    cinematic = Math.max(cinematic, finishing ? 1.35 : .95);
+    cameraZoom = Math.max(cameraZoom, finishing ? 1.22 : 1.14);
+    shake = Math.max(shake, finishing ? 34 : 24);
+    flash = Math.max(flash, finishing ? .42 : .28);
+    slowMo = Math.min(slowMo, finishing ? .28 : .42);
+    roundFreeze = Math.max(roundFreeze, finishing ? .30 : .12);
+    spawnUltimateCharge(attacker);
+    spawnPremiumImpact(attacker, defender, {name:'ultimate', damage:attacks.ultimate.damage}, false);
+    spawnSlashWave(attacker, defender, 'ultimate');
+    const title = finishing ? 'FINISHER' : 'ULTIMATE';
+    const name = finishing ? finisherDisplayName(attacker) : ultimateDisplayName(attacker);
+    showCallout(title, name);
+    floatingText(name, (attacker.x + defender.x) * .5, Math.min(attacker.y, defender.y) - 285, '#fff0b7');
+  }
+
+  function updateUltimateCinematic(dt){
+    if (ultimateCineT <= 0) return;
+    ultimateCineT = Math.max(0, ultimateCineT - dt);
+    const attacker = ultimateCineAttacker;
+    const defender = ultimateCineDefender;
+    if (attacker && defender && Math.random() < dt * (ultimateCineFinisher ? 32 : 20)) {
+      const midX = (attacker.x + defender.x) * .5 + (Math.random()-.5)*140;
+      const midY = Math.min(attacker.y, defender.y) - 160 + (Math.random()-.5)*110;
+      particles.push({kind:'impactLine', x:midX, y:midY, vx:0, vy:0, life:.28, max:.28, size:80+Math.random()*90, angle:Math.random()*Math.PI*2, color:attacker.colorB || '#fff0b7'});
+      particles.push({kind:'spark', x:midX, y:midY, vx:(Math.random()-.5)*180, vy:(Math.random()-.5)*180, life:.22, max:.22, size:8+Math.random()*12, color:'#fff0b7'});
+    }
+  }
+
+  function drawUltimateCinematic(){
+    if (ultimateCineT <= 0 || ultimateCineMax <= 0) return;
+    const p = clamp(ultimateCineT / ultimateCineMax, 0, 1);
+    const k = 1 - p;
+    const attacker = ultimateCineAttacker;
+    const accent = attacker?.colorB || '#fff0b7';
+    ctx.save();
+    ctx.fillStyle = `rgba(0,0,0,${ultimateCineFinisher ? .36 + .28*p : .24 + .22*p})`;
+    ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = `rgba(0,0,0,${ultimateCineFinisher ? .56 : .42})`;
+    ctx.fillRect(0,0,w,h*.16);
+    ctx.fillRect(0,h*.84,w,h*.16);
+    ctx.globalCompositeOperation='lighter';
+    ctx.globalAlpha = .20 + .28*p;
+    const g = ctx.createRadialGradient(w*.5,h*.50,w*.04,w*.5,h*.50,w*.62);
+    g.addColorStop(0, accent + '88');
+    g.addColorStop(.36, 'rgba(255,240,183,.24)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha = .88;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.shadowColor=accent;
+    ctx.shadowBlur=28;
+    ctx.fillStyle='#fff0b7';
+    ctx.font='1000 ' + Math.round((ultimateCineFinisher ? 44 : 34) + k*8) + 'px Inter, Arial';
+    ctx.fillText(ultimateCineFinisher ? 'FINAL EXECUTION' : 'ULTIMATE ART', w*.5, h*.205);
+    ctx.font='1000 ' + Math.round((ultimateCineFinisher ? 68 : 48) + k*14) + 'px Inter, Arial';
+    ctx.fillText(ultimateCineFinisher ? finisherDisplayName(attacker) : ultimateDisplayName(attacker), w*.5, h*.77);
+    ctx.restore();
+  }
+
+
   function startAttack(f, type, fromBuffer=false){
     if (gameState !== 'fight') return;
     if (roundFreeze > 0) return;
@@ -4116,15 +4249,16 @@ body.combat-feel-10 .pause-btn{
 
     if (type === 'ultimate') {
       f.energy = clamp(f.energy - data.cost, 0, 100);
-      spawnAura(f, '#fff0b7');
-      spawnAura(f, f.colorB);
-      cinematic = .75;
-      cameraZoom = 1.09;
-      shake = Math.max(shake, 18);
-      flash = Math.max(flash, .32);
-      showCallout('ULTIMATE', f.ultimateName || 'Final Strike');
+      f.ultimateCd = 3.2;
+      spawnUltimateCharge(f);
+      cinematic = .95;
+      cameraZoom = 1.12;
+      shake = Math.max(shake, 22);
+      flash = Math.max(flash, .34);
+      showCallout('ULTIMATE READY', ultimateDisplayName(f));
       audio.hit('ultimate');
       tryHaptic('ultimate');
+      syncUltimateButton();
     } else if (type === 'special') {
       f.energy = clamp(f.energy - data.cost, 0, 100);
       spawnAura(f, f.colorB);
@@ -4225,6 +4359,7 @@ body.combat-feel-10 .pause-btn{
     const defenderBlocking = defender.state === 'block' && defender.stamina > 0 && defenderFacingAttacker;
     const counterHit = !defenderBlocking && isAttackStartup(defender);
 
+    const hpBefore = defender.hp;
     let dmg = atk.damage;
     let blocked = false;
 
@@ -4261,6 +4396,15 @@ body.combat-feel-10 .pause-btn{
     dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
 
     defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    if (blocked) defender.energy = clamp(defender.energy + 4, 0, 100);
+    else defender.energy = clamp(defender.energy + (atk.name === 'ultimate' ? 14 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5), 0, 100);
+    const ultimateFinisher = !blocked && atk.name === 'ultimate' && (defender.hp <= 0 || hpBefore <= defender.maxHp * .30 || defender.hp <= defender.maxHp * .18);
+    if (ultimateFinisher) {
+      defender.hp = 0;
+      triggerUltimateCinematic(attacker, defender, true);
+    } else if (!blocked && atk.name === 'ultimate') {
+      triggerUltimateCinematic(attacker, defender, false);
+    }
     defender.lastDamageTakenAt = performance.now();
     defender.pressureT = blocked ? .42 : .68;
     defender.invuln = atk.name === 'ultimate' ? .16 : .08;
@@ -4379,7 +4523,12 @@ body.combat-feel-10 .pause-btn{
     spawnKOBurst(winner);
     audio.ko();
     combatFeel10T = 1.15;
-    showCallout(winner === 'player' ? 'K.O.' : 'DOWN', winner === 'player' ? player.name + ' wins the round' : enemy.name + ' wins the round');
+    if (ultimateCineFinisher && ultimateCineAttacker) {
+      showCallout('FINISHER', finisherDisplayName(ultimateCineAttacker));
+      roundFreeze = Math.max(roundFreeze, .75);
+    } else {
+      showCallout(winner === 'player' ? 'K.O.' : 'DOWN', winner === 'player' ? player.name + ' wins the round' : enemy.name + ' wins the round');
+    }
     updateHUD(true);
     trackEvent('round_end', { winner, playerRounds, enemyRounds, roundIndex });
 
@@ -4433,8 +4582,8 @@ body.combat-feel-10 .pause-btn{
     const rewards = grantRewards(victory);
     trackEvent('fight_finish', { result:victory ? 'win' : 'loss', rewards, playerRounds, enemyRounds, duration:Math.max(0, Math.round(ROUND_TIME - roundTime)) });
     ui.result.style.display = 'flex';
-    ui.resultTitle.textContent = victory ? 'VICTORY' : 'DEFEAT';
-    ui.resultKicker.textContent = victory ? 'ARENA CLAIMED' : 'MATCH LOST';
+    ui.resultTitle.textContent = victory ? (ultimateCineFinisher ? 'FINISHER VICTORY' : 'VICTORY') : (ultimateCineFinisher ? 'EXECUTED' : 'DEFEAT');
+    ui.resultKicker.textContent = victory ? (ultimateCineFinisher ? 'RIFT EXECUTION COMPLETE' : 'ARENA CLAIMED') : (ultimateCineFinisher ? 'TITAN JUDGEMENT COMPLETE' : 'MATCH LOST');
     ui.resultText.textContent = victory
       ? `Матч завершён: ${rewards.label}. Профиль обновлён и готов к Telegram leaderboard.`
       : `AI забрал арену. Награда за участие: ${rewards.label}. Жми реванш и копи энергию для special.`;
@@ -4871,6 +5020,8 @@ body.combat-feel-10 .pause-btn{
     const lowStamina = f.stamina < 24;
 
     ai.think = Math.max(0, (ai.think || 0) - dt);
+    ai.ultCd = Math.max(0, (ai.ultCd || 0) - dt);
+    f.ultimateCd = Math.max(0, (f.ultimateCd || 0) - dt);
     ai.band = band;
     f.dir = dirToOpponent;
 
@@ -4878,6 +5029,17 @@ body.combat-feel-10 .pause-btn{
       ai.intent = 'reset';
       applyMovementInput(f, -f.dir, dt);
       if (dist > preferred * 1.16) ai.retreatT = 0;
+      return;
+    }
+
+    // Ultimate 13.0: AI can use Titan Judgement, but only with cooldown and good spacing.
+    const canUlt = f.energy >= attacks.ultimate.cost && ai.ultCd <= 0 && f.ultimateCd <= 0 && dist < specialReach + 130 && f.state !== 'attack';
+    const shouldUlt = canUlt && (opponent.hp <= opponent.maxHp * .34 || (band === 'mid' && opponent.state === 'attack') || Math.random() < profile.special * .055);
+    if (shouldUlt) {
+      ai.intent = 'ultimate';
+      ai.actionCd = 1.15;
+      ai.ultCd = 8.0 + Math.random()*4.0;
+      startAttack(f, 'ultimate');
       return;
     }
 
@@ -5111,6 +5273,7 @@ body.combat-feel-10 .pause-btn{
 
     if (gameState === 'menu' || gameState === 'result') return;
     if (gameState === 'paused') {
+      syncUltimateButton();
       updateHUD();
       return;
     }
@@ -5136,6 +5299,7 @@ body.combat-feel-10 .pause-btn{
     }
     cinematic = Math.max(0, cinematic - dt);
     combatFeel10T = Math.max(0, combatFeel10T - dt);
+    updateUltimateCinematic(dt);
     cameraZoom = lerp(cameraZoom, 1, dt*2.6);
 
     const sdt = dt * slowMo;
@@ -5165,6 +5329,7 @@ body.combat-feel-10 .pause-btn{
 
     shake = Math.max(0, shake - dt*35);
     flash = Math.max(0, flash - dt*1.9);
+    syncUltimateButton();
     updateHUD();
   }
 
@@ -6371,6 +6536,7 @@ body.combat-feel-10 .pause-btn{
     ctx.restore();
 
     drawVignette();
+    drawUltimateCinematic();
 
     if (cinematic > 0) {
       ctx.save();
