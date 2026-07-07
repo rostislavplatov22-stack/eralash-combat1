@@ -1,5 +1,3 @@
-
-
 (() => {
   'use strict';
 
@@ -27,14 +25,14 @@
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '16.0 PREMIUM ARENA FLOW';
+  const SPRITE_COMBAT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
 
   function loadSpriteSheet(src){
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
     // 9.1: cache-bust sprite sheets so Vercel/browser cannot show an older invisible asset.
-    img.src = src + '?v=character-select-14';
+    img.src = src + '?v=combat-impact-18';
     return img;
   }
 
@@ -170,6 +168,9 @@
     calloutSmall: document.getElementById('calloutSmall'),
     comboTag: document.getElementById('comboTag'),
     comboCount: document.getElementById('comboCount'),
+    impactBeat18: document.getElementById('impactBeat18'),
+    impactWord18: document.getElementById('impactWord18'),
+    impactMeta18: document.getElementById('impactMeta18'),
     debug: document.getElementById('debug'),
     resultTitle: document.getElementById('resultTitle'),
     resultText: document.getElementById('resultText'),
@@ -183,6 +184,13 @@
     fight5EnemyName: document.getElementById('fight5EnemyName'),
     fight5EnemyStyle: document.getElementById('fight5EnemyStyle'),
     fight5ArenaName: document.getElementById('fight5ArenaName'),
+    arenaMoodBadge17: document.getElementById('arenaMoodBadge17'),
+    arenaMoodName17: document.getElementById('arenaMoodName17'),
+    arenaMoodText17: document.getElementById('arenaMoodText17'),
+    arenaIntro17: document.getElementById('arenaIntro17'),
+    arenaIntroName17: document.getElementById('arenaIntroName17'),
+    arenaIntroQuote17: document.getElementById('arenaIntroQuote17'),
+    asStageFx17: document.getElementById('asStageFx17'),
     pauseBtn: document.getElementById('pauseBtn'),
     pauseOverlay: document.getElementById('pauseOverlay'),
     resumeBtn: document.getElementById('resumeBtn'),
@@ -224,6 +232,15 @@
   let lastHitAt = 0;
   let roundIntroTimer = 0;
   let combatFeel10T = 0;
+  let combatImpact18T = 0;
+  let impactBeat18Timer = 0;
+  // Combat AI & Combo 19.0 — tactical AI brain, guard-break pressure and readable combo mastery.
+  let combatAi19T = 0;
+  let combatAi19Word = '';
+  let combatAi19Meta = '';
+  let comboTrainer19T = 0;
+  let comboTrainer19Word = '';
+  let comboTrainer19Meta = '';
   let ultimateCineT = 0;
   let ultimateCineMax = 0;
   let ultimateCineKind = '';
@@ -263,16 +280,17 @@
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '16.0 ARENA FLOW';
-  const AI_COMBOS_PATCH = '16.0 ARENA FLOW';
-  const ULTIMATE_FINISHER_PATCH = '16.0 ARENA FLOW';
-  const CHARACTER_SELECT_PATCH = '16.0 ARENA FLOW';
-  const ARENA_SELECT_PATCH = '16.0 PREMIUM ARENA FLOW';
+  const REAL_PHYSICS_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const AI_COMBOS_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const ULTIMATE_FINISHER_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const CHARACTER_SELECT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
+  const ARENA_SELECT_PATCH = '18.0 COMBAT IMPACT SYSTEM';
 
   const AI_PROFILES = {
-    easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
-    normal: { name:'NORMAL', reaction:.23, block:.46, aggression:.58, punish:.42, combo:.46, special:.18, mistake:.20, footsie:.34 },
-    hard:   { name:'HARD',   reaction:.15, block:.62, aggression:.76, punish:.64, combo:.64, special:.28, mistake:.10, footsie:.52 }
+    // Combat AI & Combo 19.0 — each difficulty now drives reaction, defense, combo planning and punish discipline.
+    easy:   { name:'EASY',   reaction:.36, block:.30, aggression:.40, punish:.24, combo:.26, special:.10, mistake:.34, footsie:.20, plan:.24, bait:.12, reset:.26, burst:.14, guardPatience:.50 },
+    normal: { name:'NORMAL', reaction:.23, block:.50, aggression:.62, punish:.48, combo:.56, special:.20, mistake:.18, footsie:.38, plan:.50, bait:.24, reset:.34, burst:.24, guardPatience:.64 },
+    hard:   { name:'HARD',   reaction:.15, block:.66, aggression:.78, punish:.70, combo:.74, special:.32, mistake:.08, footsie:.56, plan:.72, bait:.38, reset:.44, burst:.36, guardPatience:.78 }
   };
 
   function aiDifficultyName(){
@@ -292,6 +310,127 @@
     return 'far';
   }
 
+
+  function combatMobileFx19(){
+    return !!(window.matchMedia && window.matchMedia('(pointer:coarse)').matches);
+  }
+
+  function aiPlanName19(plan){
+    const s = (plan || []).join('>');
+    if (s === 'light>light>heavy') return 'TACTICAL BASIC CHAIN';
+    if (s === 'light>heavy>special') return 'RIFT PUNISH ROUTE';
+    if (s === 'heavy>special') return 'ARMOR BREAK ROUTE';
+    if (s === 'light>light>special') return 'DASH RIFT ROUTE';
+    return 'PRESSURE STRING';
+  }
+
+  function setAiMind19(f, word, meta='', ttl=.72){
+    if (!f || f.id !== 'enemy') return;
+    combatAi19T = Math.max(combatAi19T, ttl);
+    combatAi19Word = String(word || 'AI READ').toUpperCase();
+    combatAi19Meta = String(meta || (f.ai?.intent || 'tactical')).toUpperCase();
+    if (f.ai) {
+      f.ai.mind = combatAi19Word;
+      f.ai.mindT = ttl;
+    }
+  }
+
+  function triggerComboTrainer19(f, name, meta=''){
+    if (!f || !name) return;
+    comboTrainer19T = .95;
+    comboTrainer19Word = String(name).toUpperCase();
+    comboTrainer19Meta = String(meta || 'CHAIN CONFIRMED').toUpperCase();
+  }
+
+  function chooseAIComboPlan19(f, opponent, profile, dist){
+    const canSpecial = f.energy >= attacks.special.cost;
+    const lightReach = attackReachValue('light', f, opponent);
+    const heavyReach = attackReachValue('heavy', f, opponent);
+    const specialReach = attackReachValue('special', f, opponent);
+    const opponentWhiff = isOpponentWhiffPunishable(opponent);
+    if (canSpecial && opponentWhiff && dist < specialReach + 80) return ['light','heavy','special'];
+    if (canSpecial && opponent.stamina < 38 && dist < specialReach + 70) return ['heavy','special'];
+    if (canSpecial && Math.random() < profile.special * 1.15 && dist < specialReach) return ['light','light','special'];
+    if (dist < heavyReach && Math.random() < profile.combo) return ['light','light','heavy'];
+    if (dist < lightReach) return ['light','light','heavy'];
+    return ['light'];
+  }
+
+  function startAIComboPlan19(f, opponent, plan, label=''){
+    if (!f || f.id !== 'enemy' || !plan || !plan.length) return false;
+    const first = plan[0];
+    if (!attacks[first]) return false;
+    f.ai.comboPlan = plan.slice(0, 4);
+    f.ai.comboPlanIndex = 1;
+    f.ai.comboPlanLabel = label || aiPlanName19(plan);
+    f.ai.comboCd = Math.max(f.ai.comboCd || 0, .30);
+    setAiMind19(f, 'AI COMBO PLAN', f.ai.comboPlanLabel, .88);
+    startAttack(f, first);
+    return true;
+  }
+
+  function nextAIComboStep19(attacker, defender, atk, profile){
+    if (!attacker || attacker.id !== 'enemy' || !attacker.ai) return '';
+    const ai = attacker.ai;
+    const plan = ai.comboPlan || [];
+    const idx = ai.comboPlanIndex || 0;
+    const dist = Math.abs((defender?.x || 0) - (attacker?.x || 0));
+    if (idx < plan.length && Math.random() > profile.mistake * .75) {
+      const next = plan[idx];
+      if (next && attacks[next] && (next !== 'special' || attacker.energy >= attacks.special.cost) && dist < attackReachValue(next, attacker, defender) + 110) {
+        ai.comboPlanIndex = idx + 1;
+        ai.intent = 'combo';
+        setAiMind19(attacker, 'CHAIN STEP', `${ai.comboPlanLabel || aiPlanName19(plan)} · ${next.toUpperCase()}`, .55);
+        return next;
+      }
+    }
+    ai.comboPlan = null;
+    ai.comboPlanIndex = 0;
+    ai.comboPlanLabel = '';
+    return '';
+  }
+
+  function triggerGuardBreak19(f, attacker=null){
+    if (!f || f.guardBreakCd > 0) return;
+    f.guardBreakCd = 1.65;
+    f.guardBrokenT = .72;
+    f.stamina = 0;
+    f.blockHoldT = 0;
+    f.hitstunTime = Math.max(f.hitstunTime || 0, .50);
+    f.vx += (attacker ? Math.sign(f.x - attacker.x) || attacker.dir || 1 : -f.dir) * 330;
+    f.vy = -110;
+    setState(f, 'hitstun');
+    floatingText('GUARD BREAK 19.0', f.x, f.y - (f.collisionH || f.h || 180) * .92, '#ffd27a');
+    showCombatWord('GUARD BREAK', f.x, f.y - (f.collisionH || f.h || 180) * .70, '#ffd27a');
+    spawnAura(f, '#ffd27a');
+    particles.push({kind:'shockwave', x:f.x, y:f.y-(f.collisionH || f.h || 180)*.55, vx:0, vy:0, life:.55, max:.55, size:110, color:'#ffd27a'});
+    hitStop = Math.max(hitStop, .14);
+    shake = Math.max(shake, 18);
+    flash = Math.max(flash, .20);
+    tryHaptic('heavy');
+    if (attacker && attacker.id === 'enemy') setAiMind19(attacker, 'GUARD BROKEN', 'PUNISH WINDOW', .9);
+  }
+
+  function registerCombatResult19(attacker, defender, atk, blocked, dmg, counterHit){
+    if (!attacker || !defender || !atk) return;
+    if (blocked) {
+      defender.blockStress19 = clamp((defender.blockStress19 || 0) + (atk.guardDamage || 12), 0, 100);
+      if (defender.blockStress19 > 72 && defender.guardBreakCd <= 0) {
+        floatingText('BLOCK PRESSURE', defender.x, defender.y - (defender.collisionH || defender.h || 180) * .82, '#8edcff');
+      }
+      return;
+    }
+
+    defender.blockStress19 = Math.max(0, (defender.blockStress19 || 0) - 18);
+    attacker.combo19Score = (attacker.combo19Score || 0) + Math.max(1, Math.round(dmg || 0));
+    if (attacker.currentComboName) {
+      attacker.combo19Name = attacker.currentComboName;
+      triggerComboTrainer19(attacker, attacker.currentComboName, `${Math.round(attacker.combo19Score || 0)} DAMAGE ROUTE`);
+    }
+    if (counterHit && attacker.id === 'enemy') setAiMind19(attacker, 'COUNTER READ', 'STARTUP PUNISH', .85);
+  }
+
+
   function isOpponentWhiffPunishable(f){
     if (!f) return false;
     if ((f.punishableT || 0) > 0) return true;
@@ -308,21 +447,25 @@
 
   function lastComboName(seq){
     const s = (seq || []).slice(-4).join('>');
-    if (s.endsWith('light>light>heavy')) return 'RAVEN BASIC CHAIN';
+    if (s.endsWith('light>light>heavy>special')) return 'EXECUTION STRING';
     if (s.endsWith('light>heavy>special')) return 'RIFT BREAKER';
     if (s.endsWith('heavy>special')) return 'PUNISH LINK';
     if (s.endsWith('light>light>special')) return 'DASH RIFT';
-    if (s.endsWith('light>light>heavy>special')) return 'EXECUTION STRING';
+    if (s.endsWith('light>light>heavy')) return 'RAVEN BASIC CHAIN';
+    if (s.endsWith('heavy>light>heavy')) return 'WARDEN CRUSH LOOP';
+    if (s.endsWith('light>heavy>heavy')) return 'PRESSURE BREAKER';
     return '';
   }
 
   function comboBonusFor(name, atkName){
     if (!name) return 1;
-    if (name === 'EXECUTION STRING') return atkName === 'special' ? 1.30 : 1.18;
-    if (name === 'RIFT BREAKER') return atkName === 'special' ? 1.24 : 1.12;
-    if (name === 'PUNISH LINK') return atkName === 'special' ? 1.20 : 1.10;
-    if (name === 'DASH RIFT') return 1.16;
-    if (name === 'RAVEN BASIC CHAIN') return atkName === 'heavy' ? 1.18 : 1.08;
+    if (name === 'EXECUTION STRING') return atkName === 'special' ? 1.34 : 1.20;
+    if (name === 'RIFT BREAKER') return atkName === 'special' ? 1.27 : 1.13;
+    if (name === 'PUNISH LINK') return atkName === 'special' ? 1.23 : 1.11;
+    if (name === 'DASH RIFT') return 1.18;
+    if (name === 'RAVEN BASIC CHAIN') return atkName === 'heavy' ? 1.22 : 1.09;
+    if (name === 'WARDEN CRUSH LOOP') return atkName === 'heavy' ? 1.24 : 1.10;
+    if (name === 'PRESSURE BREAKER') return atkName === 'heavy' ? 1.20 : 1.08;
     return 1;
   }
 
@@ -331,13 +474,24 @@
     if (!f.comboSeq || (f.comboSeqT || 0) <= 0) f.comboSeq = [];
     f.comboSeq.push(type);
     if (f.comboSeq.length > 4) f.comboSeq.shift();
-    f.comboSeqT = .95;
+    f.comboSeqT = 1.12;
+
     const name = lastComboName(f.comboSeq);
     if (name) {
       f.currentComboName = name;
-      f.comboNameT = .75;
-      floatingText(name, f.x, f.y - (f.collisionH || f.h || 180) * .92, f.id === 'player' ? '#ffd27a' : '#8edcff');
-      showCombatWord(name, f.x + f.dir * 36, f.y - (f.collisionH || f.h || 180) * .72, f.colorB || '#ffd27a');
+      f.comboNameT = .95;
+      f.combo19Name = name;
+      const y = f.y - (f.collisionH || f.h || 180) * .92;
+      const color = f.id === 'player' ? '#ffd27a' : '#8edcff';
+      floatingText(name, f.x, y, color);
+      showCombatWord(name, f.x + f.dir * 36, f.y - (f.collisionH || f.h || 180) * .72, f.colorB || color);
+      triggerComboTrainer19(f, name, f.id === 'player' ? 'PLAYER CHAIN' : 'AI ROUTE');
+      if (name === 'EXECUTION STRING' || name === 'RIFT BREAKER') {
+        hitStop = Math.max(hitStop, .055);
+        cameraZoom = Math.max(cameraZoom, 1.035);
+      }
+    } else if (f.comboSeq.length === 2 && f.comboSeq.join('>') === 'light>light') {
+      triggerComboTrainer19(f, 'CHAIN WINDOW', 'PRESS HEAVY OR SPECIAL');
     }
     return name;
   }
@@ -347,27 +501,30 @@
     f.bufferedAttack = type;
     f.bufferedAttackT = Math.max(f.bufferedAttackT || 0, time);
     f.aiComboQueued = type;
+    if (f.id === 'enemy' && f.ai) setAiMind19(f, 'BUFFERED ' + type.toUpperCase(), f.ai.comboPlanLabel || 'COMBO ROUTE', .42);
   }
 
   function aiQueueFollowup(attacker, defender, atk){
     if (!attacker || attacker.id !== 'enemy' || !attacker.ai || !atk) return;
     if (defender.hp <= 0 || attacker.hp <= 0) return;
     const profile = AI_PROFILES[attacker.ai.difficulty || aiDifficultyName()] || AI_PROFILES.normal;
-    if (Math.random() < profile.mistake) return;
+    if (Math.random() < profile.mistake * .72) return;
 
     const dist = Math.abs(defender.x - attacker.x);
     const canSpecial = attacker.energy >= attacks.special.cost;
-    let next = '';
+    let next = nextAIComboStep19(attacker, defender, atk, profile);
 
-    if (atk.name === 'light') {
-      if ((attacker.comboSeq || []).slice(-1)[0] === 'light' && Math.random() < profile.combo) next = Math.random() < .64 ? 'heavy' : 'light';
-      else if (Math.random() < profile.combo) next = 'light';
-    } else if (atk.name === 'heavy' && canSpecial && dist < attackReachValue('special', attacker, defender) && Math.random() < profile.special) {
-      next = 'special';
+    if (!next) {
+      if (atk.name === 'light') {
+        if ((attacker.comboSeq || []).slice(-1)[0] === 'light' && Math.random() < profile.combo) next = Math.random() < .68 ? 'heavy' : 'light';
+        else if (Math.random() < profile.combo) next = 'light';
+      } else if (atk.name === 'heavy' && canSpecial && dist < attackReachValue('special', attacker, defender) && Math.random() < profile.special) {
+        next = 'special';
+      }
     }
 
     if (next) {
-      queueComboFollowup(attacker, next, next === 'special' ? .54 : .44);
+      queueComboFollowup(attacker, next, next === 'special' ? .58 : .48);
       attacker.ai.intent = 'combo';
     }
   }
@@ -603,6 +760,14 @@
       pressureT: 0,
       lastDamageTakenAt: 0,
 
+      // Combat AI & Combo 19.0 state.
+      blockHoldT: 0,
+      blockStress19: 0,
+      guardBreakCd: 0,
+      guardBrokenT: 0,
+      combo19Score: 0,
+      combo19Name: '',
+
       colorA: cfg.colorA || (isPlayer ? '#14171e' : '#17191c'),
       colorB: cfg.colorB || (isPlayer ? '#c92832' : '#3eb6ff'),
       accent: cfg.accent || (isPlayer ? '#d9b76a' : '#d9f2ff'),
@@ -638,7 +803,15 @@
         aggression: clamp(Number(contentBundle.balance?.aiDifficulty || .62), .2, .95),
         blockChance: isPlayer ? .32 : clamp((aiProfile().block || .46) + baseDefense / 420, .28, .72),
         mistake: isPlayer ? .22 : clamp((aiProfile().mistake || .2) + (80 - baseSpeed) / 900, .06, .38),
-        patience: .25 + Math.random() * .35
+        patience: .25 + Math.random() * .35,
+        comboPlan: null,
+        comboPlanIndex: 0,
+        comboPlanLabel: '',
+        mind: 'neutral',
+        mindT: 0,
+        baitT: 0,
+        burstT: 0,
+        pressureReadT: 0
       }
     };
   }
@@ -720,6 +893,13 @@
     flash = 0;
     cinematic = 0;
     cameraZoom = 1;
+    combatImpact18T = 0;
+    combatAi19T = 0;
+    combatAi19Word = '';
+    combatAi19Meta = '';
+    comboTrainer19T = 0;
+    comboTrainer19Word = '';
+    comboTrainer19Meta = '';
     comboCount = 0;
     comboTimer = 0;
     comboDamage = 0;
@@ -732,7 +912,7 @@
     updateComboTag();
     syncUltimateButton();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, (player?.name || 'Fighter') + ' VS ' + (enemy?.name || 'Enemy'));
+    showCallout('ROUND ' + roundIndex, (contentArena()?.title || 'Arena') + ' · ' + (player?.name || 'Fighter') + ' VS ' + (enemy?.name || 'Enemy'));
     if (roundIntroTimer) clearTimeout(roundIntroTimer);
     roundIntroTimer = window.setTimeout(()=>{
       if (gameState === 'fight' && !roundResolving) { showCallout('FIGHT', 'Make every hit count'); audio.round(); }
@@ -848,7 +1028,10 @@
       atmosphere:'Smoke + sparks',
       readability:'Balanced',
       previewClass:'',
-      backgroundType:'black-citadel'
+      backgroundType:'black-citadel',
+      quote:'Darkness answers only strength.',
+      stageFx:'Low smoke, ember sparks, gold moon backlight',
+      moodKey:'citadel'
     },
     infernal_bridge: {
       id:'infernal_bridge',
@@ -860,7 +1043,10 @@
       atmosphere:'Heat haze + embers',
       readability:'Aggressive',
       previewClass:'infernal',
-      backgroundType:'infernal-bridge'
+      backgroundType:'infernal-bridge',
+      quote:'The bridge burns for the fighter who keeps pressure.',
+      stageFx:'Heat haze, furnace pulses, aggressive ember rain',
+      moodKey:'infernal'
     },
     moon_ritual: {
       id:'moon_ritual',
@@ -872,7 +1058,10 @@
       atmosphere:'Mist + lunar glow',
       readability:'Technical',
       previewClass:'moon',
-      backgroundType:'moon-ritual'
+      backgroundType:'moon-ritual',
+      quote:'Under the moon, every mistake becomes visible.',
+      stageFx:'Blue ritual fog, lunar bloom, clean silhouette light',
+      moodKey:'moon'
     },
     frozen_throne: {
       id:'frozen_throne',
@@ -884,7 +1073,10 @@
       atmosphere:'Snow dust + haze',
       readability:'Defensive',
       previewClass:'frozen',
-      backgroundType:'frozen-throne'
+      backgroundType:'frozen-throne',
+      quote:'Cold stone rewards patience and punishes panic.',
+      stageFx:'Snow dust, pale haze, icy edge light',
+      moodKey:'frozen'
     }
   };
 
@@ -905,6 +1097,169 @@
     updateArenaSelectUI();
     audio.ui();
   }
+
+
+  function arenaMood17(){
+    const meta = arenaSelectMeta(currentArena15());
+    const type = meta.backgroundType || 'black-citadel';
+    const mobile = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const lowPower = mobile || w < 760 || ((navigator.deviceMemory || 8) <= 4);
+    const mood = {
+      id: meta.id || 'black_citadel',
+      key: meta.moodKey || 'citadel',
+      title: meta.title || 'Black Citadel',
+      accent: meta.accent || '#d9b76a',
+      glow: (meta.accent || '#d9b76a') + '55',
+      lighting: meta.lighting || 'Gold / Ember',
+      atmosphere: meta.atmosphere || 'Smoke + sparks',
+      stageFx: meta.stageFx || 'Cinematic fog, ambient particles, color grade',
+      quote: meta.quote || 'Darkness answers only strength.',
+      type,
+      lowPower,
+      particleCount: lowPower ? 26 : 76,
+      fogCount: lowPower ? 3 : 7
+    };
+
+    if (type === 'infernal-bridge') {
+      mood.gradeA = 'rgba(255,54,23,.24)';
+      mood.gradeB = 'rgba(255,138,36,.12)';
+      mood.floor = 'rgba(255,84,34,.070)';
+      mood.particle = 'rgba(255,112,46,.88)';
+      mood.edge = 'rgba(255,42,20,.16)';
+    } else if (type === 'moon-ritual') {
+      mood.gradeA = 'rgba(80,174,255,.22)';
+      mood.gradeB = 'rgba(126,84,255,.12)';
+      mood.floor = 'rgba(124,194,255,.055)';
+      mood.particle = 'rgba(134,216,255,.82)';
+      mood.edge = 'rgba(68,150,255,.14)';
+    } else if (type === 'frozen-throne') {
+      mood.gradeA = 'rgba(190,246,255,.22)';
+      mood.gradeB = 'rgba(180,206,255,.12)';
+      mood.floor = 'rgba(200,242,255,.070)';
+      mood.particle = 'rgba(230,252,255,.86)';
+      mood.edge = 'rgba(196,245,255,.16)';
+    } else {
+      mood.gradeA = 'rgba(217,183,106,.16)';
+      mood.gradeB = 'rgba(255,80,40,.09)';
+      mood.floor = 'rgba(210,190,150,.045)';
+      mood.particle = 'rgba(255,218,142,.82)';
+      mood.edge = 'rgba(217,183,106,.11)';
+    }
+    return mood;
+  }
+
+  function syncArenaMood17(){
+    const mood = arenaMood17();
+    const root = document.documentElement;
+    root.style.setProperty('--arena17-accent', mood.accent);
+    root.style.setProperty('--arena17-glow', mood.glow);
+    document.body.setAttribute('data-arena-mood', mood.key);
+
+    if (ui.arenaMoodName17) ui.arenaMoodName17.textContent = mood.title;
+    if (ui.arenaMoodText17) ui.arenaMoodText17.textContent = `${mood.atmosphere} · ${mood.lighting}`;
+    if (ui.arenaMoodBadge17) ui.arenaMoodBadge17.style.borderColor = mood.accent + '55';
+    if (ui.arenaIntroName17) ui.arenaIntroName17.textContent = mood.title;
+    if (ui.arenaIntroQuote17) ui.arenaIntroQuote17.textContent = mood.quote;
+    if (ui.asStageFx17) ui.asStageFx17.innerHTML = `<b>17.0 Stage FX:</b> ${mood.stageFx}`;
+  }
+
+  function showArenaIntro17(){
+    syncArenaMood17();
+    const overlay = ui.arenaIntro17 || document.getElementById('arenaIntro17');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden','false');
+    overlay.classList.remove('show');
+    void overlay.offsetWidth;
+    requestAnimationFrame(()=>overlay.classList.add('show'));
+    window.setTimeout(()=>{
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.style.display = 'none';
+    }, 980);
+  }
+
+  function drawArenaMood17Layer(layer='back'){
+    if (gameState !== 'fight' && gameState !== 'roundEnd') return;
+    const mood = arenaMood17();
+    const t = performance.now() / 1000;
+    const r = EXACT_BLACK_CITADEL_ARENA ? getExactArenaStageRect() : { x:0, y:0, w, h };
+
+    ctx.save();
+    if (layer === 'back') {
+      ctx.globalCompositeOperation = 'screen';
+
+      const moon = ctx.createRadialGradient(r.x + r.w*.50, r.y + r.h*.22, 0, r.x + r.w*.50, r.y + r.h*.25, r.w*.48);
+      moon.addColorStop(0, mood.gradeA);
+      moon.addColorStop(.42, mood.gradeB);
+      moon.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = moon;
+      ctx.fillRect(0,0,w,h);
+
+      const edge = ctx.createLinearGradient(0,0,w,0);
+      edge.addColorStop(0, mood.edge);
+      edge.addColorStop(.28, 'rgba(0,0,0,0)');
+      edge.addColorStop(.72, 'rgba(0,0,0,0)');
+      edge.addColorStop(1, mood.type === 'infernal-bridge' ? 'rgba(255,128,48,.12)' : mood.edge);
+      ctx.fillStyle = edge;
+      ctx.fillRect(0,0,w,h);
+
+      const floor = ctx.createLinearGradient(0,groundY - h*.18,0,h);
+      floor.addColorStop(0,'rgba(0,0,0,0)');
+      floor.addColorStop(.45,mood.floor);
+      floor.addColorStop(1,'rgba(0,0,0,.26)');
+      ctx.fillStyle = floor;
+      ctx.fillRect(0,Math.max(0,groundY-h*.22),w,h);
+
+      // Slow cinematic light pulse, unique per selected stage.
+      const pulse = Math.sin(t * (mood.type === 'infernal-bridge' ? 2.4 : .85)) * .5 + .5;
+      ctx.globalAlpha = (mood.lowPower ? .055 : .095) + pulse * (mood.type === 'infernal-bridge' ? .055 : .025);
+      ctx.fillStyle = mood.gradeA;
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.restore();
+      return;
+    }
+
+    // Foreground atmosphere: particles/fog drawn after fighters for premium depth.
+    ctx.globalCompositeOperation = 'screen';
+    const fogN = mood.fogCount;
+    for (let i=0;i<fogN;i++){
+      const drift = mood.type === 'frozen-throne' ? 10 : mood.type === 'infernal-bridge' ? 28 : 18;
+      const x = r.x - r.w*.10 + ((i*.31*r.w + t*drift*(1+i*.18)) % (r.w*1.20));
+      const y = groundY - h*(.12 + (i%3)*.045) + Math.sin(t*.7+i)*9;
+      const rad = r.w * (.16 + (i%3)*.025);
+      const fog = ctx.createRadialGradient(x,y,0,x,y,rad);
+      fog.addColorStop(0, mood.type === 'infernal-bridge' ? 'rgba(255,90,38,.060)' : mood.type === 'frozen-throne' ? 'rgba(210,250,255,.068)' : mood.type === 'moon-ritual' ? 'rgba(120,196,255,.060)' : 'rgba(214,190,150,.052)');
+      fog.addColorStop(.42, 'rgba(255,255,255,.018)');
+      fog.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = fog;
+      ctx.beginPath();
+      ctx.arc(x,y,rad,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    const n = mood.particleCount;
+    for (let i=0;i<n;i++){
+      const seed = i * 131;
+      const speed = mood.type === 'infernal-bridge' ? 52 : mood.type === 'frozen-throne' ? 18 : 30;
+      const x = r.x - 80 + ((seed + t*speed + Math.sin(i*2.1)*55) % (r.w + 160));
+      const upward = mood.type === 'infernal-bridge' || mood.type === 'black-citadel';
+      const yRaw = (seed*1.71 + t*(upward ? 36 : 17)) % Math.max(1,r.h);
+      const y = upward ? (r.y + r.h - yRaw) : (r.y + yRaw);
+      const s = mood.type === 'frozen-throne' ? (1.0 + (i%4)*.55) : (.65 + (i%5)*.42);
+      ctx.globalAlpha = mood.lowPower ? .10 : (mood.type === 'moon-ritual' ? .11 : .17);
+      ctx.fillStyle = i % 5 === 0 ? '#fff4bf' : mood.particle;
+      if (mood.type === 'frozen-throne') {
+        ctx.fillRect(x, y, s*.95, s*.95);
+      } else {
+        ctx.beginPath();
+        ctx.arc(x,y,s,0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
 
   function updateArenaSelectUI(){
     const id = currentArena15();
@@ -928,6 +1283,7 @@
       preview.style.setProperty('--as-glow', meta.accent + '55');
     }
     if (ui?.fight5ArenaName) ui.fight5ArenaName.textContent = meta.title.toUpperCase();
+    syncArenaMood17();
     updateArenaFlowSummary16();
   }
 
@@ -951,6 +1307,7 @@
     set('ar16Player', p.name || 'Raven');
     set('ar16Enemy', e.name || 'Iron Warden');
     set('ar16Mood', `${arena.lighting || 'Gold / Ember'} · ${arena.atmosphere || 'Smoke + sparks'} · ${diff}`);
+    syncArenaMood17();
   }
 
   function showArenaReveal16(done){
@@ -1215,6 +1572,7 @@
 
 
   function newMatch(){
+    syncArenaMood17();
     matchFinalized = false;
     roundResolving = false;
     if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
@@ -1240,6 +1598,7 @@
       ui.menu.style.setProperty('display', 'none', 'important');
       document.body.classList.remove('menu-leaving');
       showFight5VsIntro();
+      showArenaIntro17();
       const arena = contentArena();
       showCallout('ROUND ' + roundIndex, (arena?.title || 'Dark fortress arena'));
     }, document.body.classList.contains('real-art-v4') ? 260 : 0);
@@ -1636,6 +1995,10 @@
 
     const data = attacks[type];
     if (!data) return;
+    if (type === 'ultimate' && (f.ultimateCd || 0) > 0) {
+      if (f.id === 'player') floatingText('ULT COOLDOWN', f.x, f.y - f.h*.86, '#d9b76a');
+      return;
+    }
 
     if ((type === 'special' || type === 'ultimate') && f.energy < data.cost) {
       if (f.id === 'player') floatingText('NO ENERGY', f.x, f.y - f.h*.86, '#d9b76a');
@@ -1669,7 +2032,8 @@
     f.state = 'attack';
     f.stateT = 0;
     const comboName = registerAttackSequence(f, type);
-    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type, dir: f.dir, whiffed: false, comboName };
+    const comboBoost19 = comboName ? (comboName === 'EXECUTION STRING' ? 1.10 : 1.06) : 1;
+    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type, dir: f.dir, whiffed: false, comboName, comboBoost19 };
     f.attackHasHit = false;
     f.lastAttackType = type;
     f.aiComboQueued = '';
@@ -1681,7 +2045,7 @@
     }
 
     // Real attack momentum: sprite and hitbox move together.
-    f.vx += f.dir * (data.lunge || 0) * .82;
+    f.vx += f.dir * (data.lunge || 0) * .82 * (f.attack?.comboBoost19 || 1);
     f.vx = clamp(f.vx, -f.stats.speed*1.28, f.stats.speed*1.28);
     spawnFootDust(f, type === 'ultimate' ? 12 : type === 'special' ? 9 : type === 'heavy' ? 7 : 4, f.colorB);
   }
@@ -1765,10 +2129,9 @@
       defender.vx += facing * Math.max(86, (atk.kb || 300) * .20);
       if (defender.stamina <= 0) {
         blocked = false;
-        dmg += 6;
+        dmg += 8;
         defender.invuln = 0;
-        floatingText('GUARD BREAK', defender.x, defender.y - defender.h*.88, '#d9b76a');
-        spawnAura(defender, '#d9b76a');
+        triggerGuardBreak19(defender, attacker);
       }
     }
 
@@ -1859,6 +2222,8 @@
 
     spawnHitSpark(defender.x - facing*28, defender.y - (defender.collisionH || defender.h)*.62, blocked ? '#8edcff' : attacker.colorB, atk.name);
     spawnPremiumImpact(attacker, defender, atk, blocked);
+    spawnCombatImpact18(attacker, defender, atk, blocked, dmg, counterHit);
+    registerCombatResult19(attacker, defender, atk, blocked, dmg, counterHit);
     spawnSlashWave(attacker, defender, atk.name);
     spawnFootDust(defender, blocked ? 4 : atk.name === 'ultimate' ? 16 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5, blocked ? '#8edcff' : attacker.colorB);
     floatingDamage(blocked ? 'BLOCK' : (counterHit ? 'COUNTER -' + dmg : '-' + dmg), defender.x, defender.y - defender.h*.88, blocked ? '#8edcff' : '#fff3d1', atk.name);
@@ -2029,17 +2394,140 @@
     else if (gameState === 'fight') setPaused(true);
   }
 
+
+  function lowPowerCombat18(){
+    try {
+      return (window.matchMedia && window.matchMedia('(pointer:coarse)').matches) || w < 760 || ((navigator.deviceMemory || 8) <= 4);
+    } catch (_) {
+      return w < 760;
+    }
+  }
+
+  function impactClass18(kind){
+    if (kind === 'block') return 'impact-block18';
+    if (kind === 'ultimate') return 'impact-ultimate18';
+    if (kind === 'special') return 'impact-special18';
+    if (kind === 'heavy') return 'impact-heavy18';
+    return 'impact-light18';
+  }
+
+  function pulseImpactClass18(kind, color){
+    const cls = impactClass18(kind);
+    document.documentElement.style.setProperty('--impact18-color', color || '#ffd27a');
+    document.body.classList.remove('impact-light18','impact-heavy18','impact-special18','impact-ultimate18','impact-block18');
+    void document.body.offsetWidth;
+    document.body.classList.add(cls);
+    window.clearTimeout(impactBeat18Timer);
+    impactBeat18Timer = window.setTimeout(()=>document.body.classList.remove(cls), kind === 'ultimate' ? 520 : 330);
+  }
+
+  function showImpactBeat18(word, meta, color){
+    const beat = ui.impactBeat18 || document.getElementById('impactBeat18');
+    if (!beat) return;
+    if (ui.impactWord18) ui.impactWord18.textContent = word;
+    if (ui.impactMeta18) ui.impactMeta18.textContent = meta;
+    beat.style.setProperty('--impact18-color', color || '#ffd27a');
+    beat.setAttribute('aria-hidden','false');
+    beat.classList.remove('show');
+    void beat.offsetWidth;
+    beat.classList.add('show');
+    window.setTimeout(()=>beat.setAttribute('aria-hidden','true'), 620);
+  }
+
+  function spawnCombatImpact18(attacker, defender, atk, blocked=false, dmg=0, counterHit=false){
+    if (!attacker || !defender || !atk) return;
+    const type = atk.name || 'light';
+    const low = lowPowerCombat18();
+    const facing = Math.sign(defender.x - attacker.x) || attacker.dir || 1;
+    const color = blocked ? '#8edcff' : (type === 'ultimate' ? '#fff0b7' : attacker.colorB || '#ff3946');
+    const cx = defender.x - facing * (blocked ? 22 : 42);
+    const cy = defender.y - (defender.collisionH || defender.h || 190) * (type === 'ultimate' ? .72 : type === 'special' ? .66 : .60);
+    const power = type === 'ultimate' ? 2.20 : type === 'special' ? 1.62 : type === 'heavy' ? 1.32 : .92;
+    const kind = blocked ? 'block' : type;
+
+    pulseImpactClass18(kind, color);
+    combatImpact18T = Math.max(combatImpact18T, type === 'ultimate' ? .62 : type === 'special' ? .46 : type === 'heavy' ? .34 : .20);
+
+    const impactFreeze = blocked ? .025 : type === 'ultimate' ? .075 : type === 'special' ? .052 : type === 'heavy' ? .036 : .014;
+    hitStop = Math.max(hitStop, (atk.hitStop || .06) + impactFreeze);
+    if (!blocked && (type === 'heavy' || type === 'special' || type === 'ultimate')) {
+      slowMo = Math.min(slowMo, type === 'ultimate' ? .52 : type === 'special' ? .68 : .78);
+      cameraZoom = Math.max(cameraZoom, type === 'ultimate' ? 1.20 : type === 'special' ? 1.11 : 1.065);
+    }
+
+    if (blocked) showImpactBeat18('BLOCK IMPACT', `${Math.round(atk.blockDamage || dmg || 0)} CHIP · ${Math.round(defender.stamina)} GUARD`, color);
+    else if (counterHit) showImpactBeat18('COUNTER HIT', `${Math.round(dmg)} DMG · ${Math.round((atk.kb || 0)/10)} KB`, '#ffd27a');
+    else if (type === 'ultimate') showImpactBeat18('ULTIMATE IMPACT', `${Math.round(dmg)} DMG · cinematic freeze`, color);
+    else if (type === 'special') showImpactBeat18('SPECIAL IMPACT', `${Math.round(dmg)} DMG · energy strike`, color);
+    else if (type === 'heavy') showImpactBeat18('HEAVY IMPACT', `${Math.round(dmg)} DMG · armor break`, color);
+
+    // 18.0: layered readable impact particles. Counts are capped on mobile.
+    const ringCount = low ? 1 : (type === 'ultimate' ? 4 : type === 'special' ? 3 : 2);
+    for (let i=0;i<ringCount;i++) {
+      particles.push({
+        kind:'shockwave',
+        x: cx + facing * i * 8,
+        y: cy + i * 7,
+        vx:0, vy:0,
+        life:.24 + power*.10 + i*.04,
+        max:.36 + power*.10 + i*.04,
+        size:(42 + i*18) * power,
+        color:i%2 ? color : '#fff3d1'
+      });
+    }
+
+    const rays = low ? (blocked ? 8 : 12) : (blocked ? 14 : Math.round(18 + power * 16));
+    for (let i=0;i<rays;i++){
+      const spread = blocked ? .72 : 1.10;
+      const a = (facing > 0 ? Math.PI : 0) + (Math.random()-.5)*spread;
+      const speed = (250 + Math.random()*780) * power;
+      particles.push({
+        kind:'impactLine',
+        x:cx + (Math.random()-.5)*26,
+        y:cy + (Math.random()-.5)*42,
+        vx:Math.cos(a)*speed,
+        vy:Math.sin(a)*speed*.40 - Math.random()*120,
+        life:.16 + Math.random()*.18,
+        max:.34,
+        size:(40 + Math.random()*95) * power,
+        color:i%5===0 ? '#fff3d1' : color,
+        angle:a
+      });
+    }
+
+    const floorCount = low ? 4 : (type === 'ultimate' ? 18 : type === 'special' ? 12 : type === 'heavy' ? 9 : 5);
+    for (let i=0;i<floorCount;i++){
+      particles.push({
+        kind:'dust',
+        x:defender.x + (Math.random()-.5)*82,
+        y:defender.y - 6 + Math.random()*14,
+        vx:(Math.random()-.5)*150,
+        vy:-20 - Math.random()*90,
+        life:.42 + Math.random()*.24,
+        max:.72,
+        size:8 + Math.random()*18*power,
+        color:blocked ? 'rgba(142,220,255,.35)' : 'rgba(217,183,106,.36)'
+      });
+    }
+
+    const premiumText = blocked ? 'GUARD' : type === 'light' ? 'HIT' : type.toUpperCase();
+    if (type !== 'light' || counterHit || blocked) {
+      showCombatWord(counterHit ? 'COUNTER' : premiumText, cx, cy - 34, counterHit ? '#ffd27a' : color);
+    }
+  }
+
   function spawnHitSpark(x,y,color,type){
-    const count = type === 'special' ? 38 : type === 'heavy' ? 28 : 18;
+    const low = lowPowerCombat18();
+    const count = low ? (type === 'ultimate' ? 26 : type === 'special' ? 22 : type === 'heavy' ? 16 : 10) : (type === 'ultimate' ? 56 : type === 'special' ? 42 : type === 'heavy' ? 30 : 18);
     for(let i=0;i<count;i++){
       const a = Math.random()*Math.PI*2;
-      const s = (type === 'special' ? 520 : type === 'heavy' ? 420 : 320) * (0.25 + Math.random());
+      const s = (type === 'ultimate' ? 760 : type === 'special' ? 560 : type === 'heavy' ? 440 : 320) * (0.25 + Math.random());
       particles.push({
         x,y,
         vx: Math.cos(a)*s,
         vy: Math.sin(a)*s - 80,
-        life: type === 'special' ? .48 : .32,
-        max: type === 'special' ? .48 : .32,
+        life: type === 'ultimate' ? .58 : type === 'special' ? .48 : .32,
+        max: type === 'ultimate' ? .58 : type === 'special' ? .48 : .32,
         size: Math.random()*3.2+1.4,
         color,
         kind:'spark'
@@ -2101,7 +2589,7 @@
   }
 
   function floatingDamage(text,x,y,color,type='light'){
-    const scale = type === 'ultimate' ? 1.38 : type === 'special' ? 1.22 : type === 'heavy' ? 1.12 : 1;
+    const scale = type === 'ultimate' ? 1.55 : type === 'special' ? 1.32 : type === 'heavy' ? 1.20 : 1.04;
     texts.push({
       text,
       x:x + (Math.random()-.5)*26,
@@ -2266,6 +2754,9 @@
     f.clashCd = Math.max(0, (f.clashCd || 0) - dt);
     f.punishableT = Math.max(0, (f.punishableT || 0) - dt);
     f.pressureT = Math.max(0, (f.pressureT || 0) - dt);
+    f.guardBreakCd = Math.max(0, (f.guardBreakCd || 0) - dt);
+    f.guardBrokenT = Math.max(0, (f.guardBrokenT || 0) - dt);
+    f.blockStress19 = Math.max(0, (f.blockStress19 || 0) - dt * 18);
     f.comboSeqT = Math.max(0, (f.comboSeqT || 0) - dt);
     f.comboNameT = Math.max(0, (f.comboNameT || 0) - dt);
     if (f.comboSeqT <= 0) { f.comboSeq = []; f.currentComboName = ''; }
@@ -2276,6 +2767,10 @@
       f.ai.retreatT = Math.max(0, (f.ai.retreatT || 0) - dt);
       f.ai.punishT = Math.max(0, (f.ai.punishT || 0) - dt);
       f.ai.comboCd = Math.max(0, (f.ai.comboCd || 0) - dt);
+      f.ai.mindT = Math.max(0, (f.ai.mindT || 0) - dt);
+      f.ai.baitT = Math.max(0, (f.ai.baitT || 0) - dt);
+      f.ai.burstT = Math.max(0, (f.ai.burstT || 0) - dt);
+      f.ai.pressureReadT = Math.max(0, (f.ai.pressureReadT || 0) - dt);
     }
     f.coyoteT = isGrounded(f) ? .095 : Math.max(0, (f.coyoteT || 0) - dt);
     f.jumpBufferT = Math.max(0, (f.jumpBufferT || 0) - dt);
@@ -2330,8 +2825,17 @@
       consumeBufferedAttack(f);
     }
     if (f.state === 'block') {
-      if (f.id === 'enemy' && f.stateT > .44) setState(f, 'idle');
-      if (f.id === 'player' && !input.block) setState(f, 'idle');
+      f.blockHoldT = (f.blockHoldT || 0) + dt;
+      const holdDrain = 11 + Math.min(26, f.blockHoldT * 16) + ((f.pressureT || 0) > 0 ? 8 : 0);
+      f.stamina = clamp(f.stamina - dt * holdDrain, 0, 100);
+      if (f.stamina <= 0 && f.guardBreakCd <= 0) {
+        triggerGuardBreak19(f, opponent);
+      } else {
+        if (f.id === 'enemy' && f.stateT > (.34 + (f.ai?.guardPatience || .18))) setState(f, 'idle');
+        if (f.id === 'player' && !input.block) setState(f, 'idle');
+      }
+    } else {
+      f.blockHoldT = 0;
     }
 
     if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'knockdown' && f.state !== 'dodge') {
@@ -2409,10 +2913,14 @@
     const lightReach = attackReachValue('light', f, opponent);
     const heavyReach = attackReachValue('heavy', f, opponent);
     const specialReach = attackReachValue('special', f, opponent);
-    const playerThreat = opponent.state === 'attack' && dist < specialReach + 90;
-    const whiffPunish = isOpponentWhiffPunishable(opponent) && dist < specialReach + 95;
+    const ultimateReach = attackReachValue('ultimate', f, opponent);
+    const playerThreat = opponent.state === 'attack' && dist < specialReach + 105;
+    const whiffPunish = isOpponentWhiffPunishable(opponent) && dist < specialReach + 105;
     const opponentBacking = Math.sign(opponent.vx || 0) === Math.sign(opponent.x - f.x);
-    const lowStamina = f.stamina < 24;
+    const lowStamina = f.stamina < 26;
+    const hpLead = (f.hp / Math.max(1, f.maxHp)) - (opponent.hp / Math.max(1, opponent.maxHp));
+    const behind = hpLead < -.18;
+    const ahead = hpLead > .20;
 
     ai.think = Math.max(0, (ai.think || 0) - dt);
     ai.ultCd = Math.max(0, (ai.ultCd || 0) - dt);
@@ -2421,116 +2929,131 @@
     f.dir = dirToOpponent;
 
     if (ai.retreatT > 0) {
-      ai.intent = 'reset';
+      ai.intent = lowStamina ? 'stamina reset' : 'spacing reset';
+      setAiMind19(f, 'RESET', ai.intent, .34);
       applyMovementInput(f, -f.dir, dt);
-      if (dist > preferred * 1.16) ai.retreatT = 0;
+      if (dist > preferred * 1.18 || ai.retreatT <= .02) ai.retreatT = 0;
       return;
     }
 
-    // Ultimate 13.0: AI can use Titan Judgement, but only with cooldown and good spacing.
-    const canUlt = f.energy >= attacks.ultimate.cost && ai.ultCd <= 0 && f.ultimateCd <= 0 && dist < specialReach + 130 && f.state !== 'attack';
-    const shouldUlt = canUlt && (opponent.hp <= opponent.maxHp * .34 || (band === 'mid' && opponent.state === 'attack') || Math.random() < profile.special * .055);
+    const canUlt = f.energy >= attacks.ultimate.cost && ai.ultCd <= 0 && f.ultimateCd <= 0 && dist < ultimateReach + 80 && f.state !== 'attack';
+    const shouldUlt = canUlt && (opponent.hp <= opponent.maxHp * .32 || (behind && band !== 'far') || (band === 'mid' && opponent.state === 'attack') || Math.random() < profile.special * .05);
     if (shouldUlt) {
-      ai.intent = 'ultimate';
-      ai.actionCd = 1.15;
-      ai.ultCd = 8.0 + Math.random()*4.0;
+      ai.intent = 'ultimate confirm';
+      ai.actionCd = 1.10;
+      ai.ultCd = 8.2 + Math.random()*4.4;
+      setAiMind19(f, 'ULTIMATE READ', opponent.hp <= opponent.maxHp * .32 ? 'FINISHER RANGE' : 'COUNTER SWING', .95);
       startAttack(f, 'ultimate');
       return;
     }
 
-    // Defensive reaction: block active/startup attacks, dodge slow big attacks, but with human mistakes.
+    // Defensive read: hard AI blocks less randomly and more when the player is actually dangerous.
     if (playerThreat && ai.guardCd <= 0 && f.state !== 'attack') {
-      const danger = opponent.attack?.name === 'ultimate' ? .34 : opponent.attack?.name === 'special' ? .22 : opponent.attack?.name === 'heavy' ? .14 : 0;
-      const shouldDefend = Math.random() < clamp(profile.block + danger - profile.mistake*.35, .12, .82);
+      const atkName = opponent.attack?.name || 'light';
+      const danger = atkName === 'ultimate' ? .38 : atkName === 'special' ? .26 : atkName === 'heavy' ? .18 : .06;
+      const inActive = isAttackActive(opponent);
+      const shouldDefend = Math.random() < clamp(profile.block + danger + (inActive ? .10 : 0) - profile.mistake*.33, .10, .88);
       if (shouldDefend) {
-        ai.guardCd = profile.reaction + Math.random()*.16;
-        ai.intent = isAttackActive(opponent) ? 'block' : 'read';
-        if ((opponent.attack?.name === 'heavy' || opponent.attack?.name === 'special') && Math.random() < .22 + profile.footsie*.20 && f.dodgeCd <= 0) {
+        ai.guardCd = profile.reaction + Math.random()*.14;
+        ai.intent = inActive ? 'perfect guard' : 'read guard';
+        ai.guardPatience = clamp(profile.guardPatience + Math.random()*.16, .34, .96);
+        setAiMind19(f, ai.intent, atkName.toUpperCase(), .58);
+        if ((atkName === 'heavy' || atkName === 'special' || atkName === 'ultimate') && Math.random() < .18 + profile.footsie*.23 && f.dodgeCd <= 0 && dist < heavyReach + 120) {
           performDodge(f);
+          ai.retreatT = .18 + Math.random()*.20;
           return;
         }
         setState(f, 'block');
-        f.vx *= .36;
+        f.vx *= .32;
         return;
       }
     }
 
     if (f.state === 'block') return;
 
-    // Punish whiffed attacks instead of randomly trading.
+    // Punish whiffs with reliable routes instead of random single hits.
     if (whiffPunish && ai.actionCd <= 0 && Math.random() < profile.punish) {
-      ai.intent = 'punish';
-      ai.actionCd = .30 + Math.random()*.18;
-      if (f.energy >= attacks.special.cost && dist < specialReach && Math.random() < profile.special + .18) startAttack(f, 'special');
-      else if (dist < heavyReach) startAttack(f, 'heavy');
-      else {
-        applyMovementInput(f, f.dir, dt);
-        if (dist < lightReach) startAttack(f, 'light');
-      }
-      return;
+      ai.intent = 'whiff punish';
+      ai.actionCd = .26 + Math.random()*.16;
+      setAiMind19(f, 'WHIFF PUNISH', opponent.attack?.name || 'RECOVERY', .82);
+      const plan = chooseAIComboPlan19(f, opponent, { ...profile, special: profile.special + .12, combo: profile.combo + .10 }, dist);
+      if (startAIComboPlan19(f, opponent, plan, 'WHIFF PUNISH ROUTE')) return;
     }
 
-    // Footsies: keep a playable distance, not constant forward spam.
+    // Tactical footsies: keep the AI readable but not passive.
     let axis = 0;
     if (band === 'far') {
       ai.intent = 'advance';
       axis = f.dir;
     } else if (band === 'close') {
-      ai.intent = lowStamina ? 'reset' : 'space';
-      axis = Math.random() < (.62 + profile.footsie*.18) ? -f.dir : 0;
+      ai.intent = lowStamina ? 'reset stamina' : 'micro space';
+      axis = Math.random() < (.58 + profile.footsie*.20) ? -f.dir : 0;
+      if (lowStamina && Math.random() < .020 + profile.reset*.010) ai.retreatT = .36 + Math.random()*.32;
     } else {
       ai.intent = 'footsies';
-      const drift = Math.sin((performance.now()/1000) * (1.8 + profile.footsie) + ai.patience*6.28);
-      if (Math.abs(drift) > .36) axis = drift > 0 ? f.dir : -f.dir;
-      if (opponentBacking && Math.random() < profile.aggression*.018) axis = f.dir;
+      const drift = Math.sin((performance.now()/1000) * (1.75 + profile.footsie) + ai.patience*6.28);
+      if (Math.abs(drift) > .33) axis = drift > 0 ? f.dir : -f.dir;
+      if (opponentBacking && Math.random() < profile.aggression*.020) axis = f.dir;
+      if (ahead && Math.random() < profile.reset*.010) axis = -f.dir;
     }
     applyMovementInput(f, axis, dt);
 
     if (ai.think <= 0) {
-      ai.think = profile.reaction + Math.random() * (.16 + profile.mistake*.18);
+      ai.think = profile.reaction + Math.random() * (.14 + profile.mistake*.16);
       ai.next = Math.random();
     }
 
-    if (ai.actionCd > 0 || ai.think > profile.reaction*.34) return;
+    if (ai.actionCd > 0 || ai.think > profile.reaction*.30) return;
 
     const canLight = dist < lightReach;
     const canHeavy = dist < heavyReach;
     const canSpecial = f.energy >= attacks.special.cost && dist < specialReach;
-    const canUltimate = f.energy >= attacks.ultimate.cost && dist < attackReachValue('ultimate', f, opponent);
+    const pressure = clamp(profile.aggression + (behind ? .16 : ahead ? -.09 : 0) + (opponent.stamina < 36 ? .08 : 0), .18, .90);
 
-    const hpLead = (f.hp / f.maxHp) - (opponent.hp / opponent.maxHp);
-    const pressure = clamp(profile.aggression + (hpLead < -.18 ? .14 : hpLead > .22 ? -.10 : 0), .18, .86);
+    // Planned pressure strings.
+    if ((band === 'mid' || band === 'close') && canLight && Math.random() < pressure * profile.plan) {
+      const plan = chooseAIComboPlan19(f, opponent, profile, dist);
+      ai.intent = 'combo plan';
+      ai.actionCd = .30 + Math.random()*.18;
+      if (startAIComboPlan19(f, opponent, plan, aiPlanName19(plan))) return;
+    }
 
-    if (band === 'mid' && canLight && Math.random() < pressure * .55) {
+    // Guard-break pressure when player holds block too long.
+    if (opponent.state === 'block' && opponent.stamina < 58 && canHeavy && Math.random() < profile.punish * .55) {
+      ai.intent = 'guard break';
+      ai.actionCd = .34 + Math.random()*.18;
+      setAiMind19(f, 'GUARD BREAK PLAN', `${Math.round(opponent.stamina)} STAMINA`, .82);
+      if (canSpecial && opponent.stamina < 34 && Math.random() < profile.special + .18) startAttack(f, 'special');
+      else startAttack(f, 'heavy');
+      return;
+    }
+
+    if (band === 'mid' && canLight && Math.random() < pressure * .40) {
       ai.intent = 'poke';
-      ai.actionCd = .24 + Math.random()*.20;
+      ai.actionCd = .22 + Math.random()*.18;
+      setAiMind19(f, 'POKE', 'MID RANGE CHECK', .42);
       startAttack(f, 'light');
       return;
     }
 
-    if (band === 'close' && canHeavy && Math.random() < pressure * .42) {
+    if (band === 'close' && canHeavy && Math.random() < pressure * .36) {
       ai.intent = 'commit';
-      ai.actionCd = .30 + Math.random()*.24;
-      startAttack(f, Math.random() < .58 ? 'light' : 'heavy');
+      ai.actionCd = .30 + Math.random()*.22;
+      setAiMind19(f, 'COMMIT', Math.random() < .55 ? 'LIGHT STARTER' : 'HEAVY PUNISH', .48);
+      startAttack(f, Math.random() < .55 ? 'light' : 'heavy');
       return;
     }
 
-    if (canSpecial && Math.random() < profile.special * (band === 'mid' ? 1.25 : .85)) {
+    if (canSpecial && Math.random() < profile.special * (band === 'mid' ? 1.15 : .80)) {
       ai.intent = 'special';
-      ai.actionCd = .55 + Math.random()*.35;
+      ai.actionCd = .52 + Math.random()*.32;
+      setAiMind19(f, 'SPECIAL', 'ENERGY SPEND', .58);
       startAttack(f, 'special');
       return;
     }
 
-    if (canUltimate && opponent.hp < opponent.maxHp * .38 && Math.random() < .10 + profile.special*.12) {
-      ai.intent = 'finish';
-      ai.actionCd = .90;
-      startAttack(f, 'ultimate');
-      return;
-    }
-
-    if (Math.random() < .0018 + profile.footsie*.0014 && isGrounded(f) && dist > preferred * .92) {
-      f.vy = -f.stats.jump*.72;
+    if (Math.random() < .0014 + profile.footsie*.0012 && isGrounded(f) && dist > preferred * .90) {
+      f.vy = -f.stats.jump*.70;
       spawnFootDust(f, 4, 'rgba(210,170,120,.26)');
     }
   }
@@ -2598,7 +3121,8 @@
     if (!ui.comboTag) return;
     if (comboCount >= 2) {
       const activeName = (player && player.currentComboName) || (enemy && enemy.currentComboName) || 'HIT COMBO';
-      ui.comboTag.innerHTML = `<b id="comboCount">${comboCount}</b> ${comboCount >= 3 ? 'HIT CHAIN' : 'HIT COMBO'}<small style="display:block;font-size:9px;letter-spacing:.16em;opacity:.78;margin-top:1px">${activeName}</small>`;
+      const dmg = Math.max(0, Math.round(comboDamage || 0));
+      ui.comboTag.innerHTML = `<b id="comboCount">${comboCount}</b> ${comboCount >= 3 ? 'HIT CHAIN' : 'HIT COMBO'}<small style="display:block;font-size:9px;letter-spacing:.16em;opacity:.78;margin-top:1px">${activeName} · ${dmg} DMG · BEST ${matchMaxCombo}</small>`;
       ui.comboCount = document.getElementById('comboCount');
       ui.comboTag.style.display = 'block';
       ui.comboTag.style.opacity = String(clamp(comboTimer, .15, 1));
@@ -2694,6 +3218,9 @@
     }
     cinematic = Math.max(0, cinematic - dt);
     combatFeel10T = Math.max(0, combatFeel10T - dt);
+    combatImpact18T = Math.max(0, combatImpact18T - dt);
+    combatAi19T = Math.max(0, combatAi19T - dt);
+    comboTrainer19T = Math.max(0, comboTrainer19T - dt);
     updateUltimateCinematic(dt);
     cameraZoom = lerp(cameraZoom, 1, dt*2.6);
 
@@ -3961,6 +4488,22 @@
       ctx.restore();
     }
 
+
+    if (combatImpact18T > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha = Math.min(.32, combatImpact18T*.42);
+      const mood = arenaMood17();
+      const g18 = ctx.createRadialGradient(w*.5,h*.54,w*.05,w*.5,h*.54,w*.78);
+      g18.addColorStop(0,'rgba(255,244,206,.24)');
+      g18.addColorStop(.34,mood.gradeA || 'rgba(217,183,106,.14)');
+      g18.addColorStop(.72,'rgba(201,40,50,.10)');
+      g18.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = g18;
+      ctx.fillRect(0,0,w,h);
+      ctx.restore();
+    }
+
     if (flash > 0) {
       ctx.save();
       ctx.globalCompositeOperation='lighter';
@@ -3970,6 +4513,78 @@
       ctx.restore();
     }
   }
+
+  
+  function drawCombatAI19Overlay(){
+    if (gameState !== 'fight' && gameState !== 'roundEnd') return;
+    const showAi = combatAi19T > 0 || (enemy?.ai?.mindT || 0) > 0;
+    const showTrainer = comboTrainer19T > 0;
+    if (!showAi && !showTrainer) return;
+
+    ctx.save();
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    if (showAi) {
+      const alpha = clamp(combatAi19T || enemy?.ai?.mindT || .2, .10, 1);
+      const bw = clamp(w * .18, 190, 300);
+      const bh = 58;
+      const x = w - bw - Math.max(16, w*.018);
+      const y = Math.max(92, h*.118);
+      ctx.globalAlpha = alpha;
+      const g = ctx.createLinearGradient(x, y, x + bw, y + bh);
+      g.addColorStop(0, 'rgba(0,0,0,.78)');
+      g.addColorStop(.5, 'rgba(28,55,70,.54)');
+      g.addColorStop(1, 'rgba(0,0,0,.64)');
+      ctx.fillStyle = g;
+      ctx.strokeStyle = 'rgba(142,220,255,.48)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, x, y, bw, bh, 14, true, true);
+      ctx.font = '900 9px Inter, Arial';
+      ctx.fillStyle = 'rgba(142,220,255,.88)';
+      ctx.fillText('AI MIND · 19.0', x+14, y+10);
+      ctx.font = '1000 17px Inter, Arial';
+      ctx.fillStyle = '#f5fbff';
+      ctx.shadowColor = 'rgba(74,190,255,.55)';
+      ctx.shadowBlur = 14;
+      ctx.fillText((combatAi19Word || enemy?.ai?.mind || 'TACTICAL READ').slice(0, 22), x+14, y+25);
+      ctx.shadowBlur = 0;
+      ctx.font = '850 9px Inter, Arial';
+      ctx.fillStyle = 'rgba(245,250,255,.66)';
+      ctx.fillText((combatAi19Meta || enemy?.ai?.intent || 'NEUTRAL').slice(0, 28), x+14, y+45);
+    }
+
+    if (showTrainer) {
+      const alpha = clamp(comboTrainer19T, .10, 1);
+      const bw = clamp(w * .21, 230, 360);
+      const bh = 62;
+      const x = Math.max(18, w*.018);
+      const y = Math.max(152, h*.185);
+      ctx.globalAlpha = alpha;
+      const g = ctx.createLinearGradient(x, y, x + bw, y + bh);
+      g.addColorStop(0, 'rgba(0,0,0,.78)');
+      g.addColorStop(.45, 'rgba(94,24,18,.58)');
+      g.addColorStop(1, 'rgba(0,0,0,.62)');
+      ctx.fillStyle = g;
+      ctx.strokeStyle = 'rgba(217,183,106,.56)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, x, y, bw, bh, 14, true, true);
+      ctx.font = '900 9px Inter, Arial';
+      ctx.fillStyle = 'rgba(217,183,106,.92)';
+      ctx.fillText('COMBO TRAINER · 19.0', x+14, y+10);
+      ctx.font = '1000 17px Inter, Arial';
+      ctx.fillStyle = '#fff3d1';
+      ctx.shadowColor = 'rgba(255,90,60,.58)';
+      ctx.shadowBlur = 14;
+      ctx.fillText((comboTrainer19Word || 'CHAIN WINDOW').slice(0, 26), x+14, y+26);
+      ctx.shadowBlur = 0;
+      ctx.font = '850 9px Inter, Arial';
+      ctx.fillStyle = 'rgba(245,240,230,.70)';
+      ctx.fillText((comboTrainer19Meta || 'PRESS HEAVY OR SPECIAL').slice(0, 34), x+14, y+47);
+    }
+    ctx.restore();
+  }
+
 
   function render(){
     // EXACT ARENA FRAMING FIX:
@@ -3996,6 +4611,7 @@
       ctx.translate(-w*.5, -h*.52);
     }
     drawArena();
+    drawArenaMood17Layer('back');
     ctx.restore();
 
     let cameraShift = 0;
@@ -4018,10 +4634,12 @@
     drawFighter(first);
     drawFighter(second);
     drawParticles();
+    drawArenaMood17Layer('front');
     ctx.restore();
 
     drawVignette();
     drawUltimateCinematic();
+    drawCombatAI19Overlay();
 
     if (cinematic > 0) {
       ctx.save();
@@ -4052,7 +4670,7 @@
       roundFreeze = 0;
       if (ui && ui.debug) {
         ui.debug.style.display = 'block';
-        ui.debug.innerHTML = 'ARENA FLOW 16.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
+        ui.debug.innerHTML = 'COMBAT IMPACT 18.0<br>LOOP RECOVERED #' + loopCrashCount + '<br>' + String(err && err.message || err).slice(0, 90);
       }
     }
     raf = requestAnimationFrame(loop);
@@ -6148,17 +6766,197 @@ function sessionId(){
   }
 
 
+
+  /* Arena Flow 16.3 — Start Flow Layer Guard
+     Hardens the whole launch chain:
+     - real-art Start always opens visible Character Select above menu
+     - Character Select Start always opens visible Arena Select above menu
+     - Arena Select Start always starts combat and hides all overlays/menu
+  */
+  function forceVisibleOverlay16_3(id, bodyClass, zIndex){
+    const el = document.getElementById(id);
+    if (!el) return null;
+    if (bodyClass) document.body.classList.add(bodyClass);
+    el.style.setProperty('display', 'flex', 'important');
+    el.style.setProperty('visibility', 'visible', 'important');
+    el.style.setProperty('pointer-events', 'auto', 'important');
+    el.style.setProperty('z-index', String(zIndex), 'important');
+    el.setAttribute('aria-hidden', 'false');
+    el.classList.add('show');
+    return el;
+  }
+
+  function hideOverlay16_3(id, bodyClass){
+    const el = document.getElementById(id);
+    if (bodyClass) document.body.classList.remove(bodyClass);
+    if (!el) return;
+    el.classList.remove('show');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.removeProperty('visibility');
+    el.style.removeProperty('pointer-events');
+    if (id === 'characterSelect' || id === 'arenaSelect') {
+      window.setTimeout(() => {
+        if (!el.classList.contains('show')) el.style.setProperty('display', 'none', 'important');
+      }, 80);
+    }
+  }
+
+  function openCharacterSelect16_3(source='start_gate_16_3'){
+    if (gameState !== 'menu' && gameState !== 'result') gameState = 'menu';
+    try { audio.ensure(); audio.ui(); } catch(_) {}
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      const savedDiff = currentDifficulty14();
+      contentBundle.balance.aiDifficulty = difficultyToValue(savedDiff);
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      saveContentState();
+      trackEvent('character_select_open', { source, patch:'16.3_layer_fix' });
+      updateCharacterSelectUI();
+    } catch(err) { console.warn('Arena Flow 16.3 character prefill failed', err); }
+    forceVisibleOverlay16_3('characterSelect', 'character-select-open', 180);
+  }
+
+  function openArenaSelect16_3(source='character_start_16_3'){
+    if (gameState !== 'menu' && gameState !== 'result') gameState = 'menu';
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      const diff = currentDifficulty14();
+      contentBundle.balance.aiDifficulty = difficultyToValue(diff);
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+      contentState.arenaId = currentArena15();
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      contentBundle.balance.activeArenaId = contentState.arenaId;
+      saveContentState();
+      trackEvent('arena_select_open', { source, patch:'16.3_layer_fix' });
+      updateArenaSelectUI();
+    } catch(err) { console.warn('Arena Flow 16.3 arena prefill failed', err); }
+    hideOverlay16_3('characterSelect', 'character-select-open');
+    window.setTimeout(() => forceVisibleOverlay16_3('arenaSelect', 'arena-select-open', 181), 90);
+  }
+
+  function startSelectedArenaMatch16_3(source='arena_start_16_3'){
+    try {
+      contentBundle.balance = contentBundle.balance || {};
+      contentState.fighterId = contentState.fighterId || 'raven';
+      contentState.enemyId = contentState.enemyId || opponentForSelectedFighter(contentState.fighterId);
+      contentState.arenaId = currentArena15();
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      contentBundle.balance.activeArenaId = contentState.arenaId;
+      saveContentState();
+      trackEvent('fight_start', {
+        source,
+        patch:'16.3_layer_fix',
+        fighter: contentState.fighterId,
+        enemy: contentState.enemyId,
+        arena: contentState.arenaId,
+        difficulty: currentDifficulty14()
+      });
+    } catch(err) { console.warn('Arena Flow 16.3 start state failed', err); }
+
+    hideOverlay16_3('characterSelect', 'character-select-open');
+    hideOverlay16_3('arenaSelect', 'arena-select-open');
+    try { audio.ensure(); audio.ui(); } catch(_) {}
+
+    let launched = false;
+    const launch = () => {
+      if (launched) return;
+      launched = true;
+      const ar = document.getElementById('arenaReveal16');
+      if (ar) {
+        ar.classList.remove('show');
+        ar.setAttribute('aria-hidden','true');
+        ar.style.setProperty('display','none','important');
+      }
+      newMatch();
+    };
+
+    try {
+      showArenaReveal16(launch);
+    } catch(err) {
+      console.warn('Arena Flow 16.3 reveal fallback to direct match', err);
+      launch();
+    }
+
+    window.setTimeout(() => {
+      if (!document.body.classList.contains('is-fighting') && gameState !== 'fight') launch();
+    }, 1250);
+    window.setTimeout(() => {
+      if (gameState === 'fight') {
+        document.body.classList.add('is-fighting');
+        ui.menu?.style?.setProperty('display', 'none', 'important');
+      }
+    }, 1550);
+  }
+
+  function bindArenaFlowLayerFix16_3(){
+    const hardBind = (id, fn) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      ['pointerdown','click','touchend'].forEach(type => {
+        el.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          fn(type);
+        }, { capture:true, passive:false });
+      });
+    };
+
+    hardBind('startBtn', () => openCharacterSelect16_3('start_button_16_3'));
+    hardBind('realStartZone', () => openCharacterSelect16_3('real_start_zone_16_3'));
+    hardBind('csStartFightBtn', () => openArenaSelect16_3('character_start_button_16_3'));
+    hardBind('asStartFightBtn', () => startSelectedArenaMatch16_3('arena_start_button_16_3'));
+
+    // Coordinate shield for the painted big "НАЧАТЬ БОЙ" button.
+    const handlePaintedStart = (event) => {
+      if (!document.body.classList.contains('real-art-v4')) return;
+      if (document.body.classList.contains('character-select-open') || document.body.classList.contains('arena-select-open')) return;
+      if (gameState !== 'menu' && gameState !== 'result') return;
+      const p = event.changedTouches?.[0] || event;
+      if (!p || typeof p.clientX !== 'number') return;
+      const lobby = document.querySelector('#menu .dc-v3-lobby') || ui.menu;
+      if (!lobby) return;
+      const r = lobby.getBoundingClientRect();
+      if (r.width < 100 || r.height < 100) return;
+      const x = ((p.clientX - r.left) / r.width) * 100;
+      const y = ((p.clientY - r.top) / r.height) * 100;
+      // Wider than the painted button so browser scaling/Vercel viewport differences cannot miss it.
+      const insideBigStart = x >= 24 && x <= 72 && y >= 63 && y <= 87;
+      if (!insideBigStart) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      openCharacterSelect16_3('painted_start_shield_16_3');
+    };
+    document.addEventListener('pointerdown', handlePaintedStart, { capture:true, passive:false });
+    document.addEventListener('click', handlePaintedStart, { capture:true, passive:false });
+    document.addEventListener('touchend', handlePaintedStart, { capture:true, passive:false });
+
+    window.eralashStartFight = () => openCharacterSelect16_3('window_api_16_3');
+    window.eralashOpenArenaSelect = () => openArenaSelect16_3('window_api_16_3');
+    window.eralashDirectFight = () => startSelectedArenaMatch16_3('window_api_direct_16_3');
+  }
+
+
   resize();
   bindControls();
   bindEconomyControls();
   bindRealArtClickMap();
   bindCharacterSelect();
   bindArenaSelect();
+  bindArenaFlowLayerFix16_3();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
-  window.eralashStartFight = () => openCharacterSelect('window_api');
-  window.eralashOpenArenaSelect = () => openArenaSelect('window_api');
+  window.eralashStartFight = () => openCharacterSelect16_3('window_api_16_3');
+  window.eralashOpenArenaSelect = () => openArenaSelect16_3('window_api_16_3');
+  window.eralashDirectFight = () => startSelectedArenaMatch16_3('window_api_direct_16_3');
 
   raf = requestAnimationFrame((t)=>{ last=t; loop(t); });
 })();
