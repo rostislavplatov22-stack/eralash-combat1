@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — True Arena Set & Fighter Presentation 22.0</title>
+  <title>EraLash Combat — True Arena Set & Fighter Presentation 22.1</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -3959,9 +3959,187 @@ body.fighter-presentation-22 .fight5-vs-card.enemy{
   body.fighter-presentation-22 .cs-card{min-height:360px}
 }
 
+
+/* ==========================================================
+   True Arena Set 22.1 — Arena Card Visual Hotfix
+   Fixes 22.0 card issue: non-citadel arenas looked like blurred
+   color placeholders. These previews now show readable stage plates:
+   bridge/furnace, moon ritual circle, frozen throne hall.
+   ========================================================== */
+body.arena-set-22-1 .arena-select{
+  align-items:flex-start !important;
+  padding:clamp(10px,2vw,26px) !important;
+}
+body.arena-set-22-1 .as-shell{
+  max-height:calc(100dvh - clamp(20px,4vw,52px)) !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+body.arena-set-22-1 .as-top{
+  flex:0 0 auto;
+}
+body.arena-set-22-1 .as-body{
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-bottom:22px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(217,183,106,.45) rgba(255,255,255,.05);
+}
+body.arena-set-22-1 .as-body::-webkit-scrollbar{width:8px}
+body.arena-set-22-1 .as-body::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:999px}
+body.arena-set-22-1 .as-body::-webkit-scrollbar-thumb{background:rgba(217,183,106,.40);border-radius:999px}
+body.arena-set-22-1 .as-card,
+body.arena-set-22-1 .as-preview{
+  background:#050507 !important;
+  isolation:isolate;
+}
+body.arena-set-22-1 .as-card:before,
+body.arena-set-22-1 .as-preview:before{
+  filter:none !important;
+  opacity:1 !important;
+  transform:scale(1.001) !important;
+  background-size:cover !important;
+  background-position:center !important;
+}
+body.arena-set-22-1 .as-card:after,
+body.arena-set-22-1 .as-preview:after{
+  opacity:1 !important;
+}
+
+/* Black Citadel keeps the real art but gets stronger card readability. */
+body.arena-set-22-1 .as-card[data-as-arena="black_citadel"]:before,
+body.arena-set-22-1 .as-preview:not(.infernal):not(.moon):not(.frozen):before{
+  background-image:
+    radial-gradient(circle at 50% 12%,rgba(255,236,185,.22),transparent 24%),
+    linear-gradient(180deg,rgba(0,0,0,.08) 0%,rgba(0,0,0,.32) 48%,rgba(0,0,0,.78) 100%),
+    url('assets/arena-black-citadel-courtyard.png') !important;
+  filter:brightness(.72) contrast(1.05) saturate(1.04) !important;
+}
+
+/* Infernal Bridge: furnace gates, bridge deck, lava seams, ember depth. */
+body.arena-set-22-1 .as-card[data-as-arena="infernal_bridge"]:before,
+body.arena-set-22-1 .as-preview.infernal:before{
+  background-image:
+    radial-gradient(circle at 50% -4%,rgba(255,188,76,.48),transparent 18%),
+    radial-gradient(ellipse at 50% 96%,rgba(255,74,22,.58),transparent 38%),
+    linear-gradient(90deg,transparent 0 12%,rgba(12,4,4,.65) 12% 18%,transparent 18% 82%,rgba(12,4,4,.65) 82% 88%,transparent 88%),
+    linear-gradient(115deg,transparent 0 42%,rgba(255,112,36,.28) 43% 45%,rgba(70,15,8,.82) 46% 53%,rgba(255,112,36,.26) 54% 56%,transparent 57%),
+    repeating-linear-gradient(0deg,transparent 0 25px,rgba(255,96,28,.18) 26px 28px,transparent 29px 54px),
+    repeating-linear-gradient(90deg,rgba(255,90,20,.12) 0 2px,transparent 2px 58px),
+    linear-gradient(180deg,#170302 0%,#311008 38%,#130403 70%,#020101 100%) !important;
+}
+body.arena-set-22-1 .as-card[data-as-arena="infernal_bridge"]:after,
+body.arena-set-22-1 .as-preview.infernal:after{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,210,104,.22),transparent 26%),
+    linear-gradient(90deg,rgba(255,69,24,.20),transparent 34%,transparent 66%,rgba(255,128,42,.17)),
+    linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.16) 42%,rgba(0,0,0,.76) 100%) !important;
+}
+
+/* Moon Ritual: giant moon, ritual stones, magic circle and cold courtyard floor. */
+body.arena-set-22-1 .as-card[data-as-arena="moon_ritual"]:before,
+body.arena-set-22-1 .as-preview.moon:before{
+  background-image:
+    radial-gradient(circle at 50% 14%,rgba(226,246,255,.88) 0 9%,rgba(142,201,255,.25) 10% 18%,transparent 19%),
+    radial-gradient(ellipse at 50% 77%,rgba(106,172,255,.30),transparent 38%),
+    repeating-radial-gradient(ellipse at 50% 80%,rgba(147,218,255,.32) 0 2px,transparent 2px 27px),
+    linear-gradient(90deg,transparent 0 15%,rgba(10,15,28,.76) 15% 21%,transparent 21% 41%,rgba(10,15,28,.68) 41% 45%,transparent 45% 55%,rgba(10,15,28,.68) 55% 59%,transparent 59% 79%,rgba(10,15,28,.76) 79% 85%,transparent 85%),
+    linear-gradient(180deg,#06111d 0%,#0a1028 42%,#050717 68%,#010205 100%) !important;
+}
+body.arena-set-22-1 .as-card[data-as-arena="moon_ritual"]:after,
+body.arena-set-22-1 .as-preview.moon:after{
+  background:
+    radial-gradient(circle at 50% 16%,rgba(222,246,255,.24),transparent 29%),
+    radial-gradient(ellipse at 50% 78%,rgba(116,186,255,.24),transparent 35%),
+    linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.22) 48%,rgba(0,0,0,.74)) !important;
+}
+
+/* Frozen Throne: ice palace columns, throne silhouette, cracked frozen floor. */
+body.arena-set-22-1 .as-card[data-as-arena="frozen_throne"]:before,
+body.arena-set-22-1 .as-preview.frozen:before{
+  background-image:
+    radial-gradient(circle at 50% 10%,rgba(232,255,255,.54),transparent 18%),
+    linear-gradient(90deg,transparent 0 9%,rgba(198,240,255,.22) 9% 14%,transparent 14% 23%,rgba(198,240,255,.15) 23% 28%,transparent 28% 72%,rgba(198,240,255,.15) 72% 77%,transparent 77% 86%,rgba(198,240,255,.22) 86% 91%,transparent 91%),
+    linear-gradient(180deg,transparent 0 26%,rgba(8,17,27,.84) 26% 66%,transparent 67%),
+    repeating-linear-gradient(128deg,transparent 0 42px,rgba(222,252,255,.20) 43px 45px,transparent 46px 84px),
+    radial-gradient(ellipse at 50% 88%,rgba(210,250,255,.38),transparent 44%),
+    linear-gradient(180deg,#071824 0%,#0b2134 42%,#06101a 67%,#010306 100%) !important;
+}
+body.arena-set-22-1 .as-card[data-as-arena="frozen_throne"]:after,
+body.arena-set-22-1 .as-preview.frozen:after{
+  background:
+    radial-gradient(circle at 50% 15%,rgba(234,255,255,.24),transparent 29%),
+    linear-gradient(90deg,rgba(183,235,255,.15),transparent 38%,transparent 62%,rgba(183,235,255,.16)),
+    linear-gradient(180deg,rgba(0,0,0,.00),rgba(0,0,0,.18) 48%,rgba(0,0,0,.72)) !important;
+}
+
+/* Presentation polish: labels sit on a readable glass plate, not directly over art. */
+body.arena-set-22-1 .as-card-content{
+  inset:auto 15px 14px 15px;
+  padding:12px 12px 11px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.68));
+  box-shadow:0 14px 32px rgba(0,0,0,.36);
+  backdrop-filter:blur(4px);
+}
+body.arena-set-22-1 .as-card h3{
+  margin-top:8px;
+  font-size:clamp(21px,2vw,29px);
+}
+body.arena-set-22-1 .as-card p{
+  color:rgba(255,246,226,.86);
+}
+body.arena-set-22-1 .as-preview-label{
+  padding:12px 13px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(0,0,0,.38),rgba(0,0,0,.66));
+  backdrop-filter:blur(4px);
+}
+body.arena-set-22-1 .as-stage-fx17{
+  border-color:rgba(255,230,168,.24);
+  background:
+    radial-gradient(circle at 0 0,var(--as-glow,rgba(217,183,106,.12)),transparent 38%),
+    rgba(255,255,255,.055);
+}
+
+/* Desktop height guard: arena cards stay visible on 900px high laptops. */
+@media(max-height:920px) and (min-width:900px){
+  body.arena-set-22-1 .as-top{padding:18px 24px 10px}
+  body.arena-set-22-1 .as-title{font-size:clamp(28px,4.2vw,50px)}
+  body.arena-set-22-1 .as-subtitle{font-size:13px}
+  body.arena-set-22-1 .as-body{gap:16px;padding:0 24px 18px}
+  body.arena-set-22-1 .as-card{min-height:190px}
+  body.arena-set-22-1 .as-preview{height:208px}
+  body.arena-set-22-1 .as-card-content{padding:10px 11px}
+}
+
+/* Mobile layout: no hidden Start Fight button, clean one-column scrolling. */
+@media(max-width:880px){
+  body.arena-set-22-1 .as-shell{
+    width:calc(100vw - 18px);
+    max-height:calc(100dvh - 18px) !important;
+    border-radius:22px;
+  }
+  body.arena-set-22-1 .as-top{
+    padding:16px 16px 10px;
+  }
+  body.arena-set-22-1 .as-body{
+    grid-template-columns:1fr !important;
+    padding:0 16px 18px;
+  }
+  body.arena-set-22-1 .as-grid{
+    grid-template-columns:1fr;
+  }
+  body.arena-set-22-1 .as-card{min-height:178px}
+  body.arena-set-22-1 .as-preview{height:176px}
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 fighter-presentation-22">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 fighter-presentation-22">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -4296,7 +4474,7 @@ body.fighter-presentation-22 .fight5-vs-card.enemy{
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">True Arena Set · 22.0</div>
+          <div class="as-kicker">True Arena Set · 22.1</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Arena</span></h1>
           <p class="as-subtitle">Арена теперь меняет не только цвет, а саму сцену боя: архитектуру, пол, свет, глубину, intro и читаемость персонажей.</p>
         </div>
@@ -4351,7 +4529,7 @@ body.fighter-presentation-22 .fight5-vs-card.enemy{
             <div class="as-stat"><span>Atmosphere</span><b id="asAtmosphere">Smoke + sparks</b></div>
             <div class="as-stat"><span>Combat Read</span><b id="asReadability">Balanced</b></div>
           </div>
-          <div id="asStageFx17" class="as-stage-fx17"><b>22.0 True Stage:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
+          <div id="asStageFx17" class="as-stage-fx17"><b>22.1 True Stage:</b> cinematic fog, ambient particles, color grade and intro phrase.</div>
           <div class="as-match-line" aria-label="Match summary">
             <span id="asPlayerName">Raven</span>
             <b>VS</b>
@@ -4362,7 +4540,7 @@ body.fighter-presentation-22 .fight5-vs-card.enemy{
             <button id="asBackBtn" class="as-back" type="button">Назад</button>
             <button id="asStartFightBtn" class="as-start" type="button">Start Fight</button>
           </div>
-          <div class="as-note">22.0 добавляет True Arena Set: отдельную боевую сцену, stage floor, parallax depth и premium fighter presentation.</div>
+          <div class="as-note">22.1 фиксирует True Arena Set: отдельную боевую сцену, stage floor, parallax depth и premium fighter presentation.</div>
         </aside>
       </div>
     </div>
@@ -5662,7 +5840,7 @@ body.fighter-presentation-22 .fight5-vs-card.enemy{
           : mood.type === 'moon-ritual'
             ? 'new moon ritual plate · standing stones · ritual circle · lunar backlight'
             : 'new frozen throne plate · ice palace columns · cracked floor · pale silhouette light';
-      ui.asStageFx17.innerHTML = `<b>22.0 True Stage:</b> ${stageNote22}`;
+      ui.asStageFx17.innerHTML = `<b>22.1 True Stage:</b> ${stageNote22}`;
     }
   }
 

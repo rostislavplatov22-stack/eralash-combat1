@@ -1,4 +1,8 @@
-# EraLash Combat — True Arena Set & Fighter Presentation 22.0
+# EraLash Combat — True Arena Set & Fighter Presentation 22.1
+
+Hotfix: Arena Select cards now show readable arena stage plates instead of blurred placeholders. Start Fight flow preserved.
+
+# EraLash Combat — True Arena Set & Fighter Presentation 22.1
 
 Версия 22.0 добавляет реально разные арены, stage floor, parallax depth и улучшенную презентацию бойцов на Character Select / VS screen.
 
