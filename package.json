@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-combat-physics-11-ready",
-  "version": "2.9.0",
+  "name": "eralash-combat-ai-combos-12-ready",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Physics 11.0: locked attack facing, real footwork, counter hits, clash checks, better knockback and safer collision physics."
+  "description": "EraLash Combat AI + Combos 12.0: smarter Iron Warden AI, distance bands, punish windows, blocking logic, combo chains and bonus damage."
 }

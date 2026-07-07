@@ -305,3 +305,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## Combat Physics 11.0
 
 Добавлены footwork-физика, attack facing lock, counter hit, clash, wall impact, whiff recovery и более стабильная collision-система.
+
+
+## AI + Combos 12.0
+
+Добавлен умный AI, дистанции боя, punish logic, combo chains и bonus damage. Debug-метка: AI + COMBOS 12.0.

@@ -3185,9 +3185,9 @@ body.combat-feel-10 .pause-btn{
     ui.debug.style.border = '1px solid rgba(217,183,106,.35)';
     ui.debug.style.background = 'linear-gradient(180deg,rgba(8,9,12,.72),rgba(0,0,0,.50))';
     ui.debug.style.boxShadow = '0 14px 40px rgba(0,0,0,.35)';
-    ui.debug.innerHTML = `PHYSICS ${REAL_PHYSICS_PATCH}<br>` +
-      `Raven: ${player.state} · vx ${Math.round(player.vx)} · lag ${Math.round((player.landingLag||0)*100)/100} · stamina ${Math.round(player.stamina)}<br>` +
-      `Warden: ${enemy.state} · vx ${Math.round(enemy.vx)} · pressure ${Math.round((enemy.contactPressure||0)*100)} · stamina ${Math.round(enemy.stamina)}`;
+    ui.debug.innerHTML = `AI + COMBOS ${AI_COMBOS_PATCH}<br>` +
+      `Raven: ${player.state} · combo ${(player.comboSeq||[]).join('>') || '—'} · stamina ${Math.round(player.stamina)}<br>` +
+      `Warden: ${enemy.state} · AI ${enemy.ai?.difficulty || aiDifficultyName()} / ${enemy.ai?.intent || 'neutral'} / ${enemy.ai?.band || 'far'} · stamina ${Math.round(enemy.stamina)}`;
   }
 
 
@@ -3296,7 +3296,111 @@ body.combat-feel-10 .pause-btn{
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '11.0 FOOTWORK';
+  const REAL_PHYSICS_PATCH = '12.0 AI COMBOS';
+  const AI_COMBOS_PATCH = '12.0 AI COMBOS';
+
+  const AI_PROFILES = {
+    easy:   { name:'EASY',   reaction:.34, block:.28, aggression:.38, punish:.20, combo:.22, special:.08, mistake:.34, footsie:.18 },
+    normal: { name:'NORMAL', reaction:.23, block:.46, aggression:.58, punish:.42, combo:.46, special:.18, mistake:.20, footsie:.34 },
+    hard:   { name:'HARD',   reaction:.15, block:.62, aggression:.76, punish:.64, combo:.64, special:.28, mistake:.10, footsie:.52 }
+  };
+
+  function aiDifficultyName(){
+    const v = clamp(Number(contentBundle?.balance?.aiDifficulty ?? .62), .1, .95);
+    if (v < .45) return 'easy';
+    if (v > .76) return 'hard';
+    return 'normal';
+  }
+
+  function aiProfile(){
+    return AI_PROFILES[aiDifficultyName()] || AI_PROFILES.normal;
+  }
+
+  function distanceBand(dist, preferred){
+    if (dist < preferred * .72) return 'close';
+    if (dist < preferred * 1.22) return 'mid';
+    return 'far';
+  }
+
+  function isOpponentWhiffPunishable(f){
+    if (!f) return false;
+    if ((f.punishableT || 0) > 0) return true;
+    if (f.state !== 'attack' || !f.attack) return false;
+    const activeEnd = f.attack.startup + f.attack.active;
+    return f.stateT > activeEnd && !f.attackHasHit;
+  }
+
+  function attackReachValue(type, f, opponent){
+    const atk = attacks[type] || attacks.light;
+    const scale = premiumFighterScaleFactor ? premiumFighterScaleFactor() : 1;
+    return atk.range * scale + fighterBodyRadius(f) + fighterBodyRadius(opponent) * .28;
+  }
+
+  function lastComboName(seq){
+    const s = (seq || []).slice(-4).join('>');
+    if (s.endsWith('light>light>heavy')) return 'RAVEN BASIC CHAIN';
+    if (s.endsWith('light>heavy>special')) return 'RIFT BREAKER';
+    if (s.endsWith('heavy>special')) return 'PUNISH LINK';
+    if (s.endsWith('light>light>special')) return 'DASH RIFT';
+    if (s.endsWith('light>light>heavy>special')) return 'EXECUTION STRING';
+    return '';
+  }
+
+  function comboBonusFor(name, atkName){
+    if (!name) return 1;
+    if (name === 'EXECUTION STRING') return atkName === 'special' ? 1.30 : 1.18;
+    if (name === 'RIFT BREAKER') return atkName === 'special' ? 1.24 : 1.12;
+    if (name === 'PUNISH LINK') return atkName === 'special' ? 1.20 : 1.10;
+    if (name === 'DASH RIFT') return 1.16;
+    if (name === 'RAVEN BASIC CHAIN') return atkName === 'heavy' ? 1.18 : 1.08;
+    return 1;
+  }
+
+  function registerAttackSequence(f, type){
+    if (!f) return '';
+    if (!f.comboSeq || (f.comboSeqT || 0) <= 0) f.comboSeq = [];
+    f.comboSeq.push(type);
+    if (f.comboSeq.length > 4) f.comboSeq.shift();
+    f.comboSeqT = .95;
+    const name = lastComboName(f.comboSeq);
+    if (name) {
+      f.currentComboName = name;
+      f.comboNameT = .75;
+      floatingText(name, f.x, f.y - (f.collisionH || f.h || 180) * .92, f.id === 'player' ? '#ffd27a' : '#8edcff');
+      showCombatWord(name, f.x + f.dir * 36, f.y - (f.collisionH || f.h || 180) * .72, f.colorB || '#ffd27a');
+    }
+    return name;
+  }
+
+  function queueComboFollowup(f, type, time=.46){
+    if (!f || !type) return;
+    f.bufferedAttack = type;
+    f.bufferedAttackT = Math.max(f.bufferedAttackT || 0, time);
+    f.aiComboQueued = type;
+  }
+
+  function aiQueueFollowup(attacker, defender, atk){
+    if (!attacker || attacker.id !== 'enemy' || !attacker.ai || !atk) return;
+    if (defender.hp <= 0 || attacker.hp <= 0) return;
+    const profile = AI_PROFILES[attacker.ai.difficulty || aiDifficultyName()] || AI_PROFILES.normal;
+    if (Math.random() < profile.mistake) return;
+
+    const dist = Math.abs(defender.x - attacker.x);
+    const canSpecial = attacker.energy >= attacks.special.cost;
+    let next = '';
+
+    if (atk.name === 'light') {
+      if ((attacker.comboSeq || []).slice(-1)[0] === 'light' && Math.random() < profile.combo) next = Math.random() < .64 ? 'heavy' : 'light';
+      else if (Math.random() < profile.combo) next = 'light';
+    } else if (atk.name === 'heavy' && canSpecial && dist < attackReachValue('special', attacker, defender) && Math.random() < profile.special) {
+      next = 'special';
+    }
+
+    if (next) {
+      queueComboFollowup(attacker, next, next === 'special' ? .54 : .44);
+      attacker.ai.intent = 'combo';
+    }
+  }
   let hudDelayTimer = 0;
   let lastHudSnapshot = { pHp:null, eHp:null, pEnergy:null, eEnergy:null, timer:null, rounds:null };
   let loopCrashCount = 0;
@@ -3514,6 +3618,16 @@ body.combat-feel-10 .pause-btn{
       rootMotionX: 0,
       counterVulnerable: 0,
 
+      // AI + Combos 12.0 state.
+      comboSeq: [],
+      comboSeqT: 0,
+      currentComboName: '',
+      comboNameT: 0,
+      aiComboQueued: '',
+      punishableT: 0,
+      pressureT: 0,
+      lastDamageTakenAt: 0,
+
       colorA: cfg.colorA || (isPlayer ? '#14171e' : '#17191c'),
       colorB: cfg.colorB || (isPlayer ? '#c92832' : '#3eb6ff'),
       accent: cfg.accent || (isPlayer ? '#d9b76a' : '#d9f2ff'),
@@ -3537,9 +3651,18 @@ body.combat-feel-10 .pause-btn{
       ai: {
         think: 0,
         next: 0,
+        intent: 'neutral',
+        band: 'far',
+        actionCd: 0,
+        guardCd: 0,
+        retreatT: 0,
+        punishT: 0,
+        comboCd: 0,
+        lastDecision: 0,
+        difficulty: aiDifficultyName(),
         aggression: clamp(Number(contentBundle.balance?.aiDifficulty || .62), .2, .95),
-        blockChance: isPlayer ? .32 : clamp(.24 + baseDefense / 260, .28, .62),
-        mistake: isPlayer ? .22 : clamp(.34 - baseSpeed / 520, .10, .30),
+        blockChance: isPlayer ? .32 : clamp((aiProfile().block || .46) + baseDefense / 420, .28, .72),
+        mistake: isPlayer ? .22 : clamp((aiProfile().mistake || .2) + (80 - baseSpeed) / 900, .06, .38),
         patience: .25 + Math.random() * .35
       }
     };
@@ -3626,7 +3749,7 @@ body.combat-feel-10 .pause-btn{
     comboDamage = 0;
     updateComboTag();
     physicsDebugT = 5.5;
-    showCallout('ROUND ' + roundIndex, 'PHYSICS 11.0 · FOOTWORK + HITBOX');
+    showCallout('ROUND ' + roundIndex, 'AI + COMBOS 12.0 · SMART WARDEN');
     if (roundIntroTimer) clearTimeout(roundIntroTimer);
     roundIntroTimer = window.setTimeout(()=>{
       if (gameState === 'fight' && !roundResolving) { showCallout('FIGHT', 'Make every hit count'); audio.round(); }
@@ -3891,7 +4014,7 @@ body.combat-feel-10 .pause-btn{
 
 
   function isActionLocked(f){
-    return f.state === 'hitstun' || f.state === 'knockdown' || f.state === 'dodge';
+    return f.state === 'hitstun' || f.state === 'knockdown' || f.state === 'dodge' || (f.landingLag || 0) > .045 || (f.whiffRecoverT || 0) > .045;
   }
 
   function canAttackCancel(f, type){
@@ -3905,7 +4028,8 @@ body.combat-feel-10 .pause-btn{
 
   function bufferAttack(f, type){
     f.bufferedAttack = type;
-    f.bufferedAttackT = .22;
+    // 12.0: longer input buffer makes LIGHT -> LIGHT -> HEAVY reliable on mobile.
+    f.bufferedAttackT = .34;
   }
 
   function consumeBufferedAttack(f){
@@ -4015,11 +4139,17 @@ body.combat-feel-10 .pause-btn{
 
     f.state = 'attack';
     f.stateT = 0;
-    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type, dir: f.dir, whiffed: false };
+    const comboName = registerAttackSequence(f, type);
+    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type, dir: f.dir, whiffed: false, comboName };
     f.attackHasHit = false;
     f.lastAttackType = type;
-    f.comboT = .42;
+    f.aiComboQueued = '';
+    f.comboT = .62;
     f.comboStep = type === 'light' ? Math.min(2, (f.comboStep || 0) + 1) : 0;
+    if (f.ai) {
+      f.ai.actionCd = Math.max(f.ai.actionCd || 0, type === 'special' ? .32 : type === 'heavy' ? .26 : .18);
+      f.ai.intent = type === 'special' ? 'special' : type === 'heavy' ? 'commit' : 'poke';
+    }
 
     // Real attack momentum: sprite and hitbox move together.
     f.vx += f.dir * (data.lunge || 0) * .82;
@@ -4119,10 +4249,20 @@ body.combat-feel-10 .pause-btn{
       spawnAura(defender, '#ffd27a');
     }
 
+    const comboName = (!blocked && attacker.attack && attacker.attack.comboName) ? attacker.attack.comboName : '';
+    if (comboName) {
+      dmg *= comboBonusFor(comboName, atk.name);
+      attacker.comboNameT = .85;
+      attacker.currentComboName = comboName;
+      floatingText(comboName, defender.x, defender.y - defender.h*.98, attacker.id === 'player' ? '#ffd27a' : '#8edcff');
+    }
+
     const armorReduce = (!blocked && defender.armor && atk.name !== 'ultimate') ? defender.armor : 0;
     dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
 
     defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    defender.lastDamageTakenAt = performance.now();
+    defender.pressureT = blocked ? .42 : .68;
     defender.invuln = atk.name === 'ultimate' ? .16 : .08;
 
     const massScale = 1 / Math.max(.8, defender.mass || 1);
@@ -4160,6 +4300,7 @@ body.combat-feel-10 .pause-btn{
     defender.stateT = 0;
 
     attacker.energy = clamp(attacker.energy + atk.energyGain, 0, 100);
+    if (!blocked) aiQueueFollowup(attacker, defender, atk);
     hitStop = Math.max(hitStop, (atk.hitStop || .06) * (blocked ? .75 : 1.22));
     if (!blocked) {
       if (performance.now() - lastHitAt < 1500) comboCount += 1;
@@ -4579,6 +4720,19 @@ body.combat-feel-10 .pause-btn{
     f.landingLag = Math.max(0, (f.landingLag || 0) - dt);
     f.whiffRecoverT = Math.max(0, (f.whiffRecoverT || 0) - dt);
     f.clashCd = Math.max(0, (f.clashCd || 0) - dt);
+    f.punishableT = Math.max(0, (f.punishableT || 0) - dt);
+    f.pressureT = Math.max(0, (f.pressureT || 0) - dt);
+    f.comboSeqT = Math.max(0, (f.comboSeqT || 0) - dt);
+    f.comboNameT = Math.max(0, (f.comboNameT || 0) - dt);
+    if (f.comboSeqT <= 0) { f.comboSeq = []; f.currentComboName = ''; }
+    if (f.comboNameT <= 0) f.currentComboName = '';
+    if (f.ai) {
+      f.ai.actionCd = Math.max(0, (f.ai.actionCd || 0) - dt);
+      f.ai.guardCd = Math.max(0, (f.ai.guardCd || 0) - dt);
+      f.ai.retreatT = Math.max(0, (f.ai.retreatT || 0) - dt);
+      f.ai.punishT = Math.max(0, (f.ai.punishT || 0) - dt);
+      f.ai.comboCd = Math.max(0, (f.ai.comboCd || 0) - dt);
+    }
     f.coyoteT = isGrounded(f) ? .095 : Math.max(0, (f.coyoteT || 0) - dt);
     f.jumpBufferT = Math.max(0, (f.jumpBufferT || 0) - dt);
     f.bufferedAttackT = Math.max(0, (f.bufferedAttackT || 0) - dt);
@@ -4608,8 +4762,10 @@ body.combat-feel-10 .pause-btn{
       }
       if (f.stateT >= f.attack.total) {
         if (!f.attackHasHit) {
-          f.whiffRecoverT = Math.max(f.whiffRecoverT || 0, f.attack.name === 'heavy' ? .14 : f.attack.name === 'special' ? .18 : .08);
+          f.whiffRecoverT = Math.max(f.whiffRecoverT || 0, f.attack.name === 'heavy' ? .18 : f.attack.name === 'special' ? .24 : .10);
+          f.punishableT = Math.max(f.punishableT || 0, f.attack.name === 'special' ? .38 : f.attack.name === 'heavy' ? .30 : .16);
           f.attack.whiffed = true;
+          if (f.id === 'player') floatingText('WHIFF', f.x, f.y - (f.collisionH || f.h)*.78, '#8edcff');
         }
         setState(f, 'idle');
         consumeBufferedAttack(f);
@@ -4700,48 +4856,124 @@ body.combat-feel-10 .pause-btn{
   }
 
   function updateAI(f, opponent, dt){
-    const ai = f.ai;
-    ai.think -= dt;
+    const ai = f.ai || (f.ai = {});
+    const profile = AI_PROFILES[ai.difficulty || aiDifficultyName()] || AI_PROFILES.normal;
     const dist = Math.abs(opponent.x - f.x);
-    const preferred = USE_PREMIUM_FIGHTER_ART ? fighterPreferredDistance(f, opponent) + 86 : 158;
-    const attackReach = attacks.heavy.range * premiumFighterScaleFactor() + fighterBodyRadius(f) + fighterBodyRadius(opponent) * .22;
-    const close = dist < preferred * .78;
-    const inStrikeRange = dist < attackReach;
-    const playerThreat = opponent.state === 'attack' && dist < attackReach + 80;
-    f.dir = opponent.x > f.x ? 1 : -1;
+    const preferred = USE_PREMIUM_FIGHTER_ART ? fighterPreferredDistance(f, opponent) + 96 : 168;
+    const band = distanceBand(dist, preferred);
+    const dirToOpponent = opponent.x > f.x ? 1 : -1;
+    const lightReach = attackReachValue('light', f, opponent);
+    const heavyReach = attackReachValue('heavy', f, opponent);
+    const specialReach = attackReachValue('special', f, opponent);
+    const playerThreat = opponent.state === 'attack' && dist < specialReach + 90;
+    const whiffPunish = isOpponentWhiffPunishable(opponent) && dist < specialReach + 95;
+    const opponentBacking = Math.sign(opponent.vx || 0) === Math.sign(opponent.x - f.x);
+    const lowStamina = f.stamina < 24;
 
-    if (ai.think <= 0) {
-      ai.think = .10 + Math.random()*.20;
-      ai.next = Math.random();
+    ai.think = Math.max(0, (ai.think || 0) - dt);
+    ai.band = band;
+    f.dir = dirToOpponent;
+
+    if (ai.retreatT > 0) {
+      ai.intent = 'reset';
+      applyMovementInput(f, -f.dir, dt);
+      if (dist > preferred * 1.16) ai.retreatT = 0;
+      return;
     }
 
-    if (playerThreat && Math.random() < ai.blockChance && f.state !== 'attack') {
-      if (Math.random() < .22 && f.dodgeCd <= 0) {
-        performDodge(f);
+    // Defensive reaction: block active/startup attacks, dodge slow big attacks, but with human mistakes.
+    if (playerThreat && ai.guardCd <= 0 && f.state !== 'attack') {
+      const danger = opponent.attack?.name === 'ultimate' ? .34 : opponent.attack?.name === 'special' ? .22 : opponent.attack?.name === 'heavy' ? .14 : 0;
+      const shouldDefend = Math.random() < clamp(profile.block + danger - profile.mistake*.35, .12, .82);
+      if (shouldDefend) {
+        ai.guardCd = profile.reaction + Math.random()*.16;
+        ai.intent = isAttackActive(opponent) ? 'block' : 'read';
+        if ((opponent.attack?.name === 'heavy' || opponent.attack?.name === 'special') && Math.random() < .22 + profile.footsie*.20 && f.dodgeCd <= 0) {
+          performDodge(f);
+          return;
+        }
+        setState(f, 'block');
+        f.vx *= .36;
         return;
       }
-      setState(f, 'block');
-      f.vx *= .45;
-      return;
     }
 
     if (f.state === 'block') return;
 
-    let axis = 0;
-    if (dist > preferred + 44) axis = f.dir;
-    else if (close) axis = -f.dir;
-    else if (Math.random() < .012) axis = Math.random() < .5 ? -f.dir : f.dir;
-    applyMovementInput(f, axis, dt);
-
-    if (inStrikeRange && ai.think < .08 && Math.random() > ai.mistake) {
-      if (f.energy >= attacks.ultimate.cost && Math.random() < .045) startAttack(f, 'ultimate');
-      else if (f.energy >= attacks.special.cost && Math.random() < .24) startAttack(f, 'special');
-      else if (dist < preferred * .92 && Math.random() < .50) startAttack(f, Math.random() < .48 ? 'heavy' : 'light');
-      else if (Math.random() < .15) startAttack(f, 'heavy');
+    // Punish whiffed attacks instead of randomly trading.
+    if (whiffPunish && ai.actionCd <= 0 && Math.random() < profile.punish) {
+      ai.intent = 'punish';
+      ai.actionCd = .30 + Math.random()*.18;
+      if (f.energy >= attacks.special.cost && dist < specialReach && Math.random() < profile.special + .18) startAttack(f, 'special');
+      else if (dist < heavyReach) startAttack(f, 'heavy');
+      else {
+        applyMovementInput(f, f.dir, dt);
+        if (dist < lightReach) startAttack(f, 'light');
+      }
+      return;
     }
 
-    if (Math.random() < .0016 && isGrounded(f) && dist > preferred) {
-      f.vy = -f.stats.jump*.78;
+    // Footsies: keep a playable distance, not constant forward spam.
+    let axis = 0;
+    if (band === 'far') {
+      ai.intent = 'advance';
+      axis = f.dir;
+    } else if (band === 'close') {
+      ai.intent = lowStamina ? 'reset' : 'space';
+      axis = Math.random() < (.62 + profile.footsie*.18) ? -f.dir : 0;
+    } else {
+      ai.intent = 'footsies';
+      const drift = Math.sin((performance.now()/1000) * (1.8 + profile.footsie) + ai.patience*6.28);
+      if (Math.abs(drift) > .36) axis = drift > 0 ? f.dir : -f.dir;
+      if (opponentBacking && Math.random() < profile.aggression*.018) axis = f.dir;
+    }
+    applyMovementInput(f, axis, dt);
+
+    if (ai.think <= 0) {
+      ai.think = profile.reaction + Math.random() * (.16 + profile.mistake*.18);
+      ai.next = Math.random();
+    }
+
+    if (ai.actionCd > 0 || ai.think > profile.reaction*.34) return;
+
+    const canLight = dist < lightReach;
+    const canHeavy = dist < heavyReach;
+    const canSpecial = f.energy >= attacks.special.cost && dist < specialReach;
+    const canUltimate = f.energy >= attacks.ultimate.cost && dist < attackReachValue('ultimate', f, opponent);
+
+    const hpLead = (f.hp / f.maxHp) - (opponent.hp / opponent.maxHp);
+    const pressure = clamp(profile.aggression + (hpLead < -.18 ? .14 : hpLead > .22 ? -.10 : 0), .18, .86);
+
+    if (band === 'mid' && canLight && Math.random() < pressure * .55) {
+      ai.intent = 'poke';
+      ai.actionCd = .24 + Math.random()*.20;
+      startAttack(f, 'light');
+      return;
+    }
+
+    if (band === 'close' && canHeavy && Math.random() < pressure * .42) {
+      ai.intent = 'commit';
+      ai.actionCd = .30 + Math.random()*.24;
+      startAttack(f, Math.random() < .58 ? 'light' : 'heavy');
+      return;
+    }
+
+    if (canSpecial && Math.random() < profile.special * (band === 'mid' ? 1.25 : .85)) {
+      ai.intent = 'special';
+      ai.actionCd = .55 + Math.random()*.35;
+      startAttack(f, 'special');
+      return;
+    }
+
+    if (canUltimate && opponent.hp < opponent.maxHp * .38 && Math.random() < .10 + profile.special*.12) {
+      ai.intent = 'finish';
+      ai.actionCd = .90;
+      startAttack(f, 'ultimate');
+      return;
+    }
+
+    if (Math.random() < .0018 + profile.footsie*.0014 && isGrounded(f) && dist > preferred * .92) {
+      f.vy = -f.stats.jump*.72;
       spawnFootDust(f, 4, 'rgba(210,170,120,.26)');
     }
   }
@@ -4806,9 +5038,11 @@ body.combat-feel-10 .pause-btn{
 
 
   function updateComboTag(){
-    if (!ui.comboTag || !ui.comboCount) return;
+    if (!ui.comboTag) return;
     if (comboCount >= 2) {
-      ui.comboCount.textContent = comboCount;
+      const activeName = (player && player.currentComboName) || (enemy && enemy.currentComboName) || 'HIT COMBO';
+      ui.comboTag.innerHTML = `<b id="comboCount">${comboCount}</b> ${comboCount >= 3 ? 'HIT CHAIN' : 'HIT COMBO'}<small style="display:block;font-size:9px;letter-spacing:.16em;opacity:.78;margin-top:1px">${activeName}</small>`;
+      ui.comboCount = document.getElementById('comboCount');
       ui.comboTag.style.display = 'block';
       ui.comboTag.style.opacity = String(clamp(comboTimer, .15, 1));
     } else {
