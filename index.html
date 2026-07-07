@@ -4858,7 +4858,7 @@ body.cinematic-art-24 .ar16-card:before{
 
 
 /* ==========================================================
-   Arena Expansion Pack 25.0
+   Arena Real Art Integration 25.1
    Eight-arena luxury roster: Storm Sanctuary, Sunken Temple,
    Iron Foundry and Crimson Garden with cinematic assets,
    rail scroll support, in-fight art and mobile-safe presentation.
@@ -4884,10 +4884,10 @@ body.arena-expansion-25 .as-rail::-webkit-scrollbar-thumb{background:rgba(231,19
 body.arena-expansion-25 .as-rail-card{
   min-height:82px;
 }
-body.arena-expansion-25 .as-preview.as-hero-stage.storm:before{background-image:url('assets/arena-cinematic-storm-sanctuary-25.webp') !important}
-body.arena-expansion-25 .as-preview.as-hero-stage.sunken:before{background-image:url('assets/arena-cinematic-sunken-temple-25.webp') !important}
-body.arena-expansion-25 .as-preview.as-hero-stage.foundry:before{background-image:url('assets/arena-cinematic-iron-foundry-25.webp') !important}
-body.arena-expansion-25 .as-preview.as-hero-stage.crimson:before{background-image:url('assets/arena-cinematic-crimson-garden-25.webp') !important}
+body.arena-expansion-25 .as-preview.as-hero-stage.storm:before{background-image:url('assets/arena-approved-storm-sanctuary-25-1.webp') !important}
+body.arena-expansion-25 .as-preview.as-hero-stage.sunken:before{background-image:url('assets/arena-approved-sunken-temple-25-1.webp') !important}
+body.arena-expansion-25 .as-preview.as-hero-stage.foundry:before{background-image:url('assets/arena-approved-iron-foundry-25-1.webp') !important}
+body.arena-expansion-25 .as-preview.as-hero-stage.crimson:before{background-image:url('assets/arena-approved-crimson-garden-25-1.webp') !important}
 body.arena-expansion-25 .as-preview.as-hero-stage.storm:after{
   background:
     radial-gradient(circle at 51% 50%,rgba(120,190,255,.16),transparent 25%),
@@ -4912,18 +4912,18 @@ body.arena-expansion-25 .as-preview.as-hero-stage.crimson:after{
     linear-gradient(90deg,rgba(0,0,0,.74),transparent 24%,transparent 70%,rgba(0,0,0,.72)),
     linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.08) 46%,rgba(0,0,0,.78));
 }
-body.arena-expansion-25 .as-rail-card[data-as-arena="storm_sanctuary"] .as-rail-thumb{background-image:url('assets/arena-cinematic-storm-sanctuary-25.webp') !important}
-body.arena-expansion-25 .as-rail-card[data-as-arena="sunken_temple"] .as-rail-thumb{background-image:url('assets/arena-cinematic-sunken-temple-25.webp') !important}
-body.arena-expansion-25 .as-rail-card[data-as-arena="iron_foundry"] .as-rail-thumb{background-image:url('assets/arena-cinematic-iron-foundry-25.webp') !important}
-body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"] .as-rail-thumb{background-image:url('assets/arena-cinematic-crimson-garden-25.webp') !important}
+body.arena-expansion-25 .as-rail-card[data-as-arena="storm_sanctuary"] .as-rail-thumb{background-image:url('assets/arena-approved-storm-sanctuary-25-1.webp') !important}
+body.arena-expansion-25 .as-rail-card[data-as-arena="sunken_temple"] .as-rail-thumb{background-image:url('assets/arena-approved-sunken-temple-25-1.webp') !important}
+body.arena-expansion-25 .as-rail-card[data-as-arena="iron_foundry"] .as-rail-thumb{background-image:url('assets/arena-approved-iron-foundry-25-1.webp') !important}
+body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"] .as-rail-thumb{background-image:url('assets/arena-approved-crimson-garden-25-1.webp') !important}
 body.arena-expansion-25 .as-rail-card[data-as-arena="storm_sanctuary"].active{box-shadow:0 0 0 1px rgba(120,190,255,.28),0 20px 50px rgba(90,170,255,.20)}
 body.arena-expansion-25 .as-rail-card[data-as-arena="sunken_temple"].active{box-shadow:0 0 0 1px rgba(72,220,190,.28),0 20px 50px rgba(72,220,190,.18)}
 body.arena-expansion-25 .as-rail-card[data-as-arena="iron_foundry"].active{box-shadow:0 0 0 1px rgba(255,104,32,.30),0 20px 50px rgba(255,104,32,.20)}
 body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box-shadow:0 0 0 1px rgba(224,42,78,.30),0 20px 50px rgba(224,42,78,.18)}
-.cinematic-intro24.storm .ci24-stage{background-image:url('assets/arena-cinematic-storm-sanctuary-25.webp') !important}
-.cinematic-intro24.sunken .ci24-stage{background-image:url('assets/arena-cinematic-sunken-temple-25.webp') !important}
-.cinematic-intro24.foundry .ci24-stage{background-image:url('assets/arena-cinematic-iron-foundry-25.webp') !important}
-.cinematic-intro24.crimson .ci24-stage{background-image:url('assets/arena-cinematic-crimson-garden-25.webp') !important}
+.cinematic-intro24.storm .ci24-stage{background-image:url('assets/arena-approved-storm-sanctuary-25-1.webp') !important}
+.cinematic-intro24.sunken .ci24-stage{background-image:url('assets/arena-approved-sunken-temple-25-1.webp') !important}
+.cinematic-intro24.foundry .ci24-stage{background-image:url('assets/arena-approved-iron-foundry-25-1.webp') !important}
+.cinematic-intro24.crimson .ci24-stage{background-image:url('assets/arena-approved-crimson-garden-25-1.webp') !important}
 .cinematic-intro24.storm .ci24-stage:after{
   background:
     radial-gradient(circle at 50% 55%,rgba(110,180,255,.18),transparent 26%),
@@ -4964,9 +4964,50 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
   }
 }
 
+
+/* ==========================================================
+   Arena Real Art Integration 25.1
+   Replaces the weak generated 25.0 stage plates with approved
+   user-provided real key art, dedicated rail thumbnails, HUD-safe
+   grading and cleaner combat presentation.
+   ========================================================== */
+body.arena-real-art-25-1 .as-kicker{color:#fff0bf}
+body.arena-real-art-25-1 .as-title span{
+  background:linear-gradient(90deg,#fff2bd,#d7a857 52%,#8fe7ff);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+body.arena-real-art-25-1 .as-preview.as-hero-stage.storm:before{background-image:url('assets/arena-approved-storm-sanctuary-25-1.webp') !important;background-position:center center !important}
+body.arena-real-art-25-1 .as-preview.as-hero-stage.sunken:before{background-image:url('assets/arena-approved-sunken-temple-25-1.webp') !important;background-position:center center !important}
+body.arena-real-art-25-1 .as-preview.as-hero-stage.foundry:before{background-image:url('assets/arena-approved-iron-foundry-25-1.webp') !important;background-position:center center !important}
+body.arena-real-art-25-1 .as-preview.as-hero-stage.crimson:before{background-image:url('assets/arena-approved-crimson-garden-25-1.webp') !important;background-position:center center !important}
+body.arena-real-art-25-1 .as-preview.as-hero-stage:after{
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.56),rgba(0,0,0,.06) 34%,rgba(0,0,0,.72)),
+    linear-gradient(90deg,rgba(0,0,0,.78),transparent 22%,transparent 74%,rgba(0,0,0,.76)) !important;
+}
+body.arena-real-art-25-1 .as-rail-card[data-as-arena="storm_sanctuary"] .as-rail-thumb{background-image:url('assets/thumb-approved-storm-sanctuary-25-1.webp') !important;background-position:center !important}
+body.arena-real-art-25-1 .as-rail-card[data-as-arena="sunken_temple"] .as-rail-thumb{background-image:url('assets/thumb-approved-sunken-temple-25-1.webp') !important;background-position:center !important}
+body.arena-real-art-25-1 .as-rail-card[data-as-arena="iron_foundry"] .as-rail-thumb{background-image:url('assets/thumb-approved-iron-foundry-25-1.webp') !important;background-position:center !important}
+body.arena-real-art-25-1 .as-rail-card[data-as-arena="crimson_garden"] .as-rail-thumb{background-image:url('assets/thumb-approved-crimson-garden-25-1.webp') !important;background-position:center !important}
+body.arena-real-art-25-1 .as-rail-card .as-rail-thumb{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 10px 28px rgba(0,0,0,.42);
+}
+body.arena-real-art-25-1 .as-stage-fx17{
+  border-color:rgba(255,231,171,.28);
+  background:linear-gradient(135deg,rgba(255,231,171,.12),rgba(0,0,0,.34));
+}
+.cinematic-intro24.storm .ci24-stage{background-image:url('assets/arena-approved-storm-sanctuary-25-1.webp') !important}
+.cinematic-intro24.sunken .ci24-stage{background-image:url('assets/arena-approved-sunken-temple-25-1.webp') !important}
+.cinematic-intro24.foundry .ci24-stage{background-image:url('assets/arena-approved-iron-foundry-25-1.webp') !important}
+.cinematic-intro24.crimson .ci24-stage{background-image:url('assets/arena-approved-crimson-garden-25-1.webp') !important}
+body.arena-real-art-25-1 .ci24-card{
+  border-color:rgba(255,231,171,.32);
+  box-shadow:0 36px 110px rgba(0,0,0,.58), inset 0 1px rgba(255,255,255,.14);
+}
+
 </style>
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -5290,7 +5331,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">25.0 расширяет arena roster: 8 premium-сцен, cinematic stage-art и уникальная атмосфера в бою.</div>
+          <div class="cs-locked-note">25.1 заменяет новые арены на approved real key art: Storm, Sunken, Foundry и Crimson теперь работают как полноценные fight backgrounds.</div>
         </aside>
       </div>
     </div>
@@ -5301,7 +5342,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
     <div class="as-shell" role="dialog" aria-modal="true" aria-labelledby="asTitle">
       <div class="as-top">
         <div>
-          <div class="as-kicker">Arena Expansion Pack · 25.0</div>
+          <div class="as-kicker">Arena Real Art Integration · 25.1</div>
           <h1 id="asTitle" class="as-title">Choose Your <span>Battleground</span></h1>
           <p class="as-subtitle">Выбирай не карточку, а боевую сцену: cinematic key art, stage identity, fighter presentation и чистый premium-flow перед матчем.</p>
         </div>
@@ -5330,7 +5371,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
             <div class="as-stat"><span>Atmosphere</span><b id="asAtmosphereInline">Smoke + sparks</b></div>
             <div class="as-stat"><span>Combat Read</span><b id="asReadabilityInline">Balanced</b></div>
           </div>
-          <div id="asStageFx17" class="as-stage-fx17"><b>25.0 Arena Stage:</b> real cinematic artwork, fighter identity and premium duel intro.</div>
+          <div id="asStageFx17" class="as-stage-fx17"><b>25.1 Approved Arena Art:</b> real cinematic artwork, fighter identity and premium duel intro.</div>
         </section>
 
         <aside class="as-rail-panel">
@@ -5414,7 +5455,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
 
   <div id="arenaReveal16" class="arena-reveal16" aria-hidden="true">
     <div class="ar16-card">
-      <div class="ar16-kicker">Cinematic Match Locked · 25.0</div>
+      <div class="ar16-kicker">Cinematic Match Locked · 25.1</div>
       <div id="ar16Arena" class="ar16-arena">Black Citadel</div>
       <div class="ar16-vs-row">
         <span id="ar16Player">Raven</span>
@@ -5432,7 +5473,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
     <img id="ci24PlayerArt" class="ci24-fighter left" src="assets/fighter-shadow-raven.png" alt="">
     <img id="ci24EnemyArt" class="ci24-fighter right" src="assets/fighter-iron-warden.png" alt="">
     <div class="ci24-card">
-      <div class="ci24-k">Cinematic Duel Intro · 25.0</div>
+      <div class="ci24-k">Cinematic Duel Intro · 25.1</div>
       <div id="ci24StageName" class="ci24-stage-name">Black Citadel</div>
       <div class="ci24-vs">
         <span id="ci24PlayerName">Raven</span>
@@ -5446,7 +5487,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
 
   <div id="arenaIntro17" class="arena-intro17" aria-hidden="true">
     <div class="arena-intro17-card">
-      <div class="arena-intro17-k">Cinematic Stage Intro · 25.0</div>
+      <div class="arena-intro17-k">Cinematic Stage Intro · 25.1</div>
       <div id="arenaIntroName17" class="arena-intro17-n">Black Citadel</div>
       <div id="arenaIntroQuote17" class="arena-intro17-q">Darkness answers only strength.</div>
     </div>
@@ -5526,10 +5567,10 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
   loadArenaCinematic24('infernal-bridge', 'assets/arena-cinematic-infernal-bridge-24.webp');
   loadArenaCinematic24('moon-ritual', 'assets/arena-cinematic-moon-ritual-24.webp');
   loadArenaCinematic24('frozen-throne', 'assets/arena-cinematic-frozen-throne-24.webp');
-  loadArenaCinematic24('storm-sanctuary', 'assets/arena-cinematic-storm-sanctuary-25.webp');
-  loadArenaCinematic24('sunken-temple', 'assets/arena-cinematic-sunken-temple-25.webp');
-  loadArenaCinematic24('iron-foundry', 'assets/arena-cinematic-iron-foundry-25.webp');
-  loadArenaCinematic24('crimson-garden', 'assets/arena-cinematic-crimson-garden-25.webp');
+  loadArenaCinematic24('storm-sanctuary', 'assets/arena-approved-storm-sanctuary-25-1.webp');
+  loadArenaCinematic24('sunken-temple', 'assets/arena-approved-sunken-temple-25-1.webp');
+  loadArenaCinematic24('iron-foundry', 'assets/arena-approved-iron-foundry-25-1.webp');
+  loadArenaCinematic24('crimson-garden', 'assets/arena-approved-crimson-garden-25-1.webp');
 
 
   const premiumFighterArt = {
@@ -5548,7 +5589,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '25.0 ARENA EXPANSION PACK';
+  const SPRITE_COMBAT_PATCH = '25.1 APPROVED ARENA ART INTEGRATION';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -5824,11 +5865,11 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
   const texts = [];
   const projectiles = [];
   let physicsDebugT = 0;
-  const REAL_PHYSICS_PATCH = '25.0 ARENA EXPANSION PACK';
-  const AI_COMBOS_PATCH = '25.0 ARENA EXPANSION PACK';
-  const ULTIMATE_FINISHER_PATCH = '25.0 ARENA EXPANSION PACK';
-  const CHARACTER_SELECT_PATCH = '25.0 ARENA EXPANSION PACK';
-  const ARENA_SELECT_PATCH = '25.0 ARENA EXPANSION PACK';
+  const REAL_PHYSICS_PATCH = '25.1 APPROVED ARENA ART INTEGRATION';
+  const AI_COMBOS_PATCH = '25.1 APPROVED ARENA ART INTEGRATION';
+  const ULTIMATE_FINISHER_PATCH = '25.1 APPROVED ARENA ART INTEGRATION';
+  const CHARACTER_SELECT_PATCH = '25.1 APPROVED ARENA ART INTEGRATION';
+  const ARENA_SELECT_PATCH = '25.1 APPROVED ARENA ART INTEGRATION';
 
   const AI_PROFILES = {
     // Combat AI & Combo 19.0 — each difficulty now drives reaction, defense, combo planning and punish discipline.
@@ -6836,7 +6877,7 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
         'iron-foundry':'industrial furnace · iron platforms · sparks · smoke and heat bloom',
         'crimson-garden':'moonlit garden · stone duel floor · crimson petals · clean silhouette haze'
       }[mood.type] || mood.stageFx;
-      ui.asStageFx17.innerHTML = `<b>25.0 Arena Stage:</b> ${stageNote25}`;
+      ui.asStageFx17.innerHTML = `<b>25.1 Approved Arena Art:</b> ${stageNote25}`;
     }
   }
 
@@ -9552,6 +9593,26 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
         washB = 'rgba(190,218,255,.15)';
         fog = 'rgba(195,238,255,.070)';
         particle = '#d8fbff';
+      } else if (selected === 'storm-sanctuary') {
+        washA = 'rgba(84,165,255,.20)';
+        washB = 'rgba(160,220,255,.10)';
+        fog = 'rgba(96,170,255,.045)';
+        particle = '#b6dcff';
+      } else if (selected === 'sunken-temple') {
+        washA = 'rgba(54,210,184,.16)';
+        washB = 'rgba(210,165,72,.075)';
+        fog = 'rgba(72,210,190,.040)';
+        particle = '#75ead7';
+      } else if (selected === 'iron-foundry') {
+        washA = 'rgba(255,92,24,.20)';
+        washB = 'rgba(255,170,62,.10)';
+        fog = 'rgba(255,94,24,.050)';
+        particle = '#ff8d42';
+      } else if (selected === 'crimson-garden') {
+        washA = 'rgba(210,36,72,.16)';
+        washB = 'rgba(255,210,218,.055)';
+        fog = 'rgba(210,36,72,.040)';
+        particle = '#ef476f';
       }
 
       ctx.globalCompositeOperation = 'screen';
@@ -9590,14 +9651,8 @@ body.arena-expansion-25 .as-rail-card[data-as-arena="crimson_garden"].active{box
         ctx.fill();
       }
 
-      // Premium selected arena title etched into stage.
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.globalAlpha = .78;
-      ctx.font = '900 11px Inter, Arial';
-      ctx.textAlign = 'center';
-      ctx.letterSpacing = '2px';
-      ctx.fillStyle = 'rgba(255,240,190,.68)';
-      ctx.fillText((arena.title || 'BLACK CITADEL').toUpperCase(), w*.5, Math.max(90, h*.145));
+      // 25.1: approved real key art should stay clean in combat.
+      // No arena-name text is painted over the fight background.
       ctx.restore();
     }
 

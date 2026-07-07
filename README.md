@@ -1,3 +1,25 @@
+# EraLash Combat — Arena Real Art Integration 25.1
+
+## Что изменено
+
+- Заменены слабые 25.0 stage plates на утверждённые реальные изображения арен.
+- Storm Sanctuary, Sunken Temple, Iron Foundry и Crimson Garden теперь используют approved key art.
+- Добавлены WebP fight-background assets 1920×1080 с HUD-safe затемнением.
+- Добавлены отдельные лёгкие thumbnails для Arena Select rail.
+- Arena Select, Cinematic Duel Intro и fight background подключены к новым approved assets.
+- Убрана надпись названия арены поверх боевого фона, чтобы сцена выглядела чище.
+- Сохранены 8 арен, luxury flow 23.0, fighter identity 24.0 и combat systems 18–21.
+
+## Проверка
+
+- `npm run build` должен проходить без ошибок.
+- В Arena Select выбрать: Storm Sanctuary, Sunken Temple, Iron Foundry, Crimson Garden.
+- После Start Fight каждая из 4 арен должна отображаться в Cinematic Duel Intro и в бою.
+- HUD должен читаться на верхней части изображения.
+- Центр арены должен оставаться свободным для бойцов.
+
+---
+
 # EraLash Combat — Cinematic Art & Fighter Identity Upgrade 24.0
 
 ## Что добавлено

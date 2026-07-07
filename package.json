@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-expansion-pack-25-ready",
-  "version": "25.0.0",
+  "name": "eralash-combat-arena-real-art-integration-25-1-ready",
+  "version": "25.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Expansion Pack 25.0: four new premium arenas with cinematic stage art, arena select integration, in-fight stage identity, atmosphere FX and preserved combat presentation."
+  "description": "EraLash Combat Arena Real Art Integration 25.1: approved user-provided Storm Sanctuary, Sunken Temple, Iron Foundry and Crimson Garden artwork integrated into arena select, duel intro and in-fight backgrounds."
 }
