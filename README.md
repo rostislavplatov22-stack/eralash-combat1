@@ -1,3 +1,5 @@
+# EraLash Combat — Arena Select 15.1 Flow Lock
+
 # EraLash Combat — Premium Character Select 14.0
 
 # CHARACTER SELECT 14.0 — Premium Character Select
@@ -375,3 +377,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## Arena Select 15.0
 
 Добавлен премиальный экран выбора арены после выбора персонажа. Состояние арены сохраняется, а фон/свет/частицы меняются в бою.
+
+
+## 15.1 Flow Fix
+
+Любой вход в бой теперь жёстко ведёт через Character Select → Arena Select → Fight. Старые прямые вызовы newMatch из main menu/clickmap/Telegram MainButton заменены.

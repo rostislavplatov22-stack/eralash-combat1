@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-arena-select-15-ready",
-  "version": "15.0.0",
+  "name": "eralash-combat-arena-select-15-1-flow-fix",
+  "version": "15.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Arena Select 15.0: premium arena selection, four arena moods, arena state persistence, VS-screen arena sync and cinematic stage grading."
+  "description": "EraLash Combat Arena Select 15.1: hard pre-fight flow lock, main start always opens character select, then arena select, then fight."
 }
