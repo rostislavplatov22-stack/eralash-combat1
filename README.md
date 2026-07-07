@@ -1,3 +1,18 @@
+# EraLash Combat — Arena Approved Art Hotfix 25.2
+
+25.2 fixes the bad in-fight arena presentation seen after 25.1: approved arena art is now forced as the canvas stage plate, old procedural fallback geometry is suppressed, new cache-busted WebP assets are used, stale localStorage arena ids are normalized, and the debug panel is hidden from premium presentation.
+
+## Included approved real-art arenas
+- Storm Sanctuary
+- Sunken Temple
+- Iron Foundry
+- Crimson Garden
+
+## QA
+- `npm run build` passes
+- JS syntax check passes
+
+
 # EraLash Combat — Arena Real Art Integration 25.1
 
 ## Что изменено
