@@ -1,3 +1,7 @@
+# EraLash Combat — Hit Reaction, Stagger & KO Presentation Upgrade 27.0
+
+Premium combat contact upgrade: hit reactions, stagger, guard impact, KO beat, victory/defeat presentation, and preserved 26.10 combat readability.
+
 # EraLash Combat — Combat Readability & Attack Pose Timing Hotfix 26.10
 
 26.10 cleans up the first real attack-pose implementation so the fight reads as a fighting game instead of layered splash art.
