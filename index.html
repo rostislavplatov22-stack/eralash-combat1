@@ -6801,6 +6801,132 @@ body.character-select-approved-27-4 .cs-card:focus-visible{
   }
 }
 
+
+/* 27.5 — Clean Approved Reference Fit Hotfix
+   The previous 27.4 kept decorative overlays / hidden DOM panels over the approved reference,
+   which darkened the image and made it look broken. This layer makes the reference art the
+   only visible visual surface and leaves DOM zones purely invisible for clicks. */
+body.character-select-reference-clean-27-5 .character-select{
+  z-index:122 !important;
+  padding:0 !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#000 !important;
+  backdrop-filter:none !important;
+  overflow:hidden !important;
+}
+body.character-select-reference-clean-27-5 .character-select:before,
+body.character-select-reference-clean-27-5 .character-select:after,
+body.character-select-reference-clean-27-5 .cs-shell:before,
+body.character-select-reference-clean-27-5 .cs-shell:after{
+  display:none !important;
+  content:none !important;
+  opacity:0 !important;
+  background:none !important;
+  box-shadow:none !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+body.character-select-reference-clean-27-5 .cs-shell{
+  position:relative !important;
+  width:min(100vw, 177.68vh) !important;
+  height:min(100vh, 56.28vw) !important;
+  max-width:100vw !important;
+  max-height:100vh !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 auto !important;
+  border:0 !important;
+  border-radius:0 !important;
+  overflow:hidden !important;
+  background:#000 url("assets/character-select-approved-reference-clean-27-5.png?v=275") center center / contain no-repeat !important;
+  box-shadow:none !important;
+  outline:0 !important;
+}
+body.character-select-reference-clean-27-5 .cs-top,
+body.character-select-reference-clean-27-5 .cs-body,
+body.character-select-reference-clean-27-5 .cs-roster,
+body.character-select-reference-clean-27-5 .cs-preview,
+body.character-select-reference-clean-27-5 .cs-actions,
+body.character-select-reference-clean-27-5 .cs-difficulty,
+body.character-select-reference-clean-27-5 .cs-portrait-rail{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+body.character-select-reference-clean-27-5 .cs-top > div,
+body.character-select-reference-clean-27-5 .cs-card:before,
+body.character-select-reference-clean-27-5 .cs-card:after,
+body.character-select-reference-clean-27-5 .cs-card img,
+body.character-select-reference-clean-27-5 .cs-card-top,
+body.character-select-reference-clean-27-5 .cs-card-info,
+body.character-select-reference-clean-27-5 .cs-preview:before,
+body.character-select-reference-clean-27-5 .cs-preview:after,
+body.character-select-reference-clean-27-5 .cs-command-title,
+body.character-select-reference-clean-27-5 .cs-details,
+body.character-select-reference-clean-27-5 .cs-locked-note,
+body.character-select-reference-clean-27-5 .cs-difficulty-label,
+body.character-select-reference-clean-27-5 .cs-rail-portrait img,
+body.character-select-reference-clean-27-5 .cs-rail-portrait span,
+body.character-select-reference-clean-27-5 .cs-rail-portrait i,
+body.character-select-reference-clean-27-5 .cs-crest span{
+  display:none !important;
+}
+body.character-select-reference-clean-27-5 .cs-card,
+body.character-select-reference-clean-27-5 .cs-crest,
+body.character-select-reference-clean-27-5 .cs-rail-portrait,
+body.character-select-reference-clean-27-5 .cs-diff,
+body.character-select-reference-clean-27-5 .cs-start,
+body.character-select-reference-clean-27-5 .cs-back,
+body.character-select-reference-clean-27-5 .cs-close{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  outline:0 !important;
+  color:transparent !important;
+  text-shadow:none !important;
+  opacity:0 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+body.character-select-reference-clean-27-5 .cs-card:hover,
+body.character-select-reference-clean-27-5 .cs-card.active,
+body.character-select-reference-clean-27-5 .cs-card.active:hover,
+body.character-select-reference-clean-27-5 .cs-diff:hover,
+body.character-select-reference-clean-27-5 .cs-diff.active,
+body.character-select-reference-clean-27-5 .cs-start:hover,
+body.character-select-reference-clean-27-5 .cs-back:hover,
+body.character-select-reference-clean-27-5 .cs-close:hover{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  outline:0 !important;
+  opacity:0 !important;
+}
+body.character-select-reference-clean-27-5 .cs-close{
+  top:1.1% !important;
+  right:1.5% !important;
+  width:4.4% !important;
+  height:6.6% !important;
+  min-width:42px !important;
+  min-height:42px !important;
+  pointer-events:auto !important;
+}
+@media (max-aspect-ratio: 1/1){
+  body.character-select-reference-clean-27-5 .character-select{
+    align-items:center !important;
+    overflow:hidden !important;
+  }
+  body.character-select-reference-clean-27-5 .cs-shell{
+    width:100vw !important;
+    height:56.28vw !important;
+    min-height:0 !important;
+    margin:0 auto !important;
+  }
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -6809,7 +6935,7 @@ body.character-select-approved-27-4 .cs-card:focus-visible{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3 character-select-approved-27-4">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3 character-select-approved-27-4 character-select-reference-clean-27-5">
 <div id="app">
   <canvas id="game"></canvas>
 

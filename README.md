@@ -651,3 +651,11 @@ Fixes fighter visual orientation so Raven and Iron Warden face each other in com
 ## 27.4 Approved Prestige Character Select
 
 Replaced the previous cheap DOM/card character select with the approved cinematic prestige reference art as the full visual base, while preserving functional click zones for fighter selection, difficulty, back and start fight.
+
+
+## 27.5 Clean Approved Reference Fit Hotfix
+
+- Removed the dark overlay/panel layer that made the approved Character Select reference look cheap and broken.
+- Switched Character Select to a clean full-reference PNG surface.
+- Kept only invisible click zones for Raven, Iron Warden, difficulty, Start Fight, Back and Close.
+- Preserved 27.0 combat, 26.10 readability, 26.9 facing, 26.8 grounding and 26.6 Start routing.
