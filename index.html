@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Fighter Facing Lock Hotfix 26.8</title>
+  <title>EraLash Combat — Combat Readability Hotfix 26.10</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5636,17 +5636,17 @@ body.real-art-v4 #menu #realStartZone::after{
   };
   premiumFighterArt.player.decoding = 'async';
   premiumFighterArt.player.loading = 'eager';
-  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png?v=269';
+  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png?v=2610';
   premiumFighterArt.enemy.decoding = 'async';
   premiumFighterArt.enemy.loading = 'eager';
-  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png?v=269';
+  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png?v=2610';
 
   // Premium Fighters 6.0:
   // the old procedural stick/robot bodies are only a fallback now.
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = false; // 26.7: disable rough sprite-sheet bodies; keep attack-pose renderer only
-  const SPRITE_COMBAT_PATCH = '26.9 FIGHTER FACING LOCK';
+  const SPRITE_COMBAT_PATCH = '26.10 COMBAT READABILITY & ATTACK TIMING';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -5681,7 +5681,7 @@ body.real-art-v4 #menu #realStartZone::after{
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
-    img.src = src + '?v=267';
+    img.src = src + '?v=2610';
     return img;
   }
 
@@ -15088,6 +15088,568 @@ function sessionId(){
 
     window.eralashStartFight = () => runStart('window_api_hotfix_26_6');
   }
+
+
+  /* ==========================================================
+     26.10 — Combat Readability & Attack Pose Timing Hotfix
+     Clean state reset, short keyed attack-pose windows, less FX noise,
+     stronger contact spacing, softer burst damage.
+     ========================================================== */
+  const COMBAT_READABILITY_26_10 = true;
+
+  function resetTransientMatchState26_10(source='boot'){
+    roundResolving = false;
+    matchFinalized = false;
+    if (roundEndTimer) { clearTimeout(roundEndTimer); roundEndTimer = 0; }
+    if (roundIntroTimer) { clearTimeout(roundIntroTimer); roundIntroTimer = 0; }
+    setPaused(false, true);
+    hitStop = 0;
+    shake = 0;
+    slowMo = 1;
+    flash = 0;
+    cinematic = 0;
+    cameraZoom = 1;
+    roundFreeze = 0;
+    ultimateCineT = 0;
+    ultimateCineMax = 0;
+    ultimateCineKind = '';
+    ultimateCineAttacker = null;
+    ultimateCineDefender = null;
+    ultimateCineFinisher = false;
+    combatFeel10T = 0;
+    combatImpact18T = 0;
+    combatAi19T = 0;
+    combatPhysics20T = 0;
+    combatClarity21T = 0;
+    comboCount = 0;
+    comboTimer = 0;
+    comboDamage = 0;
+    input.left = input.right = input.jump = input.dodge = input.block = false;
+    input.light = input.heavy = input.special = input.ultimate = false;
+    input.pressed = Object.create(null);
+    texts.length = 0;
+    particles.length = 0;
+    projectiles.length = 0;
+    contactFX21.length = 0;
+    ui.result.style.display = 'none';
+    ui.result.setAttribute('aria-hidden','true');
+    ui.callout.style.display = 'none';
+    document.body.classList.remove('result-entering','fight-entering','menu-leaving');
+  }
+
+  function tuneCombatReadability26_10(){
+    // Less burst damage and fewer instant K.O. rounds, without making the fight feel weak.
+    Object.assign(attacks.light, {
+      startup:.055, active:.060, recovery:.165,
+      damage:5, blockDamage:1, guardDamage:7,
+      kb:275, lunge:92, pushback:58, hitStop:.044, hitstun:.18
+    });
+    Object.assign(attacks.heavy, {
+      startup:.130, active:.090, recovery:.285,
+      damage:12, blockDamage:4, guardDamage:17,
+      kb:560, lunge:154, pushback:104, hitStop:.096, hitstun:.34
+    });
+    Object.assign(attacks.special, {
+      startup:.155, active:.105, recovery:.330,
+      damage:18, blockDamage:6, guardDamage:25,
+      kb:650, lunge:172, pushback:112, hitStop:.125, hitstun:.46
+    });
+    Object.assign(attacks.ultimate, {
+      startup:.235, active:.135, recovery:.500,
+      damage:30, blockDamage:10, guardDamage:36,
+      kb:890, lunge:230, pushback:150, hitStop:.210, hitstun:.66
+    });
+  }
+
+  function minContactDistance26_10(a,b){
+    const br = fighterBodyRadius(a) + fighterBodyRadius(b);
+    return br + Math.max(68, w * .042);
+  }
+
+  function enforceCombatSpacing26_10(a,b, strength=.55){
+    if (!a || !b) return;
+    const dx = b.x - a.x;
+    const dir = Math.sign(dx) || 1;
+    const dist = Math.abs(dx);
+    const minDist = minContactDistance26_10(a,b);
+    if (dist >= minDist) return;
+    const overlap = minDist - dist;
+    const aWeight = Math.max(.9, a.mass || fighterWeight20(a) || 1);
+    const bWeight = Math.max(.9, b.mass || fighterWeight20(b) || 1);
+    const total = aWeight + bWeight;
+    // The attacker backs off slightly more; the defender keeps the shield/body contact point.
+    const aShare = clamp((bWeight / total) + .10, .45, .72) * strength;
+    const bShare = clamp((aWeight / total) - .10, .22, .48) * strength;
+    a.x -= dir * overlap * aShare;
+    b.x += dir * overlap * bShare;
+    a.vx *= .58;
+    b.vx *= .72;
+    clampToStage(a);
+    clampToStage(b);
+  }
+
+  function attackPosePhase26_3(f){
+    const atk = f.attack;
+    if (!atk) return -1;
+    // 26.10: pose art is a short animation key, not a held poster.
+    // 0–70ms startup key, 70–145ms contact key, 145–235ms recovery key, then base fighter art.
+    const t = Math.max(0, f.stateT || 0);
+    if (t < .070) return 0;
+    if (t < .145) return 1;
+    if (t < .235) return 2;
+    return -1;
+  }
+
+  function drawAttackPoseSprite26_3(f){
+    const set = attackPoseSet26_3(f);
+    if (!set) return false;
+    const phase = attackPosePhase26_3(f);
+    if (phase < 0) return false;
+    const frame = set[Math.min(2, Math.max(0, phase))];
+    const img = frame && frame.img;
+    if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
+
+    const isEnemy = f.id !== 'player';
+    const isWardenVisual = fighterIsWarden(f);
+    const dir = f.dir || (isEnemy ? -1 : 1);
+    const active = phase === 1;
+    const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+    const visualAccent = f.colorB || (isWardenVisual ? '#3eb6ff' : '#c92832');
+    const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+
+    const targetBodyH = fighterVisualHeight(f) * (isWardenVisual ? .90 : .88);
+    let poseH = targetBodyH * (frame.scale || 1);
+    poseH = coarse ? clamp(poseH, 238, isWardenVisual ? 360 : 330) : clamp(poseH, 280, isWardenVisual ? 398 : 365);
+    let poseW = poseH * aspect;
+    const maxW = coarse ? w * (isWardenVisual ? .31 : .30) : w * (isWardenVisual ? .285 : .265);
+    if (poseW > maxW) {
+      const k = maxW / poseW;
+      poseW *= k;
+      poseH *= k;
+    }
+
+    // Keep the animation keyed close to the fighter's real body. Contact comes from the weapon/FX.
+    const phaseImpulse = phase === 0 ? -0.035 : phase === 1 ? .045 : .012;
+    const x = f.x + dir * poseW * phaseImpulse * (isWardenVisual ? .10 : .09);
+    const y = f.y + poseH * (frame.y || 0);
+
+    ctx.save();
+    const shW = Math.max(90, poseW * (isWardenVisual ? .30 : .25));
+    const shadow = ctx.createRadialGradient(x, y + 7, 8, x, y + 7, shW);
+    shadow.addColorStop(0, active ? 'rgba(0,0,0,.82)' : 'rgba(0,0,0,.70)');
+    shadow.addColorStop(.44, active ? 'rgba(0,0,0,.36)' : 'rgba(0,0,0,.28)');
+    shadow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shadow;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 8, shW, isWardenVisual ? 26 : 20, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = active ? .18 : .10;
+    const rim = ctx.createRadialGradient(x, y-poseH*.50, 0, x, y-poseH*.50, poseW*.36);
+    rim.addColorStop(0, visualAccent + '44');
+    rim.addColorStop(.46, visualAccent + '14');
+    rim.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rim;
+    ctx.beginPath();
+    ctx.ellipse(x, y-poseH*.50, poseW*.24, poseH*.28, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir, 1);
+    const anchorX = frame.anchorX ?? .5;
+    ctx.filter = active ? 'brightness(1.11) contrast(1.09) saturate(1.10)' : 'brightness(1.04) contrast(1.07) saturate(1.04)';
+    ctx.shadowColor = visualAccent;
+    ctx.shadowBlur = active ? 16 : 9;
+    ctx.drawImage(img, -poseW * anchorX, -poseH, poseW, poseH);
+    ctx.filter = 'none';
+    ctx.restore();
+
+    if (active) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = .18;
+      ctx.fillStyle = isWardenVisual ? 'rgba(120,220,255,.34)' : 'rgba(255,80,95,.32)';
+      ctx.shadowColor = visualAccent;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.ellipse(x + dir * poseW * .18, y - poseH * .50, Math.max(10, poseW*.026), Math.max(6, poseH*.014), 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    return true;
+  }
+
+  function drawCombatPose21Overlay(f){
+    if (!f || (gameState !== 'fight' && gameState !== 'roundEnd')) return;
+    const blocking = f.state === 'block';
+    const hurt = f.state === 'hitstun' || f.state === 'knockdown' || (f.hitPose21T || 0) > 0;
+    if (!blocking && !hurt) return;
+
+    const dir = f.dir || 1;
+    const heavy = isHeavyFighter20(f);
+    const fh = fighterVisualHeight(f);
+    const fw = Math.max(110, fighterVisualWidth(f) * (heavy ? 1.08 : .98));
+    const x = f.x;
+    const y = f.y;
+    const color = f.colorB || (f.id === 'player' ? '#ff3048' : '#4ac8ff');
+    const hitA = clamp((f.hitPose21T || 0) * 2.2, 0, 1);
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    if (blocking) {
+      // 26.10: block must read, not cover Warden.
+      ctx.globalAlpha = heavy ? .18 : .14;
+      const shieldX = x + dir * fw * .16;
+      const shieldY = y - fh*.51;
+      ctx.strokeStyle = heavy ? '#8edcff' : '#ffd27a';
+      ctx.fillStyle = heavy ? 'rgba(90,210,255,.035)' : 'rgba(255,210,118,.030)';
+      ctx.shadowColor = heavy ? '#8edcff' : '#ffd27a';
+      ctx.shadowBlur = 8;
+      ctx.lineWidth = heavy ? 1.6 : 1.4;
+      ctx.beginPath();
+      ctx.ellipse(shieldX, shieldY, fw*.078, fh*.145, dir*.06, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.globalAlpha = .10;
+      ctx.beginPath();
+      ctx.ellipse(shieldX, shieldY, fw*.115, fh*.185, dir*.06, 0, Math.PI*2);
+      ctx.stroke();
+    }
+
+    if (hurt) {
+      const hdir = f.hitPose21Dir || -dir;
+      ctx.globalAlpha = .13 + hitA*.28;
+      ctx.fillStyle = f.hitPose21Blocked ? '#8edcff' : '#ff5161';
+      ctx.shadowColor = f.hitPose21Blocked ? '#8edcff' : '#ff5161';
+      ctx.shadowBlur = 14 * Math.max(.3,hitA);
+      ctx.beginPath();
+      ctx.moveTo(x - hdir*fw*.08, y - fh*.72);
+      ctx.lineTo(x - hdir*fw*.36, y - fh*.58);
+      ctx.lineTo(x - hdir*fw*.14, y - fh*.43);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawRigSlash(f, spriteH, attackPunch, active, atkName){
+    if (!f.attack || !attackPunch) return;
+    const color = f.id === 'enemy' ? 'rgba(80,200,255,' : 'rgba(255,55,70,';
+    const dir = f.dir || 1;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const reach = atkName === 'ultimate' ? spriteH*.40 : atkName === 'special' ? spriteH*.33 : atkName === 'heavy' ? spriteH*.28 : spriteH*.20;
+    const cy = -spriteH*.48;
+    const cx = dir * (spriteH*.11 + reach*.30);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    for (let i=0;i<2;i++){
+      ctx.beginPath();
+      ctx.strokeStyle = color + (active ? (.22 - i*.06) : (.09 - i*.03)) + ')';
+      ctx.lineWidth = active ? (8 - i*2) : (4 - i);
+      const start = dir > 0 ? -0.58 : Math.PI + .58;
+      const end = dir > 0 ? .58 : Math.PI - .58;
+      ctx.arc(cx, cy, reach + i*10, start, end, dir < 0);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function startAttack(f, type, fromBuffer=false){
+    if (gameState !== 'fight') return;
+    if (roundFreeze > 0) return;
+    if (isActionLocked(f)) {
+      if (!fromBuffer) bufferAttack(f, type);
+      return;
+    }
+    if (f.state === 'attack' && !canAttackCancel(f, type)) {
+      if (!fromBuffer) bufferAttack(f, type);
+      return;
+    }
+
+    const data = attacks[type];
+    if (!data) return;
+    if ((type === 'special' || type === 'ultimate') && f.energy < data.cost) {
+      if (f.id === 'player') floatingText('NO ENERGY', f.x, f.y - fighterVisualHeight(f)*.72, '#d9b76a');
+      return;
+    }
+
+    if (type === 'special' || type === 'ultimate') f.energy = clamp(f.energy - data.cost, 0, 100);
+    f.attack = { ...data, total: data.startup + data.active + data.recovery, name: data.name || type, dir: f.dir, whiffed: false };
+    f.attackHasHit = false;
+    f.lastAttackType = type;
+    f.comboT = .55;
+    f.comboStep += 1;
+    f.groundLock = Math.max(f.groundLock || 0, type === 'ultimate' ? .34 : type === 'special' ? .24 : .14);
+    setState(f, 'attack');
+
+    const impulse = type === 'ultimate' ? 250 : type === 'special' ? 190 : type === 'heavy' ? 148 : 88;
+    f.vx += f.dir * impulse;
+    f.x += f.dir * (type === 'ultimate' ? 18 : type === 'special' ? 13 : type === 'heavy' ? 9 : 5);
+    spawnFootDust(f, type === 'light' ? 2 : type === 'heavy' ? 4 : 6, f.id === 'enemy' ? 'rgba(80,190,255,.20)' : 'rgba(255,70,80,.20)');
+
+    if (type === 'ultimate') {
+      spawnAura(f, '#fff0b7');
+      spawnAura(f, f.colorB);
+      cinematic = .58;
+      cameraZoom = 1.07;
+      shake = Math.max(shake, 14);
+      flash = Math.max(flash, .20);
+      showCallout('ULTIMATE', f.ultimateName || 'Final Strike');
+      tryHaptic('ultimate');
+    } else if (type === 'special') {
+      spawnAura(f, f.colorB);
+      cameraZoom = Math.max(cameraZoom,1.035);
+      shake = Math.max(shake, 4);
+      tryHaptic('medium');
+    } else if (type === 'heavy') {
+      shake = Math.max(shake, 3);
+    }
+
+    audio.hit(type);
+    clampToStage(f);
+    if (player && enemy) enforceCombatSpacing26_10(player, enemy, .32);
+  }
+
+  function applyHit(attacker, defender, atk){
+    if (defender.invuln > 0 || defender.hp <= 0) return;
+
+    const facing = Math.sign(defender.x - attacker.x) || attacker.dir || 1;
+    const defenderFacingAttacker = Math.sign(attacker.x - defender.x) === defender.dir;
+    const defenderBlocking = defender.state === 'block' && defender.stamina > 0 && defenderFacingAttacker;
+    enforceCombatSpacing26_10(attacker, defender, .70);
+
+    let dmg = atk.damage;
+    let blocked = false;
+
+    if (defenderBlocking) {
+      blocked = true;
+      dmg = Math.max(1, Math.round(atk.blockDamage * .68));
+      defender.stamina = clamp(defender.stamina - Math.round((atk.guardDamage || 14) * .76), 0, 100);
+      defender.vx += facing * Math.max(112, (atk.kb || 300) * .22);
+      defender.x += facing * 16;
+      if (defender.stamina <= 0) {
+        blocked = false;
+        dmg += 5;
+        defender.invuln = 0;
+        floatingText('GUARD BREAK', defender.x, defender.y - fighterVisualHeight(defender)*.75, '#d9b76a');
+        spawnAura(defender, '#d9b76a');
+      }
+    }
+
+    if (!blocked) dmg *= (atk.name === 'ultimate' ? .76 : atk.name === 'special' ? .73 : atk.name === 'heavy' ? .72 : .74);
+    const armorReduce = (!blocked && defender.armor && atk.name !== 'ultimate') ? defender.armor : 0;
+    dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
+    defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    defender.invuln = blocked ? .10 : (atk.name === 'ultimate' ? .20 : .12);
+
+    const massScale = 1 / Math.max(.92, defender.mass || 1);
+    const effectiveKb = blocked ? (atk.kb*.26) : atk.kb*.74;
+    defender.vx = facing * effectiveKb * massScale;
+    defender.vy = blocked ? -12 : (atk.lift || -70) * .76 * massScale;
+    defender.x += facing * (blocked ? 18 : atk.name === 'ultimate' ? 76 : atk.name === 'special' ? 58 : atk.name === 'heavy' ? 48 : 25) * massScale;
+
+    attacker.vx -= facing * (atk.pushback || 70) * .72 / Math.max(.9, attacker.mass || 1);
+    attacker.x -= facing * (atk.name === 'ultimate' ? 34 : atk.name === 'special' ? 28 : atk.name === 'heavy' ? 20 : 12);
+    attacker.vx *= atk.attackerBrake || .68;
+
+    enforceCombatSpacing26_10(attacker, defender, .88);
+
+    const hardHit = !blocked && (atk.name === 'heavy' || atk.name === 'special' || atk.name === 'ultimate');
+    if (hardHit && atk.name !== 'heavy') {
+      defender.knockdownTime = atk.name === 'ultimate' ? .72 : .42;
+      setState(defender, 'knockdown');
+    } else if (!blocked) {
+      defender.hitstunTime = Math.max(.18, (atk.hitstun || .32) * .78);
+      setState(defender, 'hitstun');
+    } else {
+      setState(defender, 'block');
+    }
+
+    const fxX = defender.x - facing * 38;
+    const fxY = defender.y - fighterVisualHeight(defender)*.58;
+    spawnImpact(fxX, fxY, attacker.colorB, blocked ? 'light' : atk.name);
+    if (!blocked) {
+      floatingText('-' + dmg, defender.x, defender.y - fighterVisualHeight(defender)*.82, attacker.colorB);
+      comboCount = attacker.id === 'player' ? comboCount + 1 : 0;
+      comboDamage = attacker.id === 'player' ? comboDamage + dmg : 0;
+      comboTimer = .95;
+      matchMaxCombo = Math.max(matchMaxCombo, comboCount);
+      updateComboTag();
+    }
+
+    attacker.attackHasHit = true;
+    attacker.energy = clamp(attacker.energy + Math.round((atk.energyGain || 0) * .88), 0, 100);
+    hitStop = blocked ? Math.min(.045, (atk.hitStop || .06)*.52) : Math.min(.14, (atk.hitStop || .08) * .82);
+    shake = Math.max(shake, blocked ? 3 : atk.name === 'ultimate' ? 18 : atk.name === 'special' ? 12 : atk.name === 'heavy' ? 8 : 4);
+    flash = Math.max(flash, blocked ? .045 : atk.name === 'ultimate' ? .22 : .10);
+    cameraZoom = Math.max(cameraZoom, blocked ? 1.010 : atk.name === 'ultimate' ? 1.07 : atk.name === 'special' ? 1.04 : 1.02);
+    slowMo = atk.name === 'ultimate' ? .58 : atk.name === 'special' ? .78 : .90;
+    tryHaptic(atk.name === 'light' ? 'light' : 'medium');
+
+    clampToStage(attacker);
+    clampToStage(defender);
+    updateHUD();
+    if (defender.hp <= 0) finishRound(attacker.id);
+  }
+
+  function updateFighter(f, opponent, dt){
+    const wasGrounded = isGrounded(f);
+    f.stateT += dt;
+    f.invuln = Math.max(0, f.invuln - dt);
+    f.dodgeCd = Math.max(0, (f.dodgeCd || 0) - dt);
+    f.afterImage = Math.max(0, (f.afterImage || 0) - dt);
+    f.groundLock = Math.max(0, (f.groundLock || 0) - dt);
+    f.landingLag = Math.max(0, (f.landingLag || 0) - dt);
+    f.whiffRecoverT = Math.max(0, (f.whiffRecoverT || 0) - dt);
+    f.clashCd = Math.max(0, (f.clashCd || 0) - dt);
+    f.coyoteT = isGrounded(f) ? .095 : Math.max(0, (f.coyoteT || 0) - dt);
+    f.jumpBufferT = Math.max(0, (f.jumpBufferT || 0) - dt);
+    f.bufferedAttackT = Math.max(0, (f.bufferedAttackT || 0) - dt);
+    f.comboT = Math.max(0, (f.comboT || 0) - dt);
+    if (f.comboT <= 0) f.comboStep = 0;
+
+    const staminaRegen = f.state === 'block' ? 8 : 28;
+    f.stamina = clamp(f.stamina + dt*staminaRegen, 0, 100);
+    f.energy = clamp(f.energy + dt*(f.id === 'player' ? 3.2 : 2.5), 0, 100);
+
+    if (f.state === 'attack' && f.attack) {
+      const ab = attackBox(f);
+      if (!f.attackHasHit) {
+        const hb = hurtBox(opponent);
+        const facingTarget = (opponent.x - f.x) * (f.dir || 1) > -18;
+        const scale = premiumFighterScaleFactor ? premiumFighterScaleFactor() : 1;
+        const reachBoost = f.attack.name === 'ultimate' ? 1.25 : f.attack.name === 'special' ? 1.15 : f.attack.name === 'heavy' ? 1.08 : 1.02;
+        const centerReach = fighterBodyRadius(f) + fighterBodyRadius(opponent) + Math.max(132, f.attack.range * scale * reachBoost);
+        const centerClose = Math.abs(opponent.x - f.x) <= centerReach;
+        const verticalClose = Math.abs((opponent.y || groundY) - (f.y || groundY)) <= Math.max(120, fighterVisualHeight(f) * .38);
+        if ((ab && rectsOverlap(ab, hb)) || (facingTarget && centerClose && verticalClose)) {
+          applyHit(f, opponent, f.attack);
+        }
+      }
+
+      const activeEnd = f.attack.startup + f.attack.active;
+      const power = f.attack.name === 'ultimate' ? 1.12 : f.attack.name === 'special' ? 1.00 : f.attack.name === 'heavy' ? .88 : .72;
+      if (f.stateT < activeEnd) {
+        f.vx += f.dir * (f.attack.lunge || 0) * dt * 2.85 * power;
+        f.x += f.dir * (f.attack.lunge || 0) * dt * .32 * power;
+        enforceCombatSpacing26_10(f, opponent, .36);
+      } else {
+        f.vx *= Math.pow(.52, dt*60);
+      }
+      if (f.stateT >= f.attack.total) {
+        setState(f, 'idle');
+        consumeBufferedAttack(f);
+      }
+    }
+
+    if (f.state === 'hitstun' && f.stateT > (f.hitstunTime || .34)) {
+      setState(f, 'idle');
+      consumeBufferedAttack(f);
+    }
+    if (f.state === 'knockdown' && f.stateT > (f.knockdownTime || .70) && isGrounded(f)) {
+      setState(f, 'idle');
+      f.invuln = .16;
+      spawnFootDust(f, 7, 'rgba(210,170,120,.26)');
+    }
+    if (f.state === 'dodge' && f.stateT > .28) {
+      setState(f, 'idle');
+      consumeBufferedAttack(f);
+    }
+    if (f.state === 'block') {
+      if (f.id === 'enemy' && f.stateT > .44) setState(f, 'idle');
+      if (f.id === 'player' && !input.block) setState(f, 'idle');
+    }
+
+    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'knockdown' && f.state !== 'dodge') {
+      if (f.id === 'player') updatePlayerControl(f, dt);
+      else updateAI(f, opponent, dt);
+    }
+
+    f.vy += GRAVITY * (f.stats.gravityScale || 1) * dt;
+    f.x += f.vx * dt;
+    f.y += f.vy * dt;
+
+    if (f.y > groundY) {
+      f.y = groundY;
+      if (!wasGrounded && Math.abs(f.vy) > 300) {
+        spawnFootDust(f, 8, 'rgba(210,170,120,.28)');
+        shake = Math.max(shake, 3.2);
+      }
+      f.vy = 0;
+    }
+
+    if (player && enemy && f.state !== 'knockdown') enforceCombatSpacing26_10(player, enemy, .24);
+
+    const grounded = isGrounded(f);
+    const friction = grounded ? (f.state === 'block' ? .66 : f.state === 'attack' ? .62 : .84) : .965;
+    f.vx *= Math.pow(friction, dt*60);
+    if (Math.abs(f.vx) < 9) f.vx = 0;
+    clampToStage(f);
+
+    if (USE_PREMIUM_FIGHTER_ART && grounded && Math.abs(f.vx) > 120 && Math.random() < dt * 12) {
+      spawnFootDust(f, 1, f.id === 'enemy' ? 'rgba(80,190,255,.13)' : 'rgba(255,70,80,.13)');
+    }
+
+    if (f.state !== 'attack' && f.state !== 'hitstun' && f.state !== 'block' && f.state !== 'dodge' && f.state !== 'knockdown') {
+      if (!grounded) setState(f, 'jump');
+      else if (Math.abs(f.vx) > 35 || Math.abs(f.walkIntent || 0) > 0) setState(f, 'walk');
+      else setState(f, 'idle');
+    }
+  }
+
+  function newMatch(){
+    resetTransientMatchState26_10('new_match');
+    syncArenaMood17();
+    stageClarity21IntroT = 3.25;
+    combatClarity21T = .55;
+    combatClarity21Word = 'COMBAT READABILITY 26.10';
+    combatClarity21Meta = 'clean timing · cleaner contact';
+    cameraDirector21Punch = Math.max(cameraDirector21Punch || 0, .14);
+    matchFinalized = false;
+    roundResolving = false;
+    playerRounds = 0;
+    enemyRounds = 0;
+    roundIndex = 1;
+    matchMaxCombo = 0;
+    gameState = 'fight';
+    ui.result.style.display = 'none';
+    ui.result.classList.add('fight5-result');
+    hideTelegramMainButton();
+    resetRoundPositions();
+
+    roundFreeze = 2.15;
+    document.body.classList.remove('menu-returning');
+    document.body.classList.add('menu-leaving','fight-entering');
+    ui.menu.setAttribute('aria-hidden', 'true');
+
+    window.setTimeout(() => {
+      document.body.classList.add('is-fighting');
+      ui.menu.style.setProperty('display', 'none', 'important');
+      document.body.classList.remove('menu-leaving');
+      showFight5VsIntro();
+      showArenaIntro17();
+      const arena = contentArena();
+      showCallout('ROUND ' + roundIndex, (arena?.title || 'Dark fortress arena'));
+    }, document.body.classList.contains('real-art-v4') ? 260 : 0);
+
+    window.setTimeout(() => {
+      document.body.classList.remove('fight-entering');
+      showCallout('FIGHT', 'Round ' + roundIndex);
+    }, document.body.classList.contains('real-art-v4') ? 1500 : 900);
+  }
+
+  tuneCombatReadability26_10();
+  resetTransientMatchState26_10('boot_26_10');
+
 
   resize();
   bindControls();
