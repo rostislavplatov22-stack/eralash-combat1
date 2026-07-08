@@ -5058,7 +5058,7 @@ body.real-art-v4 #menu #realStartZone::after{
 
 
 /* ==========================================================
-   Character Select Luxury Rebuild 27.1
+   Prestige Character Select 27.2
    Premium fighter selection presentation, no cheap card layout.
    ========================================================== */
 body.character-select-luxury-27-1 .character-select{
@@ -5439,6 +5439,714 @@ body.character-select-luxury-27-1 .cs-locked-note{
   body.character-select-luxury-27-1 .cs-vs{text-align:center !important;}
 }
 
+/* ==========================================================
+   Prestige Character Select & Cinematic Hero Presentation 27.2
+   Reference-driven hero selection: huge fighters, VS ceremony,
+   command panel, portrait rail, luxury gold/red/blue treatment.
+   ========================================================== */
+body.character-select-prestige-27-2 .character-select{
+  z-index:122 !important;
+  padding:clamp(6px,1vw,18px) !important;
+  background:
+    radial-gradient(circle at 15% 45%, rgba(188,16,30,.46), transparent 38%),
+    radial-gradient(circle at 72% 42%, rgba(35,128,224,.36), transparent 42%),
+    radial-gradient(circle at 50% 110%, rgba(214,159,64,.18), transparent 36%),
+    linear-gradient(180deg, rgba(0,0,0,.96), rgba(0,0,0,.99)) !important;
+  backdrop-filter: blur(12px) saturate(1.25) contrast(1.08) !important;
+}
+body.character-select-prestige-27-2 .character-select:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 48%, transparent 0 38%, rgba(0,0,0,.58) 82%),
+    linear-gradient(90deg, rgba(120,6,18,.30), transparent 31%, transparent 63%, rgba(15,85,155,.30)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 84px);
+  opacity:1;
+}
+body.character-select-prestige-27-2 .character-select:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,72,64,.08), transparent 26%),
+    radial-gradient(circle at 67% 20%, rgba(80,180,255,.09), transparent 28%),
+    linear-gradient(180deg, rgba(255,235,170,.04), transparent 20%, transparent 76%, rgba(0,0,0,.55));
+  mix-blend-mode:screen;
+}
+body.character-select-prestige-27-2 .cs-shell{
+  width:min(1840px, calc(100vw - 16px)) !important;
+  height:min(940px, calc(100vh - 16px)) !important;
+  max-height:min(940px, calc(100vh - 16px)) !important;
+  border-radius:18px !important;
+  border:1px solid rgba(232,198,122,.38) !important;
+  background:
+    linear-gradient(90deg, rgba(45,3,8,.82) 0%, rgba(8,8,11,.95) 45%, rgba(4,17,30,.92) 76%, rgba(3,7,12,.98) 100%),
+    radial-gradient(circle at 27% 43%, rgba(230,34,44,.26), transparent 38%),
+    radial-gradient(circle at 63% 42%, rgba(64,158,255,.25), transparent 36%),
+    linear-gradient(180deg, rgba(255,246,198,.07), rgba(0,0,0,.35)) !important;
+  box-shadow:
+    0 70px 180px rgba(0,0,0,.92),
+    inset 0 0 0 1px rgba(255,255,255,.055),
+    inset 0 26px 90px rgba(255,255,255,.025),
+    0 0 120px rgba(218,180,94,.10) !important;
+  overflow:hidden !important;
+}
+body.character-select-prestige-27-2 .cs-shell:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.95 !important;
+  background:
+    linear-gradient(90deg, rgba(120,7,16,.42), transparent 28%, rgba(232,198,122,.08) 50%, transparent 65%, rgba(45,120,210,.36)),
+    radial-gradient(circle at 50% 54%, rgba(218,180,94,.18), transparent 28%),
+    repeating-linear-gradient(90deg, transparent 0 116px, rgba(255,255,255,.035) 116px 117px);
+}
+body.character-select-prestige-27-2 .cs-shell:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:3;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.10), transparent 16%, transparent 76%, rgba(0,0,0,.60)),
+    radial-gradient(circle at 50% 52%, transparent 0 54%, rgba(0,0,0,.47) 100%);
+}
+body.character-select-prestige-27-2 .cs-top{
+  position:absolute !important;
+  z-index:6 !important;
+  left:36px !important;
+  right:420px !important;
+  top:24px !important;
+  padding:0 !important;
+  border:0 !important;
+  pointer-events:none;
+}
+body.character-select-prestige-27-2 .cs-kicker{
+  font-size:11px !important;
+  letter-spacing:.26em !important;
+  color:#f2d88c !important;
+  text-shadow:0 0 18px rgba(232,198,122,.28);
+}
+body.character-select-prestige-27-2 .cs-kicker:before{
+  width:46px !important;
+  background:linear-gradient(90deg, transparent, #f0d58a, transparent) !important;
+}
+body.character-select-prestige-27-2 .cs-title{
+  margin:10px 0 0 !important;
+  font-size:clamp(30px,3.2vw,58px) !important;
+  line-height:.92 !important;
+  letter-spacing:.05em !important;
+  color:#efd17c !important;
+  max-width:760px;
+  opacity:.96;
+}
+body.character-select-prestige-27-2 .cs-title span{color:#fff1bd !important;}
+body.character-select-prestige-27-2 .cs-subtitle{
+  max-width:740px !important;
+  margin-top:10px !important;
+  color:rgba(230,222,200,.78) !important;
+  font-size:13px !important;
+}
+body.character-select-prestige-27-2 .cs-close{
+  pointer-events:auto;
+  position:fixed !important;
+  top:calc(50vh - min(470px, calc(50vh - 8px)) + 22px) !important;
+  right:calc(50vw - min(920px, calc(50vw - 8px)) + 24px) !important;
+  z-index:9 !important;
+  width:46px !important;
+  height:46px !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.38)) !important;
+}
+body.character-select-prestige-27-2 .cs-body{
+  position:relative !important;
+  z-index:5 !important;
+  height:100% !important;
+  padding:94px 398px 30px 34px !important;
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:0 !important;
+}
+body.character-select-prestige-27-2 .cs-roster{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:0 !important;
+  height:100% !important;
+  padding:0 26px 132px 0 !important;
+  overflow:hidden !important;
+}
+body.character-select-prestige-27-2 .cs-roster:before{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  bottom:126px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(232,198,122,.58), rgba(232,198,122,.18), transparent);
+  z-index:8;
+}
+body.character-select-prestige-27-2 .cs-roster:after{
+  content:"VS";
+  position:absolute;
+  left:50%;
+  top:45%;
+  transform:translate(-50%,-50%);
+  z-index:7;
+  width:112px;
+  height:112px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:#f8db91;
+  font-family:Georgia,serif;
+  font-size:58px;
+  line-height:1;
+  letter-spacing:-.08em;
+  text-shadow:0 8px 22px rgba(0,0,0,.9), 0 0 24px rgba(232,198,122,.28);
+  background:
+    radial-gradient(circle, rgba(0,0,0,.62), rgba(0,0,0,.20) 60%, transparent),
+    conic-gradient(from 0deg, transparent, rgba(232,198,122,.35), transparent, rgba(232,198,122,.22), transparent);
+  box-shadow:0 0 60px rgba(0,0,0,.72);
+}
+body.character-select-prestige-27-2 .cs-card{
+  position:relative !important;
+  min-height:0 !important;
+  height:100% !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+  isolation:isolate;
+  transform:none !important;
+}
+body.character-select-prestige-27-2 .cs-card:hover{
+  transform:none !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+}
+body.character-select-prestige-27-2 .cs-card:before{
+  content:"";
+  position:absolute;
+  left:7%;
+  right:7%;
+  bottom:96px;
+  height:120px;
+  z-index:0;
+  border-radius:50%;
+  filter:blur(.1px);
+  opacity:.95;
+}
+body.character-select-prestige-27-2 .cs-card.raven:before{
+  left:0;
+  right:9%;
+  background:
+    radial-gradient(ellipse at center, rgba(235,33,42,.42), transparent 58%),
+    radial-gradient(ellipse at center, rgba(0,0,0,.58), transparent 72%);
+}
+body.character-select-prestige-27-2 .cs-card.warden:before{
+  left:9%;
+  right:0;
+  background:
+    radial-gradient(ellipse at center, rgba(60,170,255,.36), transparent 58%),
+    radial-gradient(ellipse at center, rgba(0,0,0,.60), transparent 72%);
+}
+body.character-select-prestige-27-2 .cs-card:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  opacity:.95;
+  background:
+    linear-gradient(180deg, transparent 0 45%, rgba(0,0,0,.56) 100%),
+    radial-gradient(circle at 50% 40%, rgba(255,255,255,.06), transparent 45%);
+}
+body.character-select-prestige-27-2 .cs-card.raven:after{
+  background:
+    radial-gradient(circle at 30% 37%, rgba(255,42,52,.34), transparent 37%),
+    linear-gradient(90deg, rgba(115,8,18,.72), transparent 60%),
+    linear-gradient(180deg, transparent 0 40%, rgba(0,0,0,.62) 100%);
+}
+body.character-select-prestige-27-2 .cs-card.warden:after{
+  background:
+    radial-gradient(circle at 62% 37%, rgba(70,165,255,.33), transparent 37%),
+    linear-gradient(270deg, rgba(15,75,134,.64), transparent 58%),
+    linear-gradient(180deg, transparent 0 40%, rgba(0,0,0,.62) 100%);
+}
+body.character-select-prestige-27-2 .cs-card img{
+  position:absolute !important;
+  z-index:2 !important;
+  bottom:102px !important;
+  max-width:none !important;
+  width:auto !important;
+  filter:
+    drop-shadow(0 38px 42px rgba(0,0,0,.95))
+    drop-shadow(0 0 26px rgba(232,198,122,.10))
+    contrast(1.15) saturate(1.13) !important;
+  transition:transform .34s ease, filter .34s ease !important;
+}
+body.character-select-prestige-27-2 .cs-card.raven img{
+  height:min(650px, 82%) !important;
+  left:41% !important;
+  bottom:106px !important;
+  transform:translateX(-50%) scale(1.12) !important;
+  transform-origin:50% 100%;
+  filter:
+    drop-shadow(0 42px 44px rgba(0,0,0,.95))
+    drop-shadow(0 0 30px rgba(255,34,44,.23))
+    contrast(1.15) saturate(1.14) !important;
+}
+body.character-select-prestige-27-2 .cs-card.warden img{
+  height:min(690px, 86%) !important;
+  left:58% !important;
+  bottom:98px !important;
+  transform:translateX(-50%) scale(1.15) !important;
+  transform-origin:50% 100%;
+  filter:
+    drop-shadow(0 44px 46px rgba(0,0,0,.96))
+    drop-shadow(0 0 30px rgba(67,171,255,.22))
+    contrast(1.16) saturate(1.12) !important;
+}
+body.character-select-prestige-27-2 .cs-card.active img{
+  filter:
+    drop-shadow(0 46px 46px rgba(0,0,0,.98))
+    drop-shadow(0 0 40px rgba(232,198,122,.23))
+    contrast(1.18) saturate(1.15) !important;
+}
+body.character-select-prestige-27-2 .cs-card-top{
+  position:absolute !important;
+  top:72px !important;
+  left:38px !important;
+  right:38px !important;
+  z-index:4 !important;
+  padding:0 !important;
+}
+body.character-select-prestige-27-2 .cs-card.warden .cs-card-top{
+  left:58px !important;
+  right:20px !important;
+}
+body.character-select-prestige-27-2 .cs-role{
+  color:#f5d98f !important;
+  letter-spacing:.28em !important;
+  font-size:10px !important;
+  text-shadow:0 0 18px rgba(232,198,122,.30);
+}
+body.character-select-prestige-27-2 .cs-tag{
+  display:none !important;
+}
+body.character-select-prestige-27-2 .cs-card-info{
+  position:absolute !important;
+  z-index:5 !important;
+  left:42px !important;
+  right:32px !important;
+  bottom:144px !important;
+  padding:0 !important;
+  background:none !important;
+}
+body.character-select-prestige-27-2 .cs-card.warden .cs-card-info{
+  left:58px !important;
+  right:28px !important;
+}
+body.character-select-prestige-27-2 .cs-card-info h3{
+  font-family:Georgia, 'Times New Roman', serif !important;
+  text-transform:uppercase !important;
+  font-size:clamp(46px,4vw,74px) !important;
+  letter-spacing:.045em !important;
+  color:#fff4da !important;
+  line-height:.9 !important;
+  text-shadow:0 22px 40px rgba(0,0,0,.92), 0 0 24px rgba(232,198,122,.15);
+}
+body.character-select-prestige-27-2 .cs-card-info p{
+  max-width:520px !important;
+  color:#e2d8c6 !important;
+  font-size:15px !important;
+  line-height:1.44 !important;
+  text-shadow:0 10px 20px rgba(0,0,0,.86);
+}
+body.character-select-prestige-27-2 .cs-mini-stats{
+  width:min(360px, 72%) !important;
+  margin-top:14px !important;
+}
+body.character-select-prestige-27-2 .cs-mini-row{
+  grid-template-columns:54px 1fr 34px !important;
+}
+body.character-select-prestige-27-2 .cs-mini-bar{
+  height:5px !important;
+  border-radius:99px !important;
+}
+body.character-select-prestige-27-2 .cs-mini-bar i{
+  background:linear-gradient(90deg, #b32733, #f5d173) !important;
+}
+body.character-select-prestige-27-2 .cs-card.warden .cs-mini-bar i{
+  background:linear-gradient(90deg, #2d8ed6, #a9ecff) !important;
+}
+body.character-select-prestige-27-2 .cs-preview{
+  position:absolute !important;
+  z-index:7 !important;
+  right:28px !important;
+  top:76px !important;
+  bottom:30px !important;
+  width:350px !important;
+  min-height:0 !important;
+  height:auto !important;
+  padding:26px 22px 20px !important;
+  border-radius:0 !important;
+  border:1px solid rgba(232,198,122,.44) !important;
+  background:
+    linear-gradient(180deg, rgba(7,8,10,.92), rgba(3,4,6,.98)),
+    radial-gradient(circle at 50% 0%, rgba(232,198,122,.14), transparent 34%),
+    radial-gradient(circle at 50% 58%, rgba(50,148,255,.10), transparent 46%) !important;
+  box-shadow:
+    0 48px 110px rgba(0,0,0,.72),
+    inset 0 0 0 1px rgba(255,255,255,.055),
+    inset 0 18px 50px rgba(255,255,255,.026) !important;
+  overflow:hidden !important;
+}
+body.character-select-prestige-27-2 .cs-preview:before,
+body.character-select-prestige-27-2 .cs-preview:after{
+  content:"";
+  position:absolute;
+  left:22px;
+  right:22px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(232,198,122,.70), transparent);
+  pointer-events:none;
+}
+body.character-select-prestige-27-2 .cs-preview:before{top:16px;}
+body.character-select-prestige-27-2 .cs-preview:after{bottom:16px;}
+body.character-select-prestige-27-2 .cs-command-title{
+  position:relative;
+  z-index:3;
+  text-align:center;
+  margin:4px 0 22px;
+  padding-bottom:18px;
+  border-bottom:1px solid rgba(232,198,122,.26);
+}
+body.character-select-prestige-27-2 .cs-command-title span{
+  display:block;
+  font-family:Georgia, 'Times New Roman', serif;
+  font-size:30px;
+  letter-spacing:.04em;
+  color:#f0c978;
+  text-transform:capitalize;
+  text-shadow:0 0 24px rgba(232,198,122,.18);
+}
+body.character-select-prestige-27-2 .cs-command-title small{
+  display:block;
+  margin-top:6px;
+  color:rgba(230,222,205,.56);
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  font-size:10px;
+}
+body.character-select-prestige-27-2 .cs-versus{
+  display:none !important;
+}
+body.character-select-prestige-27-2 .cs-details{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:16px !important;
+  margin:0 !important;
+}
+body.character-select-prestige-27-2 .cs-panel{
+  position:relative;
+  border-radius:0 !important;
+  padding:22px 18px !important;
+  min-height:112px !important;
+  border:1px solid rgba(232,198,122,.30) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(0,0,0,.35)),
+    radial-gradient(circle at 12% 35%, rgba(232,198,122,.12), transparent 30%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 18px 38px rgba(0,0,0,.32) !important;
+}
+body.character-select-prestige-27-2 .cs-panel:first-child{
+  padding-left:92px !important;
+}
+body.character-select-prestige-27-2 .cs-panel:first-child:before{
+  content:"";
+  position:absolute;
+  left:18px;
+  top:28px;
+  width:56px;
+  height:56px;
+  border:1px solid rgba(232,198,122,.38);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,34,44,.65), transparent 45%),
+    linear-gradient(135deg, rgba(120,10,18,.92), rgba(7,8,11,.96));
+  box-shadow:0 0 22px rgba(255,34,44,.18), inset 0 0 18px rgba(255,255,255,.08);
+}
+body.character-select-prestige-27-2 .cs-panel:first-child:after{
+  content:"";
+  position:absolute;
+  left:28px;
+  top:38px;
+  width:36px;
+  height:36px;
+  background:linear-gradient(135deg, transparent 42%, #ff3142 43% 56%, transparent 57%),
+             linear-gradient(45deg, transparent 42%, #ffd1d1 43% 52%, transparent 53%);
+  transform:rotate(-12deg);
+  filter:drop-shadow(0 0 8px rgba(255,58,64,.65));
+}
+body.character-select-prestige-27-2 .cs-panel b{
+  display:block !important;
+  font-family:Georgia, 'Times New Roman', serif;
+  color:#eac778 !important;
+  font-size:18px !important;
+  line-height:1.1;
+  letter-spacing:.08em !important;
+  margin-bottom:10px;
+}
+body.character-select-prestige-27-2 .cs-panel span{
+  display:block !important;
+  color:#d8d0c2 !important;
+  font-size:14px !important;
+  line-height:1.42 !important;
+}
+body.character-select-prestige-27-2 .cs-difficulty{
+  margin-top:22px !important;
+  padding:18px 14px !important;
+  border:1px solid rgba(232,198,122,.30);
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.35));
+}
+body.character-select-prestige-27-2 .cs-difficulty-label{
+  text-align:center;
+  color:#eac778 !important;
+  font-family:Georgia, 'Times New Roman', serif;
+  letter-spacing:.12em !important;
+  font-size:19px !important;
+  margin-bottom:14px !important;
+}
+body.character-select-prestige-27-2 .cs-difficulty-buttons{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:6px !important;
+}
+body.character-select-prestige-27-2 .cs-diff{
+  min-height:56px !important;
+  border-radius:0 !important;
+  border-color:rgba(232,198,122,.22) !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(0,0,0,.42)) !important;
+  color:#ddd5c8 !important;
+  letter-spacing:.12em !important;
+}
+body.character-select-prestige-27-2 .cs-diff.active{
+  background:
+    radial-gradient(circle at 50% 78%, rgba(82,160,255,.24), transparent 44%),
+    linear-gradient(180deg, rgba(35,83,150,.35), rgba(6,8,12,.70)) !important;
+  border-color:rgba(140,200,255,.82) !important;
+  color:#fff6d5 !important;
+  box-shadow:0 0 24px rgba(70,160,255,.18), inset 0 1px 0 rgba(255,255,255,.18);
+}
+body.character-select-prestige-27-2 .cs-actions{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+  margin-top:22px !important;
+}
+body.character-select-prestige-27-2 .cs-start{
+  order:1;
+  min-height:82px !important;
+  border-radius:0 !important;
+  font-family:Georgia, 'Times New Roman', serif !important;
+  font-size:32px !important;
+  letter-spacing:.08em !important;
+  color:#fff2c1 !important;
+  text-shadow:0 2px 0 rgba(0,0,0,.7), 0 0 18px rgba(232,198,122,.24);
+  border:1px solid rgba(255,236,166,.82) !important;
+  background:
+    linear-gradient(180deg, rgba(255,252,210,.26), transparent 18%),
+    linear-gradient(135deg, #59320c 0%, #d59b39 22%, #2b1707 48%, #d89f3f 78%, #51300c 100%) !important;
+  box-shadow:
+    0 30px 70px rgba(210,142,42,.34),
+    0 0 0 1px rgba(255,255,255,.10) inset,
+    inset 0 1px 0 rgba(255,255,255,.48),
+    inset 0 -18px 30px rgba(0,0,0,.42) !important;
+}
+body.character-select-prestige-27-2 .cs-start:before,
+body.character-select-prestige-27-2 .cs-start:after{
+  content:"✦";
+  margin:0 12px;
+  color:#fff3bc;
+  text-shadow:0 0 14px rgba(255,226,154,.50);
+}
+body.character-select-prestige-27-2 .cs-back{
+  order:2;
+  min-height:54px !important;
+  border-radius:0 !important;
+  width:70% !important;
+  justify-self:center !important;
+  font-family:Georgia, 'Times New Roman', serif !important;
+  font-size:19px !important;
+  color:#f1dec0 !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.46)) !important;
+  border-color:rgba(232,198,122,.42) !important;
+}
+body.character-select-prestige-27-2 .cs-locked-note{
+  display:none !important;
+}
+body.character-select-prestige-27-2 .cs-portrait-rail{
+  position:absolute;
+  left:32px;
+  right:34px;
+  bottom:26px;
+  height:112px;
+  z-index:9;
+  display:grid;
+  grid-template-columns:52px repeat(7, minmax(72px, 1fr));
+  gap:8px;
+  align-items:stretch;
+  padding:8px;
+  border:1px solid rgba(232,198,122,.28);
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(0,0,0,.58));
+  box-shadow:0 24px 60px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.08);
+}
+body.character-select-prestige-27-2 .cs-crest,
+body.character-select-prestige-27-2 .cs-rail-portrait{
+  position:relative;
+  border:1px solid rgba(232,198,122,.26);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.54));
+  overflow:hidden;
+  cursor:default;
+  color:#e5c77d;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+body.character-select-prestige-27-2 .cs-crest.active{
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,220,132,.28), transparent 46%),
+    linear-gradient(180deg, rgba(80,43,12,.88), rgba(0,0,0,.58));
+  border-color:rgba(255,226,154,.72);
+  box-shadow:0 0 22px rgba(232,198,122,.18), inset 0 1px 0 rgba(255,255,255,.18);
+}
+body.character-select-prestige-27-2 .cs-crest span{
+  display:grid;
+  place-items:center;
+  height:100%;
+  font-size:23px;
+}
+body.character-select-prestige-27-2 .cs-rail-portrait img{
+  position:absolute;
+  left:50%;
+  bottom:-8px;
+  transform:translateX(-50%);
+  height:112%;
+  width:auto;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.85)) contrast(1.08) saturate(1.06);
+}
+body.character-select-prestige-27-2 .cs-rail-portrait.active{
+  border-color:rgba(255,70,76,.94);
+  box-shadow:0 0 0 1px rgba(255,70,76,.38), 0 0 24px rgba(255,32,42,.22), inset 0 1px 0 rgba(255,255,255,.14);
+}
+body.character-select-prestige-27-2 .cs-rail-portrait.active:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border:1px solid rgba(255,230,150,.60);
+  pointer-events:none;
+}
+body.character-select-prestige-27-2 .cs-rail-portrait.locked{
+  display:grid;
+  place-items:center;
+  color:#82776b;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255,255,255,.05), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.025), rgba(0,0,0,.62));
+}
+body.character-select-prestige-27-2 .cs-rail-portrait.locked span{
+  font-size:28px;
+  opacity:.22;
+}
+body.character-select-prestige-27-2 .cs-rail-portrait.locked i{
+  position:absolute;
+  right:8px;
+  bottom:7px;
+  font-size:10px;
+  letter-spacing:.12em;
+  font-style:normal;
+  color:#b49b68;
+  opacity:.75;
+}
+body.character-select-prestige-27-2 .cs-card.active .cs-card-info h3:after{
+  content:"";
+  display:block;
+  margin-top:16px;
+  width:170px;
+  height:2px;
+  background:linear-gradient(90deg, transparent, #e9c778, transparent);
+}
+@media (max-width: 1280px){
+  body.character-select-prestige-27-2 .cs-shell{
+    height:min(900px, calc(100vh - 14px)) !important;
+  }
+  body.character-select-prestige-27-2 .cs-body{
+    padding-right:330px !important;
+  }
+  body.character-select-prestige-27-2 .cs-preview{
+    width:294px !important;
+    right:18px !important;
+  }
+  body.character-select-prestige-27-2 .cs-card-info h3{
+    font-size:40px !important;
+  }
+}
+@media (max-width: 980px){
+  body.character-select-prestige-27-2 .cs-shell{
+    overflow:auto !important;
+    height:auto !important;
+    max-height:calc(100vh - 14px) !important;
+  }
+  body.character-select-prestige-27-2 .cs-top{
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    top:auto !important;
+    padding:22px !important;
+  }
+  body.character-select-prestige-27-2 .cs-body{
+    display:block !important;
+    height:auto !important;
+    padding:0 18px 22px !important;
+  }
+  body.character-select-prestige-27-2 .cs-roster{
+    height:620px !important;
+    padding-bottom:110px !important;
+  }
+  body.character-select-prestige-27-2 .cs-preview{
+    position:relative !important;
+    inset:auto !important;
+    width:auto !important;
+    margin-top:18px !important;
+  }
+}
+@media (max-width: 680px){
+  body.character-select-prestige-27-2 .cs-title{font-size:34px !important;}
+  body.character-select-prestige-27-2 .cs-roster{
+    grid-template-columns:1fr !important;
+    height:auto !important;
+    padding-bottom:0 !important;
+    gap:10px !important;
+  }
+  body.character-select-prestige-27-2 .cs-roster:after,
+  body.character-select-prestige-27-2 .cs-portrait-rail{display:none !important;}
+  body.character-select-prestige-27-2 .cs-card{
+    height:440px !important;
+  }
+  body.character-select-prestige-27-2 .cs-card img{
+    height:78% !important;
+    bottom:92px !important;
+  }
+  body.character-select-prestige-27-2 .cs-card-info{
+    bottom:22px !important;
+  }
+  body.character-select-prestige-27-2 .cs-card-info h3{font-size:32px !important;}
+  body.character-select-prestige-27-2 .cs-mini-stats{display:none !important;}
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -5447,7 +6155,7 @@ body.character-select-luxury-27-1 .cs-locked-note{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -5694,9 +6402,9 @@ body.character-select-luxury-27-1 .cs-locked-note{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">Character Select Luxury Rebuild · 27.1</div>
-          <h1 id="csTitle" class="cs-title">Choose Your <span>Champion</span></h1>
-          <p class="cs-subtitle">Премиальный выбор бойца: крупная презентация, чистая читаемость, роль в бою и немедленный переход к арене.</p>
+          <div class="cs-kicker">Prestige Character Select · 27.2</div>
+          <h1 id="csTitle" class="cs-title">Choose Your <span>Legend</span></h1>
+          <p class="cs-subtitle">Кинематографичная hero-презентация бойцов: Raven против Iron Warden, престижный VS-showcase и мгновенный переход к арене.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
       </div>
@@ -5730,9 +6438,21 @@ body.character-select-luxury-27-1 .cs-locked-note{
               </div>
             </div>
           </article>
+
+          <div class="cs-portrait-rail" aria-hidden="true">
+            <button class="cs-crest active" type="button"><span>☠</span></button>
+            <button class="cs-rail-portrait active" type="button"><img src="assets/fighter-shadow-raven.png" alt=""><b></b></button>
+            <button class="cs-rail-portrait" type="button"><img src="assets/fighter-iron-warden.png" alt=""><b></b></button>
+            <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
+            <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
+            <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
+            <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
+            <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
+          </div>
         </div>
 
         <aside class="cs-preview">
+          <div class="cs-command-title"><span>Raven Vs Iron Warden</span><small>Prestige Duel Protocol</small></div>
           <div class="cs-versus">
             <div class="cs-face player">
               <img id="csPlayerImg" src="assets/fighter-shadow-raven.png" alt="">
@@ -5771,7 +6491,7 @@ body.character-select-luxury-27-1 .cs-locked-note{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">27.1 Character Select: крупные fighter cards, clean VS preview, быстрый Start Fight и готовая боевая роль.</div>
+          <div class="cs-locked-note">27.2 Prestige Select: cinematic hero showcase, luxury command panel, premium VS ceremony and ready combat flow.</div>
         </aside>
       </div>
     </div>
@@ -6392,7 +7112,7 @@ body.character-select-luxury-27-1 .cs-locked-note{
   const REAL_PHYSICS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const AI_COMBOS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const ULTIMATE_FINISHER_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
-  const CHARACTER_SELECT_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
+  const CHARACTER_SELECT_PATCH = '27.2 PRESTIGE CHARACTER SELECT';
   const ARENA_SELECT_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
 
   const AI_PROFILES = {
