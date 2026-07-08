@@ -600,3 +600,10 @@ Fixed round completion at 0 HP and added in-game pause menu.
 ## 26.9 Fighter Facing Lock Hotfix
 
 Fixes fighter visual orientation so Raven and Iron Warden face each other in combat. Separates gameplay direction from native full-body art direction, preserving 26.8 scale/grounding/idle polish and 26.6 start routing.
+
+
+## Character Select Luxury Rebuild 27.1
+
+- Premium rebuild of Character Select presentation.
+- Larger fighter cards, cleaner VS preview, stronger luxury styling.
+- Preserves 27.0 combat hit reactions and previous stable flow.
