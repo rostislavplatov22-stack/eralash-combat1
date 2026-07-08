@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-premium-fighter-base-restore-26-7-ready",
-  "version": "26.7.0",
+  "name": "eralash-combat-fighter-scale-grounding-idle-presence-26-8-ready",
+  "version": "26.8.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat 26.7 Premium Fighter Base Restore hotfix: restores clean premium fighter bodies while keeping attack pose tests."
+  "description": "EraLash Combat 26.8 Fighter Scale, Grounding & Idle Presence Polish: improves fighter scale, contact shadows, idle presence, and readability while preserving 26.7 stable combat flow."
 }

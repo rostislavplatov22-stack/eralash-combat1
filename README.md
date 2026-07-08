@@ -1,3 +1,21 @@
+# EraLash Combat — Fighter Scale, Grounding & Idle Presence Polish 26.8
+
+26.8 improves the in-fight premium presentation after the stable 26.7 fighter-base restore.
+
+## Highlights
+
+- Increased Raven and Iron Warden visual scale.
+- Stronger grounding/contact shadows under the fighters.
+- Subtle red/blue floor glow for better stage integration.
+- Soft idle presence:
+  - Raven cloak / ember sway.
+  - Iron Warden armor / shield pulse.
+- Better fighter readability on dark approved arenas.
+- Preserved Start Button Routing 26.6.
+- Preserved Premium Fighter Base Restore 26.7.
+- Preserved approved fullscreen arena integration.
+- Preserved attack-pose renderer without aggressive gameplay changes.
+
 # EraLash Combat — Start Button Routing Hotfix 26.6
 
 26.6 fixes the main menu painted **НАЧАТЬ БОЙ** CTA so it reliably opens the combat flow on Vercel/desktop. It adds a hardened start-button rescue layer: direct DOM binding, large coordinate hit area, pointer/click/touch routing, and verification fallback while preserving 26.5 combat pose readability and approved fullscreen arenas.

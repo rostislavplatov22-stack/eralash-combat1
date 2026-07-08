@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Start Button Routing Hotfix 26.6</title>
+  <title>EraLash Combat — Fighter Scale, Grounding & Idle Presence Polish 26.8</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5636,17 +5636,17 @@ body.real-art-v4 #menu #realStartZone::after{
   };
   premiumFighterArt.player.decoding = 'async';
   premiumFighterArt.player.loading = 'eager';
-  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png';
+  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png?v=268';
   premiumFighterArt.enemy.decoding = 'async';
   premiumFighterArt.enemy.loading = 'eager';
-  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png';
+  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png?v=268';
 
   // Premium Fighters 6.0:
   // the old procedural stick/robot bodies are only a fallback now.
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = false; // 26.7: disable rough sprite-sheet bodies; keep attack-pose renderer only
-  const SPRITE_COMBAT_PATCH = '26.7 PREMIUM BASE FIGHTERS';
+  const SPRITE_COMBAT_PATCH = '26.8 SCALE GROUNDING IDLE PRESENCE';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -5775,13 +5775,48 @@ body.real-art-v4 #menu #realStartZone::after{
   // small stickman hitboxes were still used. That made the fighters visually
   // overlap and feel frozen. These helpers give big sprites proper body space,
   // spacing, hitboxes and AI distance.
+  const FIGHTER_PRESENCE_26_8 = {
+    player: {
+      scale: 1.09,
+      physicsScale: 1.08,
+      yLift: -6,
+      shadowScaleX: 1.10,
+      shadowScaleY: .35,
+      shadowOpacity: .39,
+      contactOpacity: .58,
+      glowOpacity: .18,
+      rimBoost: .10,
+      idleBob: 3.2,
+      idleSway: 1.15,
+      idlePulse: .10
+    },
+    enemy: {
+      scale: 1.07,
+      physicsScale: 1.06,
+      yLift: -5,
+      shadowScaleX: 1.22,
+      shadowScaleY: .42,
+      shadowOpacity: .45,
+      contactOpacity: .64,
+      glowOpacity: .20,
+      rimBoost: .12,
+      idleBob: 2.2,
+      idleSway: .72,
+      idlePulse: .12
+    }
+  };
+
+  function fighterPresence26_8(f){
+    return fighterIsWarden(f) ? FIGHTER_PRESENCE_26_8.enemy : FIGHTER_PRESENCE_26_8.player;
+  }
+
   function premiumFighterScaleFactor(){
     return clamp(w / 1600, .72, 1.18);
   }
 
   function fighterVisualHeight(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.h;
-    const base = fighterIsWarden(f) ? 420 : 390;
+    const base = fighterIsWarden(f) ? 420 * fighterPresence26_8(f).physicsScale : 390 * fighterPresence26_8(f).physicsScale;
     return base * premiumFighterScaleFactor() * (window.matchMedia && window.matchMedia('(pointer:coarse)').matches ? .92 : 1);
   }
 
@@ -10437,6 +10472,9 @@ body.real-art-v4 #menu #realStartZone::after{
     const coreB = hurt ? '#ff5161' : (f.colorB || (isEnemy ? '#3eb6ff' : '#c92832'));
     const accent = f.accent || (isEnemy ? '#d7dff0' : '#d9b76a');
     const heavyBody20 = isHeavyFighter20(f);
+    const presence26_8 = fighterPresence26_8(f);
+    const idlePhase26_8 = f.state === 'idle' ? Math.sin(time / (heavyBody20 ? 820 : 690) + (f.breathSeed20 || 0)) : 0;
+    const idlePulse26_8 = f.state === 'idle' ? (0.5 + 0.5 * Math.sin(time / (heavyBody20 ? 650 : 560) + (f.breathSeed20 || 0))) : 0;
     const breath20 = Math.sin(time/720 + (f.breathSeed20 || 0));
     const damage20 = clamp(f.damageVisual20 || 0, 0, 1);
     const recoil20 = clamp(f.impactRecoil20 || 0, 0, 1);
@@ -10444,7 +10482,7 @@ body.real-art-v4 #menu #realStartZone::after{
     const wall20 = clamp(f.wallPressure20 || 0, 0, 1);
 
     const walkCycle = Math.sin(time / (heavyBody20 ? 72 : 58));
-    const bob = f.state === 'idle' ? breath20*(heavyBody20 ? 2.4 : 4.8) : f.state === 'walk' ? Math.abs(walkCycle)*(heavyBody20 ? 9.5 : 14.0) : 0;
+    const bob = f.state === 'idle' ? breath20 * presence26_8.idleBob : f.state === 'walk' ? Math.abs(walkCycle)*(heavyBody20 ? 9.5 : 14.0) : 0;
     const attackPunch = attacking ? Math.sin(tAttack * Math.PI) : 0;
     const attackLunge = dir * attackPunch * (atkName === 'ultimate' ? 48 : atkName === 'special' ? 37 : atkName === 'heavy' ? 29 : 17);
     const dodgeSlide = dodging ? -dir * 34 * Math.max(0, 1 - f.stateT/.26) : 0;
@@ -10463,11 +10501,12 @@ body.real-art-v4 #menu #realStartZone::after{
     if (isEnemy) spriteH *= coarse ? 1.06 : 1.09;
     if (heavyBody20) spriteH *= coarse ? 1.035 : 1.055;
     else spriteH *= coarse ? .995 : 1.015;
+    spriteH *= presence26_8.scale;
     if (atkName === 'ultimate') spriteH *= 1.018;
     const spriteW = spriteH * aspect;
 
     // Keep both full-body fighters readable on narrow/mobile screens.
-    const maxSpriteW = coarse ? w * .36 : w * .235;
+    const maxSpriteW = coarse ? w * .39 : w * .255;
     if (spriteW > maxSpriteW) {
       const k = maxSpriteW / spriteW;
       spriteH *= k;
@@ -10475,24 +10514,43 @@ body.real-art-v4 #menu #realStartZone::after{
     const finalW = spriteH * aspect;
     const finalH = spriteH;
 
-    const x = f.x + poseX;
-    const y = f.y + bob + poseY + (isEnemy ? 3 : 6);
+    const idleX26_8 = f.state === 'idle' ? dir * idlePhase26_8 * (heavyBody20 ? 1.2 : 2.4) : 0;
+    const x = f.x + poseX + idleX26_8;
+    const y = f.y + bob + poseY + (isEnemy ? 3 : 6) + presence26_8.yLift;
     const xOffset = isEnemy ? 8 : -6;
 
     // Heavy grounded contact shadow, drawn in world space.
     ctx.save();
-    const shadowW = finalW * (isEnemy ? .68 : .60) * (heavyBody20 ? 1.16 : 1);
+    const shadowW = finalW * (isEnemy ? .68 : .60) * (heavyBody20 ? 1.16 : 1) * presence26_8.shadowScaleX;
+    const shadowH = (heavyBody20 ? 29 : 24) * presence26_8.shadowScaleY * 2.55;
     const shadow = ctx.createRadialGradient(x, y + 7, 8, x, y + 7, shadowW);
-    shadow.addColorStop(0,`rgba(0,0,0,${.78 + contact20*.15})`);
-    shadow.addColorStop(.42,`rgba(0,0,0,${.34 + contact20*.15})`);
+    shadow.addColorStop(0,`rgba(0,0,0,${presence26_8.contactOpacity + contact20*.16})`);
+    shadow.addColorStop(.42,`rgba(0,0,0,${presence26_8.shadowOpacity + contact20*.14})`);
     shadow.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle = shadow;
     ctx.beginPath();
-    ctx.ellipse(x, y + 9, shadowW, heavyBody20 ? 29 : 24, 0, 0, Math.PI*2);
+    ctx.ellipse(x, y + 9, shadowW, shadowH, 0, 0, Math.PI*2);
     ctx.fill();
-    if (contact20 > .2) {
+
+    // 26.8: tight contact patch directly under the feet, so fighters feel planted
+    // on the stage plate instead of floating as premium PNG art.
+    const footW26_8 = finalW * (heavyBody20 ? .34 : .29);
+    ctx.globalAlpha = .72;
+    ctx.fillStyle = `rgba(0,0,0,${presence26_8.contactOpacity})`;
+    ctx.beginPath();
+    ctx.ellipse(x - dir*finalW*.08, y + 3, footW26_8, heavyBody20 ? 9 : 7, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = presence26_8.glowOpacity + idlePulse26_8 * .035 + contact20*.10;
+    ctx.fillStyle = hexA(coreB, isEnemy ? '44' : '40');
+    ctx.beginPath();
+    ctx.ellipse(x + dir*finalW*.06, y + 6, shadowW*.42, heavyBody20 ? 12 : 10, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    if (contact20 > .2 || f.state === 'idle') {
       ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = .10 + contact20*.12;
+      ctx.globalAlpha = .09 + contact20*.12 + idlePulse26_8*.035;
       ctx.strokeStyle = hexA(accent,'66');
       ctx.lineWidth = heavyBody20 ? 3 : 2;
       ctx.beginPath();
@@ -10504,7 +10562,7 @@ body.real-art-v4 #menu #realStartZone::after{
     // Premium colored back aura and rim lift for readability on the dark arena.
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = hurt ? .40 : (isEnemy ? .20 : .22) + (f.rimPower20 || .3)*.12 + damage20*.18;
+    ctx.globalAlpha = hurt ? .40 : (isEnemy ? .20 : .22) + (f.rimPower20 || .3)*.12 + damage20*.18 + presence26_8.rimBoost + idlePulse26_8*.035;
     const aura = ctx.createRadialGradient(x, y - finalH*.58, 10, x, y - finalH*.58, finalW*.78);
     aura.addColorStop(0, hexA(coreB,'82'));
     aura.addColorStop(.48, hexA(accent,'26'));
@@ -10517,7 +10575,7 @@ body.real-art-v4 #menu #realStartZone::after{
     ctx.shadowColor = hexA(coreB,'aa');
     ctx.shadowBlur = 20 + (f.rimPower20 || .3)*26;
     ctx.lineWidth = heavyBody20 ? 3.2 : 2.4;
-    ctx.globalAlpha = (hurt ? .22 : .16) + (f.rimPower20 || .3)*.16;
+    ctx.globalAlpha = (hurt ? .22 : .16) + (f.rimPower20 || .3)*.16 + presence26_8.rimBoost*.65;
     ctx.beginPath();
     ctx.ellipse(x, y - finalH*.55, finalW*.50, finalH*.42, 0, Math.PI*.72, Math.PI*1.28);
     ctx.stroke();
@@ -10554,10 +10612,10 @@ body.real-art-v4 #menu #realStartZone::after{
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(dir * (1 + (strideSquashX-1)*.35 + (attackSquashX-1)*.28 + (breatheSquashX-1)*.18), 1 + (strideSquashY-1)*.35 + (attackSquashY-1)*.22 + (breatheSquashY-1)*.12);
-    ctx.rotate(lean * .42);
+    ctx.rotate(lean * .42 + idlePhase26_8 * presence26_8.idleSway * Math.PI / 180);
     ctx.filter = hurt || damage20 > .05
       ? `brightness(${1.16 + damage20*.34}) saturate(${1.08 + damage20*.22}) contrast(${1.08 + damage20*.10})`
-      : 'brightness(1.12) contrast(1.14) saturate(1.06)';
+      : `brightness(${1.15 + idlePulse26_8*.025}) contrast(1.18) saturate(1.08)`;
     const drawX = -finalW*.5 + xOffset;
     const drawY = -finalH;
     ctx.drawImage(img, drawX, drawY, finalW, finalH);
@@ -10604,6 +10662,29 @@ body.real-art-v4 #menu #realStartZone::after{
       ctx.stroke();
       ctx.globalAlpha = .11;
       ctx.fill();
+    }
+
+    // 26.8: premium idle presence. Keep it subtle: cloth/energy motion is a
+    // readability layer, not a new attack effect.
+    if (f.state === 'idle') {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = .10 + idlePulse26_8 * presence26_8.idlePulse;
+      ctx.strokeStyle = hexA(coreB, isEnemy ? 'aa' : '99');
+      ctx.shadowColor = hexA(coreB,'aa');
+      ctx.shadowBlur = isEnemy ? 18 : 14;
+      ctx.lineWidth = isEnemy ? Math.max(2, finalW*.010) : Math.max(2, finalW*.008);
+      ctx.beginPath();
+      if (isEnemy) {
+        // Warden: slow armor / shield energy pulse.
+        ctx.ellipse(finalW*.26, -finalH*.55 + idlePhase26_8*2, finalW*.12, finalH*.23, -.08, 0, Math.PI*2);
+      } else {
+        // Raven: cloak/sword ember sway behind the assassin silhouette.
+        ctx.moveTo(-finalW*.22, -finalH*.52 + idlePhase26_8*2);
+        ctx.quadraticCurveTo(-finalW*.48 - idlePhase26_8*8, -finalH*.44, -finalW*.35, -finalH*.25 + idlePhase26_8*3);
+        ctx.moveTo(finalW*.10, -finalH*.30);
+        ctx.quadraticCurveTo(finalW*.20 + idlePhase26_8*5, -finalH*.22, finalW*.16, -finalH*.14);
+      }
+      ctx.stroke();
     }
     ctx.restore();
 
