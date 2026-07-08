@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Hit Reaction & KO Upgrade 27.0</title>
+  <title>EraLash Combat — Prestige Character Select Reference Rebuild 27.3</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -6147,6 +6147,346 @@ body.character-select-prestige-27-2 .cs-card.active .cs-card-info h3:after{
   body.character-select-prestige-27-2 .cs-mini-stats{display:none !important;}
 }
 
+
+/* ==========================================================
+   27.3 — Prestige Character Select Reference Rebuild
+   Fixes 27.2: no overlapped title, no giant text across fighters,
+   controlled hero scale, cleaner command panel and expensive spacing.
+   ========================================================== */
+body.character-select-prestige-27-3 .character-select{
+  padding:0 !important;
+  background:
+    radial-gradient(circle at 18% 46%, rgba(164,9,26,.42), transparent 36%),
+    radial-gradient(circle at 69% 42%, rgba(35,115,205,.34), transparent 42%),
+    linear-gradient(180deg, rgba(0,0,0,.97), rgba(0,0,0,.995)) !important;
+}
+body.character-select-prestige-27-3 .character-select:before{
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 50%, rgba(0,0,0,.72) 92%),
+    linear-gradient(90deg, rgba(118,6,18,.25), transparent 35%, transparent 64%, rgba(15,82,150,.25)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.014) 0 1px, transparent 1px 110px) !important;
+  opacity:1 !important;
+}
+body.character-select-prestige-27-3 .cs-shell{
+  width:min(1760px, calc(100vw - 48px)) !important;
+  height:min(860px, calc(100vh - 42px)) !important;
+  max-height:min(860px, calc(100vh - 42px)) !important;
+  border-radius:22px !important;
+  border:1px solid rgba(232,198,122,.48) !important;
+  background:
+    linear-gradient(90deg, rgba(45,3,8,.86) 0%, rgba(8,8,11,.94) 43%, rgba(4,20,36,.92) 72%, rgba(3,7,12,.98) 100%),
+    radial-gradient(circle at 28% 42%, rgba(220,25,38,.24), transparent 32%),
+    radial-gradient(circle at 63% 42%, rgba(62,164,255,.23), transparent 33%),
+    radial-gradient(circle at 50% 105%, rgba(217,172,86,.14), transparent 38%) !important;
+  box-shadow:
+    0 70px 180px rgba(0,0,0,.94),
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    inset 0 28px 90px rgba(255,255,255,.026),
+    0 0 130px rgba(232,198,122,.10) !important;
+}
+body.character-select-prestige-27-3 .cs-shell:before{
+  background:
+    linear-gradient(90deg, rgba(142,12,22,.42), transparent 31%, rgba(232,198,122,.08) 50%, transparent 64%, rgba(30,112,190,.42)),
+    radial-gradient(circle at 50% 50%, rgba(232,198,122,.11), transparent 24%),
+    repeating-linear-gradient(90deg, transparent 0 124px, rgba(255,255,255,.028) 124px 125px) !important;
+}
+body.character-select-prestige-27-3 .cs-top{
+  position:absolute !important;
+  top:24px !important;
+  left:40px !important;
+  right:438px !important;
+  z-index:14 !important;
+  padding:0 0 12px !important;
+  pointer-events:none !important;
+}
+body.character-select-prestige-27-3 .cs-kicker{
+  font-size:10px !important;
+  letter-spacing:.32em !important;
+  color:#f0d98e !important;
+  opacity:.95;
+}
+body.character-select-prestige-27-3 .cs-title{
+  margin:12px 0 0 !important;
+  font-size:clamp(34px,3.7vw,64px) !important;
+  line-height:.88 !important;
+  letter-spacing:.06em !important;
+  color:#efcf77 !important;
+  max-width:900px !important;
+  text-shadow:0 26px 60px rgba(0,0,0,.94), 0 0 26px rgba(232,198,122,.12) !important;
+}
+body.character-select-prestige-27-3 .cs-title span{
+  color:#fff1c4 !important;
+}
+body.character-select-prestige-27-3 .cs-subtitle{
+  max-width:760px !important;
+  margin-top:10px !important;
+  font-size:12px !important;
+  color:rgba(230,222,205,.70) !important;
+}
+body.character-select-prestige-27-3 .cs-close{
+  top:calc(50vh - min(430px, calc(50vh - 21px)) + 20px) !important;
+  right:calc(50vw - min(880px, calc(50vw - 24px)) + 22px) !important;
+  width:44px !important;
+  height:44px !important;
+  border-radius:15px !important;
+  z-index:40 !important;
+}
+body.character-select-prestige-27-3 .cs-body{
+  height:100% !important;
+  padding:142px 392px 24px 34px !important;
+  display:grid !important;
+  grid-template-columns:1fr !important;
+}
+body.character-select-prestige-27-3 .cs-roster{
+  height:100% !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:0 !important;
+  padding:0 24px 124px 0 !important;
+  overflow:hidden !important;
+}
+body.character-select-prestige-27-3 .cs-roster:after{
+  top:43% !important;
+  width:106px !important;
+  height:106px !important;
+  font-size:42px !important;
+  border:1px solid rgba(232,198,122,.18);
+  background:
+    radial-gradient(circle, rgba(0,0,0,.68), rgba(0,0,0,.22) 60%, transparent 68%),
+    conic-gradient(from 0deg, transparent, rgba(232,198,122,.36), transparent, rgba(232,198,122,.22), transparent) !important;
+}
+body.character-select-prestige-27-3 .cs-card{
+  overflow:hidden !important;
+  min-height:0 !important;
+  height:100% !important;
+  cursor:pointer !important;
+}
+body.character-select-prestige-27-3 .cs-card.raven:after{
+  background:
+    radial-gradient(circle at 34% 41%, rgba(255,38,52,.27), transparent 35%),
+    linear-gradient(90deg, rgba(104,8,18,.78), rgba(0,0,0,.18) 58%, transparent),
+    linear-gradient(180deg, transparent 0 34%, rgba(0,0,0,.76) 100%) !important;
+}
+body.character-select-prestige-27-3 .cs-card.warden:after{
+  background:
+    radial-gradient(circle at 62% 39%, rgba(70,170,255,.26), transparent 36%),
+    linear-gradient(270deg, rgba(12,72,134,.72), rgba(0,0,0,.16) 58%, transparent),
+    linear-gradient(180deg, transparent 0 34%, rgba(0,0,0,.76) 100%) !important;
+}
+body.character-select-prestige-27-3 .cs-card:before{
+  bottom:72px !important;
+  height:112px !important;
+  opacity:.78 !important;
+}
+body.character-select-prestige-27-3 .cs-card img{
+  bottom:132px !important;
+  max-width:none !important;
+  width:auto !important;
+  opacity:.98 !important;
+  filter:
+    drop-shadow(0 38px 44px rgba(0,0,0,.96))
+    drop-shadow(0 0 24px rgba(232,198,122,.10))
+    contrast(1.13) saturate(1.10) !important;
+}
+body.character-select-prestige-27-3 .cs-card.raven img{
+  height:min(520px, 72%) !important;
+  left:39% !important;
+  bottom:130px !important;
+  transform:translateX(-50%) scale(1.08) !important;
+  filter:
+    drop-shadow(0 42px 44px rgba(0,0,0,.96))
+    drop-shadow(0 0 26px rgba(255,36,46,.22))
+    contrast(1.13) saturate(1.12) !important;
+}
+body.character-select-prestige-27-3 .cs-card.warden img{
+  height:min(560px, 76%) !important;
+  left:58% !important;
+  bottom:126px !important;
+  transform:translateX(-50%) scale(1.08) !important;
+  filter:
+    drop-shadow(0 42px 46px rgba(0,0,0,.96))
+    drop-shadow(0 0 26px rgba(68,172,255,.22))
+    contrast(1.14) saturate(1.10) !important;
+}
+body.character-select-prestige-27-3 .cs-card.active img{
+  filter:
+    drop-shadow(0 46px 48px rgba(0,0,0,.98))
+    drop-shadow(0 0 36px rgba(232,198,122,.20))
+    contrast(1.17) saturate(1.14) !important;
+}
+body.character-select-prestige-27-3 .cs-card-top{
+  top:66px !important;
+  left:44px !important;
+  right:44px !important;
+}
+body.character-select-prestige-27-3 .cs-card.warden .cs-card-top{
+  left:54px !important;
+}
+body.character-select-prestige-27-3 .cs-card-info{
+  left:44px !important;
+  right:34px !important;
+  bottom:142px !important;
+  max-width:540px !important;
+  padding:0 !important;
+  z-index:12 !important;
+}
+body.character-select-prestige-27-3 .cs-card.warden .cs-card-info{
+  left:54px !important;
+  right:30px !important;
+  max-width:560px !important;
+}
+body.character-select-prestige-27-3 .cs-card-info h3{
+  font-size:clamp(34px,3vw,52px) !important;
+  line-height:.92 !important;
+  letter-spacing:.055em !important;
+  white-space:nowrap !important;
+  color:#fff2d6 !important;
+  text-shadow:
+    0 20px 34px rgba(0,0,0,.98),
+    0 0 20px rgba(232,198,122,.16) !important;
+}
+body.character-select-prestige-27-3 .cs-card-info h3:after{
+  margin-top:10px !important;
+  width:138px !important;
+}
+body.character-select-prestige-27-3 .cs-card-info p{
+  margin-top:12px !important;
+  max-width:460px !important;
+  font-size:13px !important;
+  line-height:1.38 !important;
+  color:rgba(235,228,213,.85) !important;
+}
+body.character-select-prestige-27-3 .cs-card.warden .cs-card-info p{
+  max-width:500px !important;
+}
+body.character-select-prestige-27-3 .cs-mini-stats{
+  width:330px !important;
+  margin-top:12px !important;
+}
+body.character-select-prestige-27-3 .cs-mini-row{
+  grid-template-columns:44px 1fr 28px !important;
+  font-size:10px !important;
+}
+body.character-select-prestige-27-3 .cs-mini-bar{
+  height:5px !important;
+}
+body.character-select-prestige-27-3 .cs-preview{
+  right:26px !important;
+  top:70px !important;
+  bottom:26px !important;
+  width:354px !important;
+  padding:24px 20px 18px !important;
+  border:1px solid rgba(232,198,122,.48) !important;
+  background:
+    linear-gradient(180deg, rgba(9,9,11,.94), rgba(2,3,5,.99)),
+    radial-gradient(circle at 50% 0%, rgba(232,198,122,.13), transparent 32%),
+    radial-gradient(circle at 50% 58%, rgba(55,150,255,.08), transparent 48%) !important;
+}
+body.character-select-prestige-27-3 .cs-command-title span{
+  font-size:28px !important;
+  line-height:1.05 !important;
+}
+body.character-select-prestige-27-3 .cs-details{
+  gap:14px !important;
+}
+body.character-select-prestige-27-3 .cs-panel{
+  min-height:104px !important;
+  padding:18px 16px !important;
+  border-color:rgba(232,198,122,.28) !important;
+}
+body.character-select-prestige-27-3 .cs-panel:first-child{
+  padding-left:84px !important;
+}
+body.character-select-prestige-27-3 .cs-panel:first-child:before{
+  width:52px !important;
+  height:52px !important;
+  top:24px !important;
+  left:16px !important;
+}
+body.character-select-prestige-27-3 .cs-panel:first-child:after{
+  top:34px !important;
+  left:26px !important;
+}
+body.character-select-prestige-27-3 .cs-panel b{
+  font-size:17px !important;
+}
+body.character-select-prestige-27-3 .cs-panel span{
+  font-size:13px !important;
+}
+body.character-select-prestige-27-3 .cs-difficulty{
+  margin-top:16px !important;
+  padding:16px 12px !important;
+}
+body.character-select-prestige-27-3 .cs-difficulty-label{
+  font-size:18px !important;
+}
+body.character-select-prestige-27-3 .cs-diff{
+  min-height:50px !important;
+}
+body.character-select-prestige-27-3 .cs-actions{
+  margin-top:16px !important;
+}
+body.character-select-prestige-27-3 .cs-start{
+  min-height:76px !important;
+  font-size:28px !important;
+  box-shadow:
+    0 26px 64px rgba(210,142,42,.32),
+    0 0 0 1px rgba(255,255,255,.10) inset,
+    inset 0 1px 0 rgba(255,255,255,.48),
+    inset 0 -16px 28px rgba(0,0,0,.42) !important;
+}
+body.character-select-prestige-27-3 .cs-back{
+  min-height:50px !important;
+  font-size:18px !important;
+}
+body.character-select-prestige-27-3 .cs-portrait-rail{
+  left:30px !important;
+  right:28px !important;
+  bottom:24px !important;
+  height:104px !important;
+  padding:7px !important;
+  grid-template-columns:50px repeat(7,minmax(62px,1fr)) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(0,0,0,.66)),
+    linear-gradient(90deg, rgba(155,18,28,.18), transparent 42%, rgba(40,130,220,.14)) !important;
+}
+body.character-select-prestige-27-3 .cs-rail-portrait img{
+  height:108% !important;
+}
+@media (max-width: 1280px){
+  body.character-select-prestige-27-3 .cs-shell{
+    width:calc(100vw - 20px) !important;
+    height:calc(100vh - 20px) !important;
+  }
+  body.character-select-prestige-27-3 .cs-body{
+    padding:132px 332px 18px 24px !important;
+  }
+  body.character-select-prestige-27-3 .cs-preview{
+    width:296px !important;
+    right:16px !important;
+    top:70px !important;
+    bottom:18px !important;
+  }
+  body.character-select-prestige-27-3 .cs-card.raven img{
+    height:min(470px,70%) !important;
+  }
+  body.character-select-prestige-27-3 .cs-card.warden img{
+    height:min(500px,74%) !important;
+  }
+  body.character-select-prestige-27-3 .cs-card-info h3{
+    font-size:34px !important;
+  }
+  body.character-select-prestige-27-3 .cs-card-info p{
+    font-size:12px !important;
+  }
+  body.character-select-prestige-27-3 .cs-mini-stats{
+    width:260px !important;
+  }
+  body.character-select-prestige-27-3 .cs-start{
+    min-height:66px !important;
+    font-size:23px !important;
+  }
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -6155,7 +6495,7 @@ body.character-select-prestige-27-2 .cs-card.active .cs-card-info h3:after{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -6402,8 +6742,8 @@ body.character-select-prestige-27-2 .cs-card.active .cs-card-info h3:after{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">Prestige Character Select · 27.2</div>
-          <h1 id="csTitle" class="cs-title">Choose Your <span>Legend</span></h1>
+          <div class="cs-kicker">Prestige Character Select · 27.3</div>
+          <h1 id="csTitle" class="cs-title">Choose Your <span>Champion</span></h1>
           <p class="cs-subtitle">Кинематографичная hero-презентация бойцов: Raven против Iron Warden, престижный VS-showcase и мгновенный переход к арене.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
@@ -6491,7 +6831,7 @@ body.character-select-prestige-27-2 .cs-card.active .cs-card-info h3:after{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">27.2 Prestige Select: cinematic hero showcase, luxury command panel, premium VS ceremony and ready combat flow.</div>
+          <div class="cs-locked-note">27.3 Prestige Reference Rebuild: corrected hero scale, cinematic spacing, luxury command panel and clean VS ceremony.</div>
         </aside>
       </div>
     </div>

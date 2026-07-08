@@ -636,3 +636,13 @@ Fixes fighter visual orientation so Raven and Iron Warden face each other in com
 - Premium rebuild of Character Select presentation.
 - Larger fighter cards, cleaner VS preview, stronger luxury styling.
 - Preserves 27.0 combat hit reactions and previous stable flow.
+
+
+## 27.3 Prestige Character Select Reference Rebuild
+
+- Исправлен 27.2 Character Select: заголовок больше не залезает на бойцов.
+- Нормализованы hero-scale и позиции Raven / Iron Warden.
+- Убрано ощущение гигантских текстов поверх персонажей.
+- Правая command panel стала плотнее и чище.
+- Нижний portrait rail стал менее шумным.
+- Логика выбора, difficulty, Back и Start Fight сохранены.
