@@ -646,3 +646,8 @@ Fixes fighter visual orientation so Raven and Iron Warden face each other in com
 - Правая command panel стала плотнее и чище.
 - Нижний portrait rail стал менее шумным.
 - Логика выбора, difficulty, Back и Start Fight сохранены.
+
+
+## 27.4 Approved Prestige Character Select
+
+Replaced the previous cheap DOM/card character select with the approved cinematic prestige reference art as the full visual base, while preserving functional click zones for fighter selection, difficulty, back and start fight.
