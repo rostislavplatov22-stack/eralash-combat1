@@ -540,3 +540,12 @@ Fixed round completion at 0 HP and added in-game pause menu.
 - Raven uses Quick Fang and Shadow Lunge pose-frame tests.
 - Iron Warden uses Thunder Ram and Judgment Breaker pose-frame tests.
 - Existing approved fullscreen arenas and combat bounds are preserved.
+
+
+## 26.7 Premium Fighter Base Restore Hotfix
+
+- Disabled rough generated idle/block sprite-sheet bodies that made Iron Warden look like a dark cutout.
+- Restored premium full-body fighter art for idle, walk, block and non-attack presentation.
+- Preserved 26.3/26.4/26.5 attack-pose renderer for actual attack frames.
+- Updated cache busting to v=267.
+- Preserved Start Button Routing 26.6 and approved fullscreen arenas.

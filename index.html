@@ -5645,8 +5645,8 @@ body.real-art-v4 #menu #realStartZone::after{
   // the old procedural stick/robot bodies are only a fallback now.
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
-  const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '26.4 ATTACK ANIMATION TEST';
+  const USE_SPRITE_FIGHTERS = false; // 26.7: disable rough sprite-sheet bodies; keep attack-pose renderer only
+  const SPRITE_COMBAT_PATCH = '26.7 PREMIUM BASE FIGHTERS';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -5681,7 +5681,7 @@ body.real-art-v4 #menu #realStartZone::after{
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
-    img.src = src + '?v=265';
+    img.src = src + '?v=267';
     return img;
   }
 
@@ -10241,6 +10241,9 @@ body.real-art-v4 #menu #realStartZone::after{
   }
 
   function drawSpriteSheetFighter(f){
+    // 26.7: real pose frames are allowed only for attack states.
+    // The generated idle/block sprite sheets made Warden look like a black cutout,
+    // so non-attack presentation falls back to the cleaner premium full-body art.
     if (drawAttackPoseSprite26_3(f)) return true;
     if (!USE_SPRITE_FIGHTERS) return false;
     const anim = spriteAnimForFighter(f);
@@ -14390,6 +14393,9 @@ function sessionId(){
   }
 
   function drawSpriteSheetFighter(f){
+    // 26.7: real pose frames are allowed only for attack states.
+    // The generated idle/block sprite sheets made Warden look like a black cutout,
+    // so non-attack presentation falls back to the cleaner premium full-body art.
     if (drawAttackPoseSprite26_3(f)) return true;
     if (!USE_SPRITE_FIGHTERS) return false;
     const anim = spriteAnimForFighter(f);
