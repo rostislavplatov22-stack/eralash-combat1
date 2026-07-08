@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-combat-pose-scale-block-readability-26-5-ready",
-  "version": "26.5.0",
+  "name": "eralash-combat-start-button-routing-hotfix-26-6-ready",
+  "version": "26.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat 26.5 — Combat Pose Scale & Block Readability Hotfix with restrained attack pose scale, stable labels, cleaner guard FX and preserved fullscreen arenas."
+  "description": "EraLash Combat 26.6 — Start Button Routing Hotfix with hard painted CTA routing, coordinate rescue layer and preserved 26.5 combat pose readability."
 }

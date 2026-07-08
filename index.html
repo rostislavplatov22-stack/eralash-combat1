@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Attack Animation Test 26.4</title>
+  <title>EraLash Combat — Start Button Routing Hotfix 26.6</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5032,6 +5032,28 @@ body.fighter-motion-26 .hud{
 }
 body.fighter-motion-26 .callout .title{
   letter-spacing:.18em;
+}
+
+
+/* ==========================================================
+   26.6 — Start Button Routing Hotfix
+   The painted command-deck CTA must always be clickable on Vercel/desktop.
+   ========================================================== */
+body.real-art-v4 #menu .dc-real-hotzones{
+  z-index:999 !important;
+  pointer-events:none !important;
+}
+body.real-art-v4 #menu #realStartZone{
+  z-index:1001 !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+}
+body.real-art-v4 #menu #realStartZone::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:-18% -8% !important;
+  border-radius:inherit !important;
+  background:rgba(255,255,255,.001) !important;
 }
 
 </style>
@@ -14362,29 +14384,8 @@ function sessionId(){
     ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), labelX, labelY+12);
     ctx.restore();
 
-    // 26.4: no extra attack nameplate. The regular fighter label is already
-    // drawn by the game, and a second moving label makes the pose frames look cheap.
-    return true;
-
-    // Minimal world-space nameplate so attack frames stay grounded.
-    ctx.save();
-    const plateW = clamp(poseW*.22, 112, 178);
-    const plateGrad = ctx.createLinearGradient(x-plateW*.5, y+13, x+plateW*.5, y+38);
-    plateGrad.addColorStop(0,'rgba(0,0,0,.72)');
-    plateGrad.addColorStop(.5, isWardenVisual ? 'rgba(42,160,255,.20)' : 'rgba(255,35,50,.18)');
-    plateGrad.addColorStop(1,'rgba(0,0,0,.72)');
-    ctx.fillStyle = plateGrad;
-    ctx.strokeStyle = isWardenVisual ? 'rgba(125,220,255,.55)' : 'rgba(255,60,76,.50)';
-    roundRect(ctx, x-plateW*.5, y+13, plateW, 25, 12, true, true);
-    ctx.font = '950 13px Inter, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = isWardenVisual ? '#c8f2ff' : '#ffd06e';
-    ctx.shadowColor = 'rgba(0,0,0,.85)';
-    ctx.shadowBlur = 7;
-    ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'RAVEN')).slice(0,16).toUpperCase(), x, y+26);
-    ctx.restore();
-
+    // 26.4/26.6: no extra moving nameplate after the stable grounded label.
+    // The previous dead block redeclared consts and could break strict parsing.
     return true;
   }
 
@@ -14869,11 +14870,132 @@ function sessionId(){
     document.addEventListener('click', handlePaintedStart, { capture:true, passive:false });
     document.addEventListener('touchend', handlePaintedStart, { capture:true, passive:false });
 
-    window.eralashStartFight = () => openCharacterSelect16_3('window_api_16_3');
+    window.eralashStartFight = window.eralashStartFight || (() => openCharacterSelect16_3('window_api_16_3'));
     window.eralashOpenArenaSelect = () => openArenaSelect16_3('window_api_16_3');
     window.eralashDirectFight = () => startSelectedArenaMatch16_3('window_api_direct_16_3');
   }
 
+
+  /* ==========================================================
+     26.6 — Start Button Routing Hotfix
+     Hard rescue layer for the painted "НАЧАТЬ БОЙ" button.
+     It uses:
+     1) direct DOM button binding,
+     2) document-level coordinate binding,
+     3) a delayed verification fallback.
+     ========================================================== */
+  function bindStartButtonRoutingHotfix26_6(){
+    const isOverlayOpen = () =>
+      document.body.classList.contains('character-select-open') ||
+      document.body.classList.contains('arena-select-open') ||
+      document.body.classList.contains('is-fighting') ||
+      gameState === 'fight';
+
+    const isMenuVisible = () => {
+      const menu = ui?.menu || document.getElementById('menu');
+      if (!menu) return false;
+      const cs = window.getComputedStyle(menu);
+      return cs.display !== 'none' && cs.visibility !== 'hidden' && cs.opacity !== '0';
+    };
+
+    let lastStartAt = 0;
+
+    const runStart = (source) => {
+      const now = Date.now();
+      if (now - lastStartAt < 420) return;
+      if (!document.body.classList.contains('real-art-v4')) return;
+      if (!isMenuVisible() || isOverlayOpen()) return;
+      lastStartAt = now;
+
+      try { audio.ensure(); } catch(_) {}
+      try { audio.ui(); } catch(_) {}
+      try { trackEvent('character_select_open', { source }); } catch(_) {}
+
+      const open = () => {
+        if (typeof openCharacterSelect16_3 === 'function') return openCharacterSelect16_3(source);
+        if (typeof openCharacterSelect === 'function') return openCharacterSelect(source);
+      };
+
+      try { open(); } catch (err) {
+        console.error('26.6 start routing failed, trying arena fallback', err);
+        try {
+          if (typeof openArenaSelect16_3 === 'function') openArenaSelect16_3(source + '_arena_fallback');
+          else if (typeof openArenaSelect === 'function') openArenaSelect(source + '_arena_fallback');
+        } catch(e) {
+          console.error('26.6 arena fallback failed', e);
+        }
+      }
+
+      // Verification: if nothing opened because another old listener/state swallowed
+      // the transition, force the character-select layer once more.
+      window.setTimeout(() => {
+        const characterOpen = document.body.classList.contains('character-select-open') ||
+          document.getElementById('characterSelect')?.classList.contains('show');
+        const arenaOpen = document.body.classList.contains('arena-select-open') ||
+          document.getElementById('arenaSelect')?.classList.contains('show');
+        if (!characterOpen && !arenaOpen && isMenuVisible() && !isOverlayOpen()) {
+          try {
+            if (typeof openCharacterSelect16_3 === 'function') openCharacterSelect16_3(source + '_verify');
+            else if (typeof openCharacterSelect === 'function') openCharacterSelect(source + '_verify');
+          } catch(e) {
+            console.error('26.6 verified start fallback failed', e);
+          }
+        }
+      }, 180);
+    };
+
+    const bindHard = (id, source) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      ['pointerdown','click','touchend'].forEach(type => {
+        el.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          runStart(source + '_' + type);
+        }, { capture:true, passive:false });
+      });
+    };
+
+    bindHard('realStartZone', 'start_button_hotfix_26_6_real_zone');
+    bindHard('startBtn', 'start_button_hotfix_26_6_dom');
+
+    const handlePaintedStart26_6 = (event) => {
+      if (!document.body.classList.contains('real-art-v4')) return;
+      if (!isMenuVisible() || isOverlayOpen()) return;
+
+      const target = event.target;
+      if (target?.closest?.('#characterSelect, #arenaSelect, #arenaReveal16, #result, #pauseOverlay, .dcv4-modal')) return;
+
+      const p = event.changedTouches?.[0] || event;
+      if (!p || typeof p.clientX !== 'number') return;
+
+      const lobby = document.querySelector('#menu .dc-v3-lobby') || ui?.menu || document.getElementById('menu');
+      if (!lobby) return;
+      const r = lobby.getBoundingClientRect();
+      if (r.width < 100 || r.height < 100) return;
+      if (p.clientX < r.left || p.clientX > r.right || p.clientY < r.top || p.clientY > r.bottom) return;
+
+      const x = ((p.clientX - r.left) / r.width) * 100;
+      const y = ((p.clientY - r.top) / r.height) * 100;
+
+      // Large safe hit area around the painted "НАЧАТЬ БОЙ" plate.
+      // This is intentionally wider than the art so browser scaling cannot miss it.
+      const insidePaintedStart = x >= 24 && x <= 73 && y >= 61 && y <= 88;
+      if (!insidePaintedStart) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+      runStart('painted_start_hotfix_26_6');
+    };
+
+    ['pointerdown','click','touchend'].forEach(type => {
+      document.addEventListener(type, handlePaintedStart26_6, { capture:true, passive:false });
+    });
+
+    window.eralashStartFight = () => runStart('window_api_hotfix_26_6');
+  }
 
   resize();
   bindControls();
@@ -14882,10 +15004,11 @@ function sessionId(){
   bindCharacterSelect();
   bindArenaSelect();
   bindArenaFlowLayerFix16_3();
+  bindStartButtonRoutingHotfix26_6();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
-  window.eralashStartFight = () => openCharacterSelect16_3('window_api_16_3');
+  window.eralashStartFight = window.eralashStartFight || (() => openCharacterSelect16_3('window_api_16_3'));
   window.eralashOpenArenaSelect = () => openArenaSelect16_3('window_api_16_3');
   window.eralashDirectFight = () => startSelectedArenaMatch16_3('window_api_direct_16_3');
 

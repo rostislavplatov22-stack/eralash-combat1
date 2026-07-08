@@ -1,3 +1,7 @@
+# EraLash Combat — Start Button Routing Hotfix 26.6
+
+26.6 fixes the main menu painted **НАЧАТЬ БОЙ** CTA so it reliably opens the combat flow on Vercel/desktop. It adds a hardened start-button rescue layer: direct DOM binding, large coordinate hit area, pointer/click/touch routing, and verification fallback while preserving 26.5 combat pose readability and approved fullscreen arenas.
+
 # EraLash Combat — Combat Pose Scale & Block Readability 26.5
 
 Hotfix for in-fight presentation after Attack Animation Test 26.3/26.4.
