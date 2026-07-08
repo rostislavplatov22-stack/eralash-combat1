@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-attack-pose-renderer-hotfix-26-4-ready",
-  "version": "26.4.0",
+  "name": "eralash-combat-combat-pose-scale-block-readability-26-5-ready",
+  "version": "26.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat 26.4 — Attack Pose Renderer Hotfix with cleaned transparent pose sprites and normalized combat scale."
+  "description": "EraLash Combat 26.5 — Combat Pose Scale & Block Readability Hotfix with restrained attack pose scale, stable labels, cleaner guard FX and preserved fullscreen arenas."
 }

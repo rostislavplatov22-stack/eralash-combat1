@@ -1,3 +1,15 @@
+# EraLash Combat — Combat Pose Scale & Block Readability 26.5
+
+Hotfix for in-fight presentation after Attack Animation Test 26.3/26.4.
+
+- Reduced oversized attack-pose rendering so Raven and Iron Warden stay inside readable fighter scale.
+- Anchored attack poses to the fighter body instead of sliding the whole cutout into the opponent.
+- Removed the second giant attack arc on top of pose art; pose art now carries the main strike silhouette.
+- Added stable foot-level nameplates during pose attacks.
+- Reduced Iron Warden default/block sprite scale so he does not become a foreground poster.
+- Softened block shield rings and removed duplicate BLOCK text spam.
+- Kept approved fullscreen arenas and expanded combat bounds.
+
 # EraLash Combat — Attack Pose Renderer Hotfix 26.4
 
 26.4 fixes the first 26.3 attack animation test: pose frames are now cleaned transparent sprites instead of full framed JPEG/poster plates, Warden/Raven attack scale is normalized against the existing fighter height, duplicate moving nameplates are removed, and approved fullscreen arenas remain intact.
