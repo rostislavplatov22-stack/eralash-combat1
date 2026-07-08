@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Fighter Scale, Grounding & Idle Presence Polish 26.8</title>
+  <title>EraLash Combat — Fighter Facing Lock Hotfix 26.8</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5636,17 +5636,17 @@ body.real-art-v4 #menu #realStartZone::after{
   };
   premiumFighterArt.player.decoding = 'async';
   premiumFighterArt.player.loading = 'eager';
-  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png?v=268';
+  premiumFighterArt.player.src = 'assets/fighter-shadow-raven.png?v=269';
   premiumFighterArt.enemy.decoding = 'async';
   premiumFighterArt.enemy.loading = 'eager';
-  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png?v=268';
+  premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png?v=269';
 
   // Premium Fighters 6.0:
   // the old procedural stick/robot bodies are only a fallback now.
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = false; // 26.7: disable rough sprite-sheet bodies; keep attack-pose renderer only
-  const SPRITE_COMBAT_PATCH = '26.8 SCALE GROUNDING IDLE PRESENCE';
+  const SPRITE_COMBAT_PATCH = '26.9 FIGHTER FACING LOCK';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -13575,6 +13575,11 @@ function sessionId(){
     const time = performance.now();
     const isEnemy = f.id !== 'player';
     const dir = f.dir || (isEnemy ? -1 : 1);
+    // 26.9 facing lock:
+    // gameplay dir always points to the opponent, but the Raven full-body source art is drawn in the opposite native direction.
+    // Warden source art faces right by default; Raven source art faces left by default.
+    // Use a separate artDir so backsteps do not make a fighter visually turn away from the duel.
+    const artDir = fighterIsWarden(f) ? dir : -dir;
     const hurt = f.state === 'hitstun' || f.state === 'knockdown';
     const blocking = f.state === 'block';
     const attacking = f.state === 'attack';
@@ -13638,7 +13643,7 @@ function sessionId(){
         const tx = drawX - dir*i*(dodging ? 36 : attacking ? 28 : 18);
         ctx.save();
         ctx.translate(tx, drawY);
-        ctx.scale(dir*squashX, squashY);
+        ctx.scale(artDir*squashX, squashY);
         ctx.rotate(stateLean*.55);
         ctx.drawImage(img, -spriteW/2, -spriteH, spriteW, spriteH);
         ctx.restore();
@@ -13672,7 +13677,7 @@ function sessionId(){
     // Main fighter image.
     ctx.save();
     ctx.translate(drawX, drawY);
-    ctx.scale(dir*squashX, squashY);
+    ctx.scale(artDir*squashX, squashY);
     ctx.rotate(stateLean);
     if (hurt) {
       ctx.filter = 'brightness(1.35) contrast(1.1) drop-shadow(0 0 18px rgba(255,80,80,.72))';

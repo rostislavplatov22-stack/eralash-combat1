@@ -567,3 +567,8 @@ Fixed round completion at 0 HP and added in-game pause menu.
 - Preserved 26.3/26.4/26.5 attack-pose renderer for actual attack frames.
 - Updated cache busting to v=267.
 - Preserved Start Button Routing 26.6 and approved fullscreen arenas.
+
+
+## 26.9 Fighter Facing Lock Hotfix
+
+Fixes fighter visual orientation so Raven and Iron Warden face each other in combat. Separates gameplay direction from native full-body art direction, preserving 26.8 scale/grounding/idle polish and 26.6 start routing.

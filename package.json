@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-fighter-scale-grounding-idle-presence-26-8-ready",
-  "version": "26.8.0",
+  "name": "eralash-combat-fighter-facing-lock-hotfix-26-9-ready",
+  "version": "26.9.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat 26.8 Fighter Scale, Grounding & Idle Presence Polish: improves fighter scale, contact shadows, idle presence, and readability while preserving 26.7 stable combat flow."
+  "description": "EraLash Combat 26.9 Fighter Facing Lock Hotfix: decouples combat facing from native fighter art orientation so Raven and Warden always face each other while preserving 26.8 scale, grounding, idle presence, and start routing."
 }
