@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Attack Animation Test 26.3</title>
+  <title>EraLash Combat — Attack Animation Test 26.4</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -5006,7 +5006,7 @@ body.arena-real-art-25-1 .ci24-card{
 }
 
 
-/* Attack Animation Test 26.3 */
+/* Attack Animation Test 26.4 */
 body.arena-approved-25-2 #debug{
   display:none !important;
 }
@@ -5020,7 +5020,7 @@ body.arena-approved-25-2 .as-rail-thumb.foundry{background-image:url('assets/thu
 body.arena-approved-25-2 .as-rail-thumb.crimson{background-image:url('assets/thumb-approved-crimson-garden-25-3.webp?v=253') !important}
 
 
-/* Attack Animation Test 26.3 */
+/* Attack Animation Test 26.4 */
 body.fighter-motion-26 #debug{display:none !important;}
 body.fighter-motion-26 .control-btn,
 body.fighter-motion-26 .fighter-card,
@@ -5624,7 +5624,7 @@ body.fighter-motion-26 .callout .title{
   // Primary combat visuals use the two uploaded full-body armored fighters.
   const USE_PREMIUM_FIGHTER_ART = true;
   const USE_SPRITE_FIGHTERS = true;
-  const SPRITE_COMBAT_PATCH = '26.3 ATTACK ANIMATION TEST';
+  const SPRITE_COMBAT_PATCH = '26.4 ATTACK ANIMATION TEST';
 
   function loadSpriteSheet(src){
     const img = new Image();
@@ -5659,7 +5659,7 @@ body.fighter-motion-26 .callout .title{
     const img = new Image();
     img.decoding = 'async';
     img.loading = 'eager';
-    img.src = src + '?v=263';
+    img.src = src + '?v=264';
     return img;
   }
 
@@ -5667,46 +5667,46 @@ body.fighter-motion-26 .callout .title{
     player: {
       // L / H = Quick Fang test, SP / ULT = approved Shadow Lunge test.
       light: [
-        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_anticipation_26_3.webp'), anchorX:.48, scale:.92, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_contact_26_3.webp'),      anchorX:.39, scale:.98, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_recovery_26_3.webp'),     anchorX:.47, scale:.94, y:.02 }
+        { img: loadAttackPose26_3('assets/poses26_4/raven_quick_fang_anticipation_26_4.webp'), anchorX:.48, scale:.92, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_quick_fang_contact_26_4.webp'),      anchorX:.39, scale:.98, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_quick_fang_recovery_26_4.webp'),     anchorX:.47, scale:.94, y:.02 }
       ],
       heavy: [
-        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_anticipation_26_3.webp'), anchorX:.48, scale:.95, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_contact_26_3.webp'),      anchorX:.39, scale:1.02, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_quick_fang_recovery_26_3.webp'),     anchorX:.47, scale:.96, y:.02 }
+        { img: loadAttackPose26_3('assets/poses26_4/raven_quick_fang_anticipation_26_4.webp'), anchorX:.48, scale:.95, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_quick_fang_contact_26_4.webp'),      anchorX:.39, scale:1.02, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_quick_fang_recovery_26_4.webp'),     anchorX:.47, scale:.96, y:.02 }
       ],
       special: [
-        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_anticipation_26_3.webp'), anchorX:.47, scale:.95, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_contact_26_3.webp'),      anchorX:.37, scale:1.03, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_recovery_26_3.webp'),     anchorX:.46, scale:.96, y:.02 }
+        { img: loadAttackPose26_3('assets/poses26_4/raven_shadow_lunge_anticipation_26_4.webp'), anchorX:.47, scale:.95, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_shadow_lunge_contact_26_4.webp'),      anchorX:.37, scale:1.03, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_shadow_lunge_recovery_26_4.webp'),     anchorX:.46, scale:.96, y:.02 }
       ],
       ultimate: [
-        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_anticipation_26_3.webp'), anchorX:.47, scale:1.00, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_contact_26_3.webp'),      anchorX:.37, scale:1.10, y:.02 },
-        { img: loadAttackPose26_3('assets/poses26_3/raven_shadow_lunge_recovery_26_3.webp'),     anchorX:.46, scale:1.02, y:.02 }
+        { img: loadAttackPose26_3('assets/poses26_4/raven_shadow_lunge_anticipation_26_4.webp'), anchorX:.47, scale:1.00, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_shadow_lunge_contact_26_4.webp'),      anchorX:.37, scale:1.10, y:.02 },
+        { img: loadAttackPose26_3('assets/poses26_4/raven_shadow_lunge_recovery_26_4.webp'),     anchorX:.46, scale:1.02, y:.02 }
       ]
     },
     enemy: {
       light: [
-        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_anticipation_26_3.webp'), anchorX:.47, scale:.95, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_contact_26_3.webp'),      anchorX:.44, scale:1.02, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_recovery_26_3.webp'),     anchorX:.46, scale:.98, y:.01 }
+        { img: loadAttackPose26_3('assets/poses26_4/warden_thunder_ram_anticipation_26_4.webp'), anchorX:.47, scale:.95, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_thunder_ram_contact_26_4.webp'),      anchorX:.44, scale:1.02, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_thunder_ram_recovery_26_4.webp'),     anchorX:.46, scale:.98, y:.01 }
       ],
       special: [
-        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_anticipation_26_3.webp'), anchorX:.47, scale:1.00, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_contact_26_3.webp'),      anchorX:.44, scale:1.08, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_thunder_ram_recovery_26_3.webp'),     anchorX:.46, scale:1.02, y:.01 }
+        { img: loadAttackPose26_3('assets/poses26_4/warden_thunder_ram_anticipation_26_4.webp'), anchorX:.47, scale:1.00, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_thunder_ram_contact_26_4.webp'),      anchorX:.44, scale:1.08, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_thunder_ram_recovery_26_4.webp'),     anchorX:.46, scale:1.02, y:.01 }
       ],
       heavy: [
-        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_anticipation_26_3.webp'), anchorX:.48, scale:1.03, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_contact_26_3.webp'),      anchorX:.46, scale:1.10, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_recovery_26_3.webp'),     anchorX:.48, scale:1.02, y:.01 }
+        { img: loadAttackPose26_3('assets/poses26_4/warden_judgment_anticipation_26_4.webp'), anchorX:.48, scale:1.03, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_judgment_contact_26_4.webp'),      anchorX:.46, scale:1.10, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_judgment_recovery_26_4.webp'),     anchorX:.48, scale:1.02, y:.01 }
       ],
       ultimate: [
-        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_anticipation_26_3.webp'), anchorX:.48, scale:1.08, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_contact_26_3.webp'),      anchorX:.46, scale:1.16, y:.01 },
-        { img: loadAttackPose26_3('assets/poses26_3/warden_judgment_recovery_26_3.webp'),     anchorX:.48, scale:1.08, y:.01 }
+        { img: loadAttackPose26_3('assets/poses26_4/warden_judgment_anticipation_26_4.webp'), anchorX:.48, scale:1.08, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_judgment_contact_26_4.webp'),      anchorX:.46, scale:1.16, y:.01 },
+        { img: loadAttackPose26_3('assets/poses26_4/warden_judgment_recovery_26_4.webp'),     anchorX:.48, scale:1.08, y:.01 }
       ]
     }
   };
@@ -10115,10 +10115,15 @@ body.fighter-motion-26 .callout .title{
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
     const visualAccent = f.colorB || (isWardenVisual ? '#3eb6ff' : '#c92832');
     const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
-    let poseH = coarse ? clamp(h * (isWardenVisual ? .52 : .49), 330, 510) : clamp(h * (isWardenVisual ? .63 : .57), 430, isWardenVisual ? 660 : 610);
-    poseH *= frame.scale || 1;
+
+    // 26.4 hotfix: pose art is a cleaned transparent sprite, not a full poster.
+    // Size it from the established fighter height so attack frames do not explode
+    // into giant pasted rectangles over the arena.
+    const targetBodyH = fighterVisualHeight(f) * (isWardenVisual ? 1.03 : 1.00);
+    let poseH = targetBodyH * (frame.scale || 1);
+    poseH = coarse ? clamp(poseH, 285, isWardenVisual ? 440 : 410) : clamp(poseH, 350, isWardenVisual ? 510 : 470);
     let poseW = poseH * aspect;
-    const maxW = coarse ? w * .74 : w * (isWardenVisual ? .64 : .58);
+    const maxW = coarse ? w * (isWardenVisual ? .48 : .46) : w * (isWardenVisual ? .43 : .41);
     if (poseW > maxW) {
       const k = maxW / poseW;
       poseW *= k;
@@ -10172,6 +10177,10 @@ body.fighter-motion-26 .callout .title{
     if (active) {
       drawReadableAttackArc20_1(x, y, poseW * .55, poseH, dir, atkName, p, true, visualAccent, isWardenVisual);
     }
+
+    // 26.4: no extra attack nameplate. The regular fighter label is already
+    // drawn by the game, and a second moving label makes the pose frames look cheap.
+    return true;
 
     // Minimal world-space nameplate so attack frames stay grounded.
     ctx.save();
@@ -14002,7 +14011,7 @@ function sessionId(){
   }
 
 
-  /* Attack Animation Test 26.3
+  /* Attack Animation Test 26.4
      This pass keeps the approved fullscreen arenas intact, but upgrades the fighters:
      - feet feel planted on the floor with contact shadows, floor reflection and stance rings
      - idle / walk / backstep / block / hit / attack have stronger readable body language
@@ -14238,10 +14247,15 @@ function sessionId(){
     const coarse = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
     const visualAccent = f.colorB || (isWardenVisual ? '#3eb6ff' : '#c92832');
     const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
-    let poseH = coarse ? clamp(h * (isWardenVisual ? .52 : .49), 330, 510) : clamp(h * (isWardenVisual ? .63 : .57), 430, isWardenVisual ? 660 : 610);
-    poseH *= frame.scale || 1;
+
+    // 26.4 hotfix: pose art is a cleaned transparent sprite, not a full poster.
+    // Size it from the established fighter height so attack frames do not explode
+    // into giant pasted rectangles over the arena.
+    const targetBodyH = fighterVisualHeight(f) * (isWardenVisual ? 1.03 : 1.00);
+    let poseH = targetBodyH * (frame.scale || 1);
+    poseH = coarse ? clamp(poseH, 285, isWardenVisual ? 440 : 410) : clamp(poseH, 350, isWardenVisual ? 510 : 470);
     let poseW = poseH * aspect;
-    const maxW = coarse ? w * .74 : w * (isWardenVisual ? .64 : .58);
+    const maxW = coarse ? w * (isWardenVisual ? .48 : .46) : w * (isWardenVisual ? .43 : .41);
     if (poseW > maxW) {
       const k = maxW / poseW;
       poseW *= k;
@@ -14295,6 +14309,10 @@ function sessionId(){
     if (active) {
       drawReadableAttackArc20_1(x, y, poseW * .55, poseH, dir, atkName, p, true, visualAccent, isWardenVisual);
     }
+
+    // 26.4: no extra attack nameplate. The regular fighter label is already
+    // drawn by the game, and a second moving label makes the pose frames look cheap.
+    return true;
 
     // Minimal world-space nameplate so attack frames stay grounded.
     ctx.save();

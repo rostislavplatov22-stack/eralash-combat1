@@ -1,6 +1,6 @@
 {
-  "name": "eralash-combat-attack-animation-test-26-3-ready",
-  "version": "26.3.0",
+  "name": "eralash-combat-attack-pose-renderer-hotfix-26-4-ready",
+  "version": "26.4.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,5 +11,5 @@
   "engines": {
     "node": "24.x"
   },
-  "description": "EraLash Combat Attack Animation Test 26.3 with clean pose sprites, WebP/PNG cutouts and real anticipation-contact-recovery attack frames."
+  "description": "EraLash Combat 26.4 — Attack Pose Renderer Hotfix with cleaned transparent pose sprites and normalized combat scale."
 }

@@ -1,3 +1,7 @@
+# EraLash Combat — Attack Pose Renderer Hotfix 26.4
+
+26.4 fixes the first 26.3 attack animation test: pose frames are now cleaned transparent sprites instead of full framed JPEG/poster plates, Warden/Raven attack scale is normalized against the existing fighter height, duplicate moving nameplates are removed, and approved fullscreen arenas remain intact.
+
 # EraLash Combat — Arena Fullscreen Combat Space Hotfix 25.3
 
 25.3 fixes fullscreen arena coverage and expands fight movement bounds so approved art fills the screen and fighters can retreat to the real map edges.
