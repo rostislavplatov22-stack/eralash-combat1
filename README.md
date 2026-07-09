@@ -679,3 +679,12 @@ Fixed the overloaded Ghlum character select by replacing fake portrait overlays 
 ## 28.3 Real Fighter Select Rebuild
 
 Clean rebuild of Character Select: removed broken reference overlays and fake portrait rail, restored a real three-fighter playable roster with Raven, Iron Warden and Ghlum, direct click zones, dynamic command panel, and preserved Ghlum combat flow.
+
+## 28.4 Character Select Viewport Fit & Ghlum Premium Polish
+
+- Исправлена посадка Character Select в viewport.
+- Правая command panel больше не должна обрезать AI Difficulty / Start Fight / Back.
+- Уменьшена вертикальная перегрузка карточек и header.
+- Ghlum получил более дорогой toxic selected-state и poison card polish.
+- Сохранены реальные три карточки Raven / Iron Warden / Ghlum и их click-зоны.
+

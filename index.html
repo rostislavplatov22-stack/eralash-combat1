@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Approved Prestige Character Select 27.4</title>
+  <title>EraLash Combat — Fighter Select Viewport Fit 28.4</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -8405,6 +8405,326 @@ body.character-select-real-28-3 .cs-start:hover{
   }
 }
 
+
+/* ==========================================================
+   28.4 — Character Select Viewport Fit & Ghlum Premium Polish
+   This is a conservative production polish over 28.3:
+   smaller header, fully visible right command panel, cleaner three-card roster,
+   premium toxic treatment for Ghlum, no reference overlays, no click traps.
+   ========================================================== */
+body.character-select-fit-28-4 .cs-shell{
+  width:min(1460px, 95vw) !important;
+  height:min(790px, calc(100vh - 28px)) !important;
+  border-radius:26px !important;
+}
+
+/* compact header gives the body and command controls enough viewport space */
+body.character-select-fit-28-4 .cs-top{
+  padding:16px clamp(24px,2.2vw,38px) 12px !important;
+  min-height:0 !important;
+}
+body.character-select-fit-28-4 .cs-kicker{
+  font-size:clamp(9px,.68vw,11px) !important;
+  letter-spacing:.22em !important;
+}
+body.character-select-fit-28-4 .cs-title{
+  margin:5px 0 5px !important;
+  font-size:clamp(36px,3.55vw,56px) !important;
+  line-height:.88 !important;
+  letter-spacing:.018em !important;
+}
+body.character-select-fit-28-4 .cs-subtitle{
+  max-width:690px !important;
+  font-size:clamp(11px,.78vw,13px) !important;
+  line-height:1.38 !important;
+  color:rgba(246,237,214,.68) !important;
+}
+body.character-select-fit-28-4 .cs-close{
+  width:42px !important;
+  height:42px !important;
+  border-radius:14px !important;
+}
+
+/* cleaner viewport fit */
+body.character-select-fit-28-4 .cs-body{
+  grid-template-columns:minmax(0,1fr) minmax(320px,360px) !important;
+  gap:clamp(14px,1.35vw,20px) !important;
+  padding:14px clamp(18px,2vw,30px) 18px !important;
+  min-height:0 !important;
+}
+body.character-select-fit-28-4 .cs-roster{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:clamp(11px,1.05vw,16px) !important;
+  height:100% !important;
+  min-height:0 !important;
+  align-items:stretch !important;
+}
+body.character-select-fit-28-4 .cs-card{
+  border-radius:22px !important;
+  min-height:0 !important;
+  height:100% !important;
+}
+body.character-select-fit-28-4 .cs-card:hover{
+  transform:translateY(-3px) !important;
+}
+body.character-select-fit-28-4 .cs-card img{
+  height:66% !important;
+  bottom:21% !important;
+  max-width:108% !important;
+}
+body.character-select-fit-28-4 .cs-card.raven img{height:68% !important;bottom:20% !important}
+body.character-select-fit-28-4 .cs-card.warden img{height:72% !important;bottom:19% !important}
+body.character-select-fit-28-4 .cs-card.ghlum img{
+  height:67% !important;
+  bottom:20% !important;
+  filter:
+    drop-shadow(0 30px 30px rgba(0,0,0,.90))
+    drop-shadow(0 0 22px rgba(120,255,92,.16))
+    contrast(1.10) saturate(1.12) !important;
+}
+body.character-select-fit-28-4 .cs-card-top{
+  top:13px !important;
+  left:14px !important;
+  right:14px !important;
+}
+body.character-select-fit-28-4 .cs-role,
+body.character-select-fit-28-4 .cs-tag{
+  font-size:clamp(8px,.62vw,10px) !important;
+}
+body.character-select-fit-28-4 .cs-tag{
+  padding:5px 8px !important;
+}
+body.character-select-fit-28-4 .cs-card-info{
+  padding:14px 15px 16px !important;
+}
+body.character-select-fit-28-4 .cs-card-info h3{
+  font-size:clamp(28px,2.05vw,38px) !important;
+  margin:0 0 6px !important;
+}
+body.character-select-fit-28-4 .cs-card-info p{
+  font-size:clamp(10px,.74vw,12px) !important;
+  line-height:1.32 !important;
+  margin:0 0 10px !important;
+}
+body.character-select-fit-28-4 .cs-mini-stats{gap:6px !important}
+body.character-select-fit-28-4 .cs-mini-row{gap:7px !important}
+body.character-select-fit-28-4 .cs-mini-bar{height:6px !important}
+
+/* premium Ghlum treatment */
+body.character-select-fit-28-4 .cs-card.ghlum{
+  background:
+    linear-gradient(180deg, rgba(38,115,34,.38), rgba(0,0,0,.78) 68%),
+    radial-gradient(circle at 50% 24%, rgba(135,255,87,.30), transparent 46%),
+    radial-gradient(circle at 70% 10%, rgba(198,255,138,.10), transparent 32%),
+    #030704 !important;
+}
+body.character-select-fit-28-4 .cs-card.ghlum::before{
+  background:
+    linear-gradient(180deg, rgba(190,255,135,.05), transparent 18%, transparent 64%, rgba(0,0,0,.86)),
+    radial-gradient(circle at 50% 34%, rgba(103,255,74,.18), transparent 42%),
+    radial-gradient(circle at 50% 86%, rgba(116,255,83,.15), transparent 30%) !important;
+}
+body.character-select-fit-28-4 .cs-card.ghlum.active{
+  border-color:rgba(149,255,107,1) !important;
+  box-shadow:
+    0 0 0 1px rgba(149,255,107,.48),
+    0 0 42px rgba(91,235,64,.26),
+    0 26px 76px rgba(0,0,0,.70),
+    inset 0 1px 0 rgba(255,255,255,.17) !important;
+}
+body.character-select-fit-28-4 .cs-card.ghlum .cs-card-info h3{
+  color:#e9ffd1 !important;
+  text-shadow:0 0 22px rgba(100,255,75,.24),0 5px 22px #000 !important;
+}
+body.character-select-fit-28-4 .cs-card.ghlum .cs-role{
+  color:#ddffb4 !important;
+}
+body.character-select-fit-28-4 .cs-card.ghlum .cs-tag{
+  background:rgba(31,94,27,.64) !important;
+  border-color:rgba(149,255,107,.58) !important;
+  color:#d9ffb5 !important;
+}
+
+/* right panel must never clip controls on 1080p */
+body.character-select-fit-28-4 .cs-preview{
+  height:100% !important;
+  min-height:0 !important;
+  padding:13px 14px 14px !important;
+  border-radius:22px !important;
+  overflow:hidden !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+body.character-select-fit-28-4 .cs-command-title{
+  margin:0 0 9px !important;
+  padding:0 0 10px !important;
+}
+body.character-select-fit-28-4 .cs-command-title span{
+  font-size:clamp(20px,1.55vw,26px) !important;
+  line-height:1.04 !important;
+}
+body.character-select-fit-28-4 .cs-command-title small{
+  margin-top:5px !important;
+  font-size:9px !important;
+}
+body.character-select-fit-28-4 .cs-versus{
+  grid-template-columns:1fr 38px 1fr !important;
+  gap:8px !important;
+  min-height:108px !important;
+  max-height:112px !important;
+  margin-bottom:9px !important;
+}
+body.character-select-fit-28-4 .cs-face{
+  min-height:108px !important;
+  border-radius:14px !important;
+}
+body.character-select-fit-28-4 .cs-face img{
+  height:76% !important;
+  opacity:.28 !important;
+}
+body.character-select-fit-28-4 .cs-face h3{
+  font-size:clamp(11px,.92vw,14px) !important;
+}
+body.character-select-fit-28-4 .cs-face p{
+  margin-top:5px !important;
+  max-width:104px !important;
+  font-size:8px !important;
+  line-height:1.18 !important;
+}
+body.character-select-fit-28-4 .cs-vs{
+  width:38px !important;
+  height:38px !important;
+  font-size:15px !important;
+}
+body.character-select-fit-28-4 .cs-details{
+  gap:8px !important;
+  margin:0 0 9px !important;
+}
+body.character-select-fit-28-4 .cs-panel{
+  padding:10px 11px !important;
+  border-radius:14px !important;
+}
+body.character-select-fit-28-4 .cs-panel b{
+  font-size:13px !important;
+  margin-bottom:5px !important;
+}
+body.character-select-fit-28-4 .cs-panel span{
+  font-size:10.5px !important;
+  line-height:1.32 !important;
+}
+body.character-select-fit-28-4 .cs-difficulty{
+  margin-top:auto !important;
+  padding-top:6px !important;
+}
+body.character-select-fit-28-4 .cs-difficulty-label{
+  font-size:10px !important;
+  margin-bottom:7px !important;
+}
+body.character-select-fit-28-4 .cs-difficulty-buttons{
+  gap:7px !important;
+}
+body.character-select-fit-28-4 .cs-diff{
+  min-height:34px !important;
+  border-radius:9px !important;
+  font-size:11px !important;
+}
+body.character-select-fit-28-4 .cs-actions{
+  grid-template-columns:88px 1fr !important;
+  gap:9px !important;
+  margin-top:9px !important;
+}
+body.character-select-fit-28-4 .cs-back,
+body.character-select-fit-28-4 .cs-start{
+  min-height:44px !important;
+  border-radius:10px !important;
+  font-size:12px !important;
+}
+body.character-select-fit-28-4 .cs-start{
+  box-shadow:0 12px 32px rgba(198,111,28,.30),0 0 28px rgba(240,199,101,.18),inset 0 1px 0 rgba(255,255,255,.42) !important;
+}
+
+/* Selected fighter color echo in the command panel */
+body.character-select-fit-28-4 .cs-card.ghlum.active ~ .cs-portrait-rail{display:none!important}
+body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
+  isolation:isolate !important;
+}
+
+/* Desktop safety for browser chrome on 1080p and narrower laptops */
+@media (max-width: 1280px), (max-height: 850px){
+  body.character-select-fit-28-4 .cs-shell{
+    width:min(1400px, 95vw) !important;
+    height:min(755px, calc(100vh - 24px)) !important;
+  }
+  body.character-select-fit-28-4 .cs-top{
+    padding:13px 28px 10px !important;
+  }
+  body.character-select-fit-28-4 .cs-title{
+    font-size:42px !important;
+  }
+  body.character-select-fit-28-4 .cs-subtitle{
+    font-size:12px !important;
+  }
+  body.character-select-fit-28-4 .cs-body{
+    padding:12px 24px 16px !important;
+    grid-template-columns:minmax(0,1fr) 342px !important;
+  }
+  body.character-select-fit-28-4 .cs-card img{
+    height:61% !important;
+    bottom:23% !important;
+  }
+  body.character-select-fit-28-4 .cs-card.raven img{height:63% !important}
+  body.character-select-fit-28-4 .cs-card.warden img{height:67% !important}
+  body.character-select-fit-28-4 .cs-card.ghlum img{height:62% !important}
+  body.character-select-fit-28-4 .cs-card-info h3{
+    font-size:28px !important;
+  }
+  body.character-select-fit-28-4 .cs-card-info p{
+    font-size:10.5px !important;
+  }
+  body.character-select-fit-28-4 .cs-preview{
+    padding:12px !important;
+  }
+  body.character-select-fit-28-4 .cs-versus{
+    min-height:96px !important;
+    max-height:100px !important;
+  }
+  body.character-select-fit-28-4 .cs-face{
+    min-height:96px !important;
+  }
+  body.character-select-fit-28-4 .cs-panel{
+    padding:8px 10px !important;
+  }
+  body.character-select-fit-28-4 .cs-panel span{
+    font-size:10px !important;
+    line-height:1.28 !important;
+  }
+}
+
+@media (max-width: 900px){
+  body.character-select-fit-28-4 .character-select{
+    overflow:auto !important;
+    align-items:flex-start !important;
+  }
+  body.character-select-fit-28-4 .cs-shell{
+    height:auto !important;
+    min-height:0 !important;
+    margin:10px auto !important;
+  }
+  body.character-select-fit-28-4 .cs-body{
+    grid-template-columns:1fr !important;
+    overflow:visible !important;
+  }
+  body.character-select-fit-28-4 .cs-roster{
+    grid-template-columns:1fr !important;
+  }
+  body.character-select-fit-28-4 .cs-card{
+    min-height:360px !important;
+  }
+  body.character-select-fit-28-4 .cs-preview{
+    min-height:auto !important;
+  }
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -8413,7 +8733,7 @@ body.character-select-real-28-3 .cs-start:hover{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -8660,9 +8980,9 @@ body.character-select-real-28-3 .cs-start:hover{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">REAL FIGHTER SELECT · 28.3</div>
+          <div class="cs-kicker">VIEWPORT FIT SELECT · 28.4</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
-          <p class="cs-subtitle">Чистый выбор бойца без накладок: три крупные рабочие карты, понятный selected-state и прямой старт выбранного героя.</p>
+          <p class="cs-subtitle">Чистый премиальный выбор бойца: три читаемые карты, улучшенная посадка в экран, Ghlum poison polish и полностью видимый Start Fight.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
       </div>
@@ -8763,7 +9083,7 @@ body.character-select-real-28-3 .cs-start:hover{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">28.3 Real select: no reference overlays, no fake slots, direct playable roster.</div>
+          <div class="cs-locked-note">28.4 viewport fit: clean 3-fighter roster, visible command controls, Ghlum poison polish.</div>
         </aside>
       </div>
     </div>
