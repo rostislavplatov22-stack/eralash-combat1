@@ -8725,6 +8725,73 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
   }
 }
 
+
+/* ==========================================================
+   28.6 Character Select Start Routing Hotfix
+   The fighter cards are real, but the START button needs a hard
+   top-layer route because old reference/canvas layers can steal input.
+   ========================================================== */
+body.character-select-start-route-28-6 #characterSelect.show,
+body.character-select-start-route-28-6.character-select-open #characterSelect{
+  z-index: 2147482000 !important;
+  pointer-events: auto !important;
+}
+
+body.character-select-start-route-28-6 #characterSelect .cs-shell,
+body.character-select-start-route-28-6 #characterSelect .cs-body,
+body.character-select-start-route-28-6 #characterSelect .cs-preview,
+body.character-select-start-route-28-6 #characterSelect .cs-actions{
+  pointer-events: auto !important;
+}
+
+body.character-select-start-route-28-6 #characterSelect .cs-actions{
+  position: relative !important;
+  z-index: 2147482600 !important;
+  display: grid !important;
+  grid-template-columns: minmax(88px,.72fr) minmax(170px,1.38fr) !important;
+  gap: 10px !important;
+  min-height: 58px !important;
+  margin-top: 10px !important;
+}
+
+body.character-select-start-route-28-6 #csStartFightBtn,
+body.character-select-start-route-28-6 #characterSelect .cs-start{
+  position: relative !important;
+  z-index: 2147483000 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: rgba(245,206,112,.26) !important;
+  min-height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateZ(0) !important;
+}
+
+body.character-select-start-route-28-6 #csStartFightBtn::after{
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 18px;
+  pointer-events: auto;
+}
+
+body.character-select-start-route-28-6 #characterSelect .cs-locked-note{
+  pointer-events: none !important;
+  opacity: .78 !important;
+}
+
+body.character-select-start-route-28-6 #characterSelect .cs-start.is-routing{
+  filter: brightness(1.18) saturate(1.08);
+  box-shadow:
+    0 0 38px rgba(245,190,92,.36),
+    inset 0 0 0 1px rgba(255,245,196,.42) !important;
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -8733,7 +8800,7 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -8980,9 +9047,9 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">GHLUM RUNTIME FIX · 28.5</div>
+          <div class="cs-kicker">GHLUM START ROUTING FIX · 28.6</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
-          <p class="cs-subtitle">Исправлен реальный запуск выбранного бойца: Ghlum сохраняется в combat runtime, даже если backend content устарел.</p>
+          <p class="cs-subtitle">Исправлен Start Fight: кнопка запуска жёстко ведёт выбранного бойца в Arena Select и бой.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
       </div>
@@ -9083,7 +9150,7 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">28.5 runtime fix: selected fighter is locked into combat before arena start.</div>
+          <div class="cs-locked-note">28.6 start fix: selected fighter is locked, routed and verified before arena start.</div>
         </aside>
       </div>
     </div>
@@ -19888,6 +19955,170 @@ function sessionId(){
 
 
 
+
+  /* ==========================================================
+     28.6 Character Select Start Routing Hotfix
+     Hard-locks the selected fighter and routes START with pointer/click/touch
+     capture so old overlays cannot steal the Start Fight input.
+     ========================================================== */
+  let __csStartRoute28_6Lock = 0;
+
+  function selectedFighterFromUI28_6(){
+    const active = document.querySelector('#characterSelect .cs-card.active[data-cs-fighter], #characterSelect [data-cs-fighter].active');
+    const id = active?.getAttribute('data-cs-fighter') || contentState.fighterId || contentBundle?.balance?.activeFighterId || 'raven';
+    return normalizeSelectedFighter28_5(id);
+  }
+
+  function lockSelectedFighterForStart28_6(source='cs_start_28_6'){
+    contentBundle.balance = contentBundle.balance || {};
+    const diff = currentDifficulty14();
+    const fighterId = normalizeSelectedFighter28_5(selectedFighterFromUI28_6());
+    const enemyId = opponentForSelectedFighter(fighterId);
+    const arenaId = currentArena15();
+
+    contentState.fighterId = fighterId;
+    contentState.enemyId = enemyId;
+    contentState.arenaId = arenaId;
+
+    contentBundle.balance.aiDifficulty = difficultyToValue(diff);
+    contentBundle.balance.activeFighterId = fighterId;
+    contentBundle.balance.enemyFighterId = enemyId;
+    contentBundle.balance.activeArenaId = arenaId;
+
+    try {
+      localStorage.setItem('eralashCombatSelectedFighter28', fighterId);
+      localStorage.setItem('eralashCombatDifficulty14', diff);
+      localStorage.setItem('eralashCombatStartRoute28_6', JSON.stringify({ fighterId, enemyId, arenaId, diff, source, ts: Date.now() }));
+    } catch (_) {}
+
+    saveContentState();
+    updateCharacterSelectUI();
+    return { fighterId, enemyId, arenaId, diff };
+  }
+
+  function startSelectedCharacterMatch28_6(source='cs_start_28_6'){
+    const now = performance.now();
+    if (now - __csStartRoute28_6Lock < 420) return;
+    __csStartRoute28_6Lock = now;
+
+    const btn = document.getElementById('csStartFightBtn');
+    if (btn) {
+      btn.classList.add('is-routing');
+      btn.setAttribute('aria-busy','true');
+    }
+
+    let locked;
+    try {
+      locked = lockSelectedFighterForStart28_6(source);
+      trackEvent('fight_start_route_28_6', {
+        source,
+        fighter: locked.fighterId,
+        enemy: locked.enemyId,
+        arena: locked.arenaId,
+        difficulty: locked.diff
+      });
+    } catch(err) {
+      console.warn('28.6 fighter start lock failed', err);
+    }
+
+    try { audio.ensure(); audio.ui(); } catch (_) {}
+
+    const overlay = document.getElementById('characterSelect');
+    if (overlay) {
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      overlay.style.setProperty('display','none','important');
+    }
+    document.body.classList.remove('character-select-open');
+
+    const routeToArena = () => {
+      try {
+        lockSelectedFighterForStart28_6(source + '_pre_arena');
+        if (typeof openArenaSelect16_3 === 'function') {
+          openArenaSelect16_3(source + '_hard_route');
+        } else if (typeof openArenaSelect === 'function') {
+          openArenaSelect(source + '_hard_route');
+        } else {
+          newMatch();
+        }
+      } catch(err) {
+        console.warn('28.6 hard route to arena failed; direct fight fallback', err);
+        try { newMatch(); } catch(_) {}
+      }
+    };
+
+    window.setTimeout(routeToArena, 40);
+
+    // Verification fallback: if arena did not open and fight did not start, force direct combat route.
+    window.setTimeout(() => {
+      const arena = document.getElementById('arenaSelect');
+      const arenaOpen = !!arena && (arena.classList.contains('show') || document.body.classList.contains('arena-select-open'));
+      const fighting = gameState === 'fight' || document.body.classList.contains('is-fighting');
+      if (!arenaOpen && !fighting) {
+        try {
+          lockSelectedFighterForStart28_6(source + '_fallback');
+          if (typeof startSelectedArenaMatch16_3 === 'function') startSelectedArenaMatch16_3(source + '_direct_fallback');
+          else newMatch();
+        } catch(err) {
+          console.warn('28.6 direct fallback failed', err);
+          try { newMatch(); } catch(_) {}
+        }
+      }
+      if (btn) {
+        btn.classList.remove('is-routing');
+        btn.removeAttribute('aria-busy');
+      }
+    }, 720);
+  }
+
+  function bindCharacterSelectStartRoute28_6(){
+    const route = (event, source) => {
+      const target = event.target?.closest?.('#csStartFightBtn, #characterSelect .cs-start');
+      if (!target) return;
+      const overlay = document.getElementById('characterSelect');
+      if (!overlay || overlay.getAttribute('aria-hidden') === 'true') return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+      startSelectedCharacterMatch28_6(source);
+    };
+
+    ['pointerdown','touchend','click'].forEach(type => {
+      document.addEventListener(type, (event) => route(event, 'cs_start_' + type + '_28_6'), true);
+    });
+
+    const btn = document.getElementById('csStartFightBtn');
+    if (btn) {
+      ['pointerdown','touchend','click'].forEach(type => {
+        btn.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+          startSelectedCharacterMatch28_6('cs_button_' + type + '_28_6');
+        }, { capture:true });
+      });
+    }
+
+    // Coordinate fallback for desktop/mobile: lower-right CTA area of command panel.
+    document.getElementById('characterSelect')?.addEventListener('pointerup', (event) => {
+      const preview = document.querySelector('#characterSelect .cs-preview');
+      const overlay = document.getElementById('characterSelect');
+      if (!preview || !overlay || overlay.getAttribute('aria-hidden') === 'true') return;
+      const r = preview.getBoundingClientRect();
+      const x = event.clientX - r.left;
+      const y = event.clientY - r.top;
+      const inStartBand = x > r.width * .36 && y > r.height * .78 && x < r.width * .98 && y < r.height * .98;
+      if (!inStartBand) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+      startSelectedCharacterMatch28_6('cs_coordinate_fallback_28_6');
+    }, true);
+
+    window.eralashStartSelectedFighter28_6 = () => startSelectedCharacterMatch28_6('window_api_28_6');
+  }
+
+
   resize();
   bindControls();
   bindEconomyControls();
@@ -19896,6 +20127,7 @@ function sessionId(){
   bindArenaSelect();
   bindArenaFlowLayerFix16_3();
   bindStartButtonRoutingHotfix26_6();
+  bindCharacterSelectStartRoute28_6();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);

@@ -1,3 +1,7 @@
+## 28.6 Character Select Start Fight Routing Hotfix
+
+Fixed the broken Character Select Start Fight button by adding hardened pointer/click/touch routing, capture-level event handling, selected fighter lock before arena routing, coordinate fallback for the command panel CTA, and a direct fight fallback if Arena Select fails to open. Preserves 28.5 Ghlum runtime lock and 28.4 Character Select polish.
+
 
 ## 28.1 — Clean Fighter Select & Ghlum Click Hotfix
 
