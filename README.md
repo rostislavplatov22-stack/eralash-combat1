@@ -669,3 +669,8 @@ Replaced the previous cheap DOM/card character select with the approved cinemati
 ## 28.0 — New Fighter: Ghlum — Cave Devourer
 
 Added third playable fighter Ghlum with new assets, roster integration, poison rushdown identity, low-profile combat tuning and preserved 27.5 clean Character Select flow.
+
+
+## 28.2 Clean Functional Fighter Select Hotfix
+
+Fixed the overloaded Ghlum character select by replacing fake portrait overlays with a clean three-fighter roster, real click zones, dynamic matchup panel, and preserved 28.0 Ghlum combat.

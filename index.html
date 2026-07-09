@@ -7161,6 +7161,593 @@ body.character-select-clean-roster-28-1 .cs-close{
   }
 }
 
+
+/* ==========================================================
+   28.2 — Clean Functional Three-Fighter Select
+   Fixes the failed overloaded reference overlay. This screen is now
+   real UI: three clear playable fighters, real click zones, dynamic
+   matchup panel and no fake locked portrait clutter.
+   ========================================================== */
+
+body.character-select-functional-three-28-2 .character-select{
+  padding:clamp(10px,1.35vw,22px) !important;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(160,22,28,.32), transparent 32%),
+    radial-gradient(circle at 80% 20%, rgba(38,125,170,.26), transparent 34%),
+    linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.97)) !important;
+  backdrop-filter:blur(10px) saturate(1.12) !important;
+}
+
+body.character-select-functional-three-28-2 .cs-shell{
+  width:min(1520px, 96vw) !important;
+  height:min(820px, calc(100vh - 34px)) !important;
+  min-height:0 !important;
+  margin:auto !important;
+  padding:0 !important;
+  border:1px solid rgba(221,184,96,.40) !important;
+  border-radius:24px !important;
+  overflow:hidden !important;
+  background:
+    linear-gradient(90deg, rgba(72,8,12,.54), rgba(10,12,15,.94) 35%, rgba(4,22,34,.72)),
+    url("assets/character-select-approved-reference-clean-27-5.png?v=282") center / cover no-repeat !important;
+  box-shadow:
+    0 34px 100px rgba(0,0,0,.70),
+    inset 0 1px 0 rgba(255,230,160,.12),
+    inset 0 0 0 1px rgba(255,255,255,.025) !important;
+  outline:0 !important;
+  display:grid !important;
+  grid-template-rows:auto 1fr !important;
+}
+body.character-select-functional-three-28-2 .cs-shell::before,
+body.character-select-functional-three-28-2 .cs-shell::after{
+  display:none !important;
+  content:none !important;
+}
+
+body.character-select-functional-three-28-2 .cs-top,
+body.character-select-functional-three-28-2 .cs-body,
+body.character-select-functional-three-28-2 .cs-roster,
+body.character-select-functional-three-28-2 .cs-preview,
+body.character-select-functional-three-28-2 .cs-actions,
+body.character-select-functional-three-28-2 .cs-difficulty,
+body.character-select-functional-three-28-2 .cs-difficulty-buttons,
+body.character-select-functional-three-28-2 .cs-card-top,
+body.character-select-functional-three-28-2 .cs-card-info,
+body.character-select-functional-three-28-2 .cs-mini-stats,
+body.character-select-functional-three-28-2 .cs-mini-row,
+body.character-select-functional-three-28-2 .cs-details,
+body.character-select-functional-three-28-2 .cs-panel,
+body.character-select-functional-three-28-2 .cs-command-title,
+body.character-select-functional-three-28-2 .cs-versus,
+body.character-select-functional-three-28-2 .cs-face{
+  display:flex !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  color:inherit !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+
+body.character-select-functional-three-28-2 .cs-top{
+  position:relative !important;
+  z-index:4 !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  padding:clamp(20px,2.05vw,34px) clamp(24px,2.5vw,44px) clamp(12px,1.1vw,18px) !important;
+  border-bottom:1px solid rgba(221,184,96,.22) !important;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.18)) !important;
+}
+body.character-select-functional-three-28-2 .cs-kicker{
+  display:block !important;
+  color:#d9b76a !important;
+  font-size:clamp(10px,.75vw,13px) !important;
+  letter-spacing:.22em !important;
+  font-weight:900 !important;
+  text-transform:uppercase !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-title{
+  display:block !important;
+  margin:.25rem 0 .35rem !important;
+  font-size:clamp(40px,4.4vw,72px) !important;
+  line-height:.88 !important;
+  letter-spacing:.03em !important;
+  color:#ffe7a8 !important;
+  text-shadow:0 10px 34px rgba(0,0,0,.9) !important;
+}
+body.character-select-functional-three-28-2 .cs-title span{
+  color:#fff4c9 !important;
+}
+body.character-select-functional-three-28-2 .cs-subtitle{
+  display:block !important;
+  max-width:760px !important;
+  margin:0 !important;
+  color:rgba(244,238,222,.78) !important;
+  font-size:clamp(12px,.92vw,15px) !important;
+  line-height:1.45 !important;
+  opacity:1 !important;
+}
+
+body.character-select-functional-three-28-2 .cs-close{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:46px !important;
+  height:46px !important;
+  border-radius:16px !important;
+  border:1px solid rgba(226,194,120,.38) !important;
+  background:rgba(7,10,12,.55) !important;
+  color:#fff1c2 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 14px 30px rgba(0,0,0,.42) !important;
+  opacity:1 !important;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+}
+
+body.character-select-functional-three-28-2 .cs-body{
+  position:relative !important;
+  z-index:3 !important;
+  min-height:0 !important;
+  padding:clamp(16px,1.65vw,26px) clamp(20px,2.3vw,38px) clamp(18px,1.85vw,30px) !important;
+  gap:clamp(16px,1.6vw,28px) !important;
+  display:grid !important;
+  grid-template-columns:minmax(0, 1fr) minmax(310px, 380px) !important;
+  align-items:stretch !important;
+  overflow:hidden !important;
+}
+
+body.character-select-functional-three-28-2 .cs-roster{
+  min-width:0 !important;
+  min-height:0 !important;
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+  gap:clamp(12px,1.2vw,20px) !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  pointer-events:auto !important;
+}
+
+/* Hide the reference portrait rail and every fake/locked slot. Real cards are the only picker. */
+body.character-select-functional-three-28-2 .cs-portrait-rail,
+body.character-select-functional-three-28-2 .cs-crest,
+body.character-select-functional-three-28-2 .cs-rail-portrait,
+body.character-select-functional-three-28-2 .cs-rail-portrait.locked{
+  display:none !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+}
+
+/* Re-enable real fighter cards; earlier reference patches had hidden them. */
+body.character-select-functional-three-28-2 .cs-card{
+  display:block !important;
+  position:relative !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  border-radius:22px !important;
+  border:1px solid rgba(225,190,112,.28) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(4,5,7,.25) 34%, rgba(0,0,0,.86)),
+    radial-gradient(circle at 50% 18%, rgba(255,226,145,.13), transparent 46%),
+    rgba(6,8,11,.82) !important;
+  overflow:hidden !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.54),
+    inset 0 1px 0 rgba(255,255,255,.09) !important;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  opacity:1 !important;
+  color:#fff1c2 !important;
+  transform:none !important;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, filter .18s ease !important;
+}
+body.character-select-functional-three-28-2 .cs-card:hover{
+  transform:translateY(-4px) !important;
+  border-color:rgba(255,224,145,.68) !important;
+  box-shadow:0 30px 76px rgba(0,0,0,.62), 0 0 34px rgba(221,184,96,.14), inset 0 1px 0 rgba(255,255,255,.12) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.active{
+  border-color:rgba(255,223,135,.95) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,223,135,.42),
+    0 0 44px rgba(221,184,96,.28),
+    0 34px 86px rgba(0,0,0,.72),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.raven.active{
+  border-color:rgba(255,67,80,.92) !important;
+  box-shadow:0 0 0 1px rgba(255,67,80,.38), 0 0 48px rgba(255,25,38,.30), 0 34px 86px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.warden.active{
+  border-color:rgba(96,201,255,.92) !important;
+  box-shadow:0 0 0 1px rgba(96,201,255,.38), 0 0 48px rgba(40,160,255,.26), 0 34px 86px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.ghlum.active{
+  border-color:rgba(132,255,103,.96) !important;
+  box-shadow:0 0 0 1px rgba(132,255,103,.42), 0 0 52px rgba(75,220,54,.30), 0 34px 86px rgba(0,0,0,.74), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+body.character-select-functional-three-28-2 .cs-card::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+}
+body.character-select-functional-three-28-2 .cs-card.raven::before{
+  background:radial-gradient(circle at 35% 18%, rgba(255,42,50,.24), transparent 46%), linear-gradient(180deg, rgba(90,5,12,.38), transparent 54%) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.warden::before{
+  background:radial-gradient(circle at 56% 18%, rgba(42,172,255,.24), transparent 46%), linear-gradient(180deg, rgba(3,36,70,.36), transparent 54%) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.ghlum::before{
+  background:radial-gradient(circle at 50% 22%, rgba(120,255,92,.22), transparent 46%), linear-gradient(180deg, rgba(18,70,25,.34), transparent 56%) !important;
+}
+
+body.character-select-functional-three-28-2 .cs-card img{
+  display:block !important;
+  position:absolute !important;
+  z-index:2 !important;
+  left:50% !important;
+  bottom:20% !important;
+  transform:translateX(-50%) !important;
+  width:auto !important;
+  height:72% !important;
+  max-width:118% !important;
+  object-fit:contain !important;
+  opacity:1 !important;
+  filter:drop-shadow(0 28px 30px rgba(0,0,0,.82)) contrast(1.08) saturate(1.06) !important;
+  pointer-events:none !important;
+}
+body.character-select-functional-three-28-2 .cs-card.warden img{
+  height:78% !important;
+  bottom:18% !important;
+}
+body.character-select-functional-three-28-2 .cs-card.ghlum img{
+  height:74% !important;
+  bottom:18% !important;
+}
+
+body.character-select-functional-three-28-2 .cs-card-top{
+  position:absolute !important;
+  z-index:5 !important;
+  top:16px !important;
+  left:16px !important;
+  right:16px !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-role,
+body.character-select-functional-three-28-2 .cs-tag{
+  display:inline-flex !important;
+  color:#ffe9a8 !important;
+  font-size:clamp(9px,.72vw,12px) !important;
+  letter-spacing:.18em !important;
+  font-weight:950 !important;
+  text-transform:uppercase !important;
+  text-shadow:0 2px 10px rgba(0,0,0,.90) !important;
+}
+body.character-select-functional-three-28-2 .cs-tag{
+  padding:6px 9px !important;
+  border-radius:999px !important;
+  border:1px solid rgba(230,196,118,.28) !important;
+  background:rgba(0,0,0,.42) !important;
+}
+
+body.character-select-functional-three-28-2 .cs-card-info{
+  position:absolute !important;
+  z-index:6 !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  display:block !important;
+  padding:clamp(15px,1.35vw,22px) !important;
+  background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.76) 16%, rgba(0,0,0,.94)) !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-card-info h3{
+  display:block !important;
+  margin:0 0 8px !important;
+  color:#fff4cc !important;
+  font-family:Georgia, 'Times New Roman', serif !important;
+  font-size:clamp(28px,2.45vw,44px) !important;
+  line-height:.95 !important;
+  letter-spacing:.02em !important;
+  text-shadow:0 4px 20px rgba(0,0,0,.95) !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-card-info p{
+  display:block !important;
+  margin:0 0 12px !important;
+  color:rgba(245,238,220,.82) !important;
+  font-size:clamp(11px,.82vw,14px) !important;
+  line-height:1.35 !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-mini-stats{
+  flex-direction:column !important;
+  gap:7px !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-mini-row{
+  align-items:center !important;
+  gap:9px !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-mini-row span,
+body.character-select-functional-three-28-2 .cs-mini-row em{
+  display:block !important;
+  color:#fff2bd !important;
+  font-size:10px !important;
+  font-style:normal !important;
+  font-weight:900 !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-mini-bar{
+  display:block !important;
+  position:relative !important;
+  flex:1 1 auto !important;
+  height:7px !important;
+  border-radius:999px !important;
+  background:rgba(255,255,255,.16) !important;
+  overflow:hidden !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-mini-bar i{
+  display:block !important;
+  height:100% !important;
+  border-radius:999px !important;
+  background:linear-gradient(90deg, #d43d48, #ffe493) !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-card.warden .cs-mini-bar i{
+  background:linear-gradient(90deg, #35b8ff, #bcefff) !important;
+}
+body.character-select-functional-three-28-2 .cs-card.ghlum .cs-mini-bar i{
+  background:linear-gradient(90deg, #60e35a, #d8ff9a) !important;
+}
+
+body.character-select-functional-three-28-2 .cs-preview{
+  display:flex !important;
+  flex-direction:column !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  padding:clamp(18px,1.45vw,24px) !important;
+  border-radius:20px !important;
+  border:1px solid rgba(221,184,96,.34) !important;
+  background:
+    linear-gradient(180deg, rgba(10,12,14,.92), rgba(0,0,0,.90)),
+    radial-gradient(circle at 50% 12%, rgba(221,184,96,.10), transparent 42%) !important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.56),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+  overflow:hidden !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+  color:#f2e6c9 !important;
+}
+body.character-select-functional-three-28-2 .cs-preview::before,
+body.character-select-functional-three-28-2 .cs-preview::after{
+  display:none !important;
+  content:none !important;
+}
+
+body.character-select-functional-three-28-2 .cs-command-title{
+  display:block !important;
+  text-align:center !important;
+  padding:0 0 14px !important;
+  border-bottom:1px solid rgba(221,184,96,.25) !important;
+  margin:0 0 16px !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-command-title span{
+  display:block !important;
+  color:#ffe2a0 !important;
+  font-family:Georgia, 'Times New Roman', serif !important;
+  font-size:clamp(22px,1.85vw,30px) !important;
+  line-height:1.05 !important;
+  text-shadow:0 4px 18px rgba(0,0,0,.95) !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-command-title small{
+  display:block !important;
+  margin-top:8px !important;
+  color:rgba(240,226,188,.58) !important;
+  letter-spacing:.18em !important;
+  font-weight:800 !important;
+  text-transform:uppercase !important;
+  font-size:10px !important;
+  opacity:1 !important;
+}
+
+body.character-select-functional-three-28-2 .cs-versus{
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+  min-height:112px !important;
+  margin-bottom:16px !important;
+}
+body.character-select-functional-three-28-2 .cs-face{
+  flex:1 1 0 !important;
+  min-width:0 !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:10px !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  border-radius:14px !important;
+  background:rgba(255,255,255,.035) !important;
+}
+body.character-select-functional-three-28-2 .cs-face img{
+  display:block !important;
+  height:82px !important;
+  max-width:100% !important;
+  object-fit:contain !important;
+  opacity:1 !important;
+  filter:drop-shadow(0 10px 12px rgba(0,0,0,.72)) !important;
+}
+body.character-select-functional-three-28-2 .cs-face h3{
+  display:block !important;
+  margin:5px 0 0 !important;
+  color:#fff0c2 !important;
+  font-size:13px !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-face p{
+  display:none !important;
+}
+body.character-select-functional-three-28-2 .cs-vs{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:46px !important;
+  height:46px !important;
+  border-radius:50% !important;
+  color:#ffe39e !important;
+  font-family:Georgia, serif !important;
+  font-size:22px !important;
+  background:rgba(221,184,96,.12) !important;
+  border:1px solid rgba(221,184,96,.35) !important;
+  opacity:1 !important;
+}
+
+body.character-select-functional-three-28-2 .cs-details{
+  flex-direction:column !important;
+  gap:12px !important;
+  margin-bottom:14px !important;
+}
+body.character-select-functional-three-28-2 .cs-panel{
+  flex-direction:column !important;
+  gap:8px !important;
+  padding:14px !important;
+  border:1px solid rgba(221,184,96,.22) !important;
+  background:rgba(255,255,255,.035) !important;
+  border-radius:14px !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-panel b{
+  display:block !important;
+  color:#ffe09b !important;
+  font-size:14px !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-panel span{
+  display:block !important;
+  color:rgba(242,235,218,.80) !important;
+  font-size:13px !important;
+  line-height:1.42 !important;
+  opacity:1 !important;
+}
+
+body.character-select-functional-three-28-2 .cs-difficulty{
+  flex-direction:column !important;
+  gap:10px !important;
+  margin-top:auto !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-difficulty-label{
+  display:block !important;
+  color:#ffe4a2 !important;
+  font-size:13px !important;
+  letter-spacing:.18em !important;
+  font-weight:900 !important;
+  text-transform:uppercase !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-difficulty-buttons{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:8px !important;
+}
+body.character-select-functional-three-28-2 .cs-diff{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:46px !important;
+  border:1px solid rgba(221,184,96,.28) !important;
+  background:rgba(255,255,255,.04) !important;
+  color:#fff1c2 !important;
+  font-weight:900 !important;
+  letter-spacing:.10em !important;
+  opacity:1 !important;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  border-radius:8px !important;
+}
+body.character-select-functional-three-28-2 .cs-diff.active{
+  border-color:rgba(93,188,255,.70) !important;
+  background:linear-gradient(180deg, rgba(55,132,190,.35), rgba(10,24,42,.60)) !important;
+  box-shadow:0 0 22px rgba(66,175,255,.16) inset, 0 0 18px rgba(66,175,255,.12) !important;
+}
+
+body.character-select-functional-three-28-2 .cs-actions{
+  display:grid !important;
+  grid-template-columns:.72fr 1.28fr !important;
+  gap:10px !important;
+  margin-top:14px !important;
+  opacity:1 !important;
+}
+body.character-select-functional-three-28-2 .cs-back,
+body.character-select-functional-three-28-2 .cs-start{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:56px !important;
+  border-radius:10px !important;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+  opacity:1 !important;
+  text-transform:uppercase !important;
+  letter-spacing:.10em !important;
+  font-weight:1000 !important;
+  font-size:14px !important;
+  color:#fff2c2 !important;
+  text-shadow:0 2px 12px rgba(0,0,0,.75) !important;
+}
+body.character-select-functional-three-28-2 .cs-back{
+  border:1px solid rgba(221,184,96,.26) !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(0,0,0,.46)) !important;
+}
+body.character-select-functional-three-28-2 .cs-start{
+  border:1px solid rgba(255,226,145,.62) !important;
+  background:
+    linear-gradient(120deg, rgba(255,245,177,.95), rgba(219,137,43,.95) 55%, rgba(92,42,13,.98)) !important;
+  color:#120d06 !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.36) !important;
+  box-shadow:0 20px 48px rgba(0,0,0,.50), 0 0 34px rgba(221,148,43,.24), inset 0 1px 0 rgba(255,255,255,.48) !important;
+}
+body.character-select-functional-three-28-2 .cs-locked-note{
+  display:none !important;
+}
+
+@media (max-width: 980px){
+  body.character-select-functional-three-28-2 .cs-shell{
+    height:auto !important;
+    min-height:min(780px, calc(100vh - 24px)) !important;
+    overflow:auto !important;
+  }
+  body.character-select-functional-three-28-2 .cs-body{
+    grid-template-columns:1fr !important;
+    overflow:visible !important;
+  }
+  body.character-select-functional-three-28-2 .cs-roster{
+    grid-template-columns:1fr !important;
+    min-height:980px !important;
+  }
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -7169,7 +7756,7 @@ body.character-select-clean-roster-28-1 .cs-close{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3 character-select-approved-27-4 character-select-reference-clean-27-5 character-select-clean-roster-28-1 new-fighter-ghlum-28">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3 character-select-approved-27-4 character-select-reference-clean-27-5 character-select-clean-roster-28-1 character-select-functional-three-28-2 new-fighter-ghlum-28">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -7416,9 +8003,9 @@ body.character-select-clean-roster-28-1 .cs-close{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">Clean Three-Fighter Select · 28.1</div>
+          <div class="cs-kicker">Functional Fighter Select · 28.2</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Champion</span></h1>
-          <p class="cs-subtitle">Чистый выбор бойца: Raven, Iron Warden или Ghlum. Без перегруза, с понятными активными зонами и мгновенным переходом к арене.</p>
+          <p class="cs-subtitle">Три бойца без перегруза: выбери Raven, Iron Warden или Ghlum. Карточки кликабельны, выбранный герой сразу попадает в матч.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
       </div>
@@ -7453,6 +8040,20 @@ body.character-select-clean-roster-28-1 .cs-close{
             </div>
           </article>
 
+          <article class="cs-card ghlum" data-cs-fighter="ghlum">
+            <img src="assets/fighter-ghlum-28.webp" alt="Ghlum">
+            <div class="cs-card-top"><span class="cs-role">Cave Devourer</span><span class="cs-tag">POISON</span></div>
+            <div class="cs-card-info">
+              <h3>Ghlum</h3>
+              <p>Низкопрофильный хищник: яд, быстрые рывки, когти и давление на ближней дистанции.</p>
+              <div class="cs-mini-stats">
+                <div class="cs-mini-row"><span>PWR</span><div class="cs-mini-bar"><i style="width:70%"></i></div><em>70</em></div>
+                <div class="cs-mini-row"><span>SPD</span><div class="cs-mini-bar"><i style="width:96%"></i></div><em>96</em></div>
+                <div class="cs-mini-row"><span>DEF</span><div class="cs-mini-bar"><i style="width:48%"></i></div><em>48</em></div>
+              </div>
+            </div>
+          </article>
+
           <div class="cs-portrait-rail" aria-hidden="true">
             <button class="cs-crest active" type="button"><span>☠</span></button>
             <button class="cs-rail-portrait active" type="button" data-cs-fighter="raven" aria-label="Select Raven"><img src="assets/fighter-shadow-raven.png" alt=""><b>RAVEN</b></button>
@@ -7466,7 +8067,7 @@ body.character-select-clean-roster-28-1 .cs-close{
         </div>
 
         <aside class="cs-preview">
-          <div class="cs-command-title"><span>Raven Vs Iron Warden</span><small>Prestige Duel Protocol</small></div>
+          <div class="cs-command-title"><span id="csCommandTitle">Raven Vs Iron Warden</span><small>Fighter Match Protocol</small></div>
           <div class="cs-versus">
             <div class="cs-face player">
               <img id="csPlayerImg" src="assets/fighter-shadow-raven.png" alt="">
@@ -7505,7 +8106,7 @@ body.character-select-clean-roster-28-1 .cs-close{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">28.1 Clean roster hotfix: simplified three-fighter selection, visible active states and fixed click zones.</div>
+          <div class="cs-locked-note">28.2 Functional select: clean three-fighter roster, real click zones and dynamic matchup panel.</div>
         </aside>
       </div>
     </div>
@@ -8146,7 +8747,7 @@ body.character-select-clean-roster-28-1 .cs-close{
   const REAL_PHYSICS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const AI_COMBOS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const ULTIMATE_FINISHER_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
-  const CHARACTER_SELECT_PATCH = '28.0 NEW FIGHTER GHLUM';
+  const CHARACTER_SELECT_PATCH = '28.2 CLEAN FUNCTIONAL FIGHTER SELECT';
   const ARENA_SELECT_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
 
   const AI_PROFILES = {
@@ -9467,6 +10068,10 @@ body.character-select-clean-roster-28-1 .cs-close{
     if (enemyRole) enemyRole.textContent = `${e.role} · ${e.skill}`;
     if (selectedSkill) selectedSkill.textContent = p.skill;
     if (selectedText) selectedText.textContent = p.text;
+    const csCommandTitle = document.getElementById('csCommandTitle');
+    if (csCommandTitle) csCommandTitle.textContent = `${p.name} Vs ${e.name}`;
+    const csStartFightBtn = document.getElementById('csStartFightBtn');
+    if (csStartFightBtn) csStartFightBtn.textContent = `START: ${String(p.name || selectedId).toUpperCase()}`;
     const csPreviewPanel = document.querySelector('.cs-preview');
     if (csPreviewPanel) csPreviewPanel.setAttribute('data-selected-fighter', (p.name || selectedId).toUpperCase());
 
@@ -9483,6 +10088,7 @@ body.character-select-clean-roster-28-1 .cs-close{
     contentBundle.balance = contentBundle.balance || {};
     contentState.fighterId = id;
     contentState.enemyId = opponentForSelectedFighter(id);
+    contentState.fighterId = contentState.fighterId || 'raven';
     contentBundle.balance.activeFighterId = contentState.fighterId;
     contentBundle.balance.enemyFighterId = contentState.enemyId;
     saveContentState();
