@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="EraLash Combat — Dark Arena" />
   <meta property="og:description" content="Dark premium Telegram fighting Mini App: AI battles, rewards, shop, Stars, referral season and Founder launch event." />
-  <title>EraLash Combat — Fighter Select Viewport Fit 28.4</title>
+  <title>EraLash Combat — Start Boot Fix 28.9</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
@@ -8841,6 +8841,67 @@ body.character-select-start-active-28-7 #csStartFightBtn.is-ready{
   50%{box-shadow:0 18px 48px rgba(217,183,106,.36),0 0 28px rgba(255,225,135,.20)}
 }
 
+
+/* ==========================================================
+   28.9 CRITICAL START BOOT FIX
+   - fixes TDZ crash that killed all click handlers
+   - adds a real active CTA over painted Command Deck button
+   ========================================================== */
+body.start-boot-fix-28-9 #menu .dc-v3-lobby{
+  position:relative !important;
+}
+body.start-boot-fix-28-9 #mainHardStartBtn28_9{
+  position:absolute !important;
+  left:30.6% !important;
+  top:73.2% !important;
+  width:34.8% !important;
+  height:10.8% !important;
+  z-index:2147482500 !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+  touch-action:manipulation !important;
+  border-radius:18px !important;
+  border:1px solid rgba(255,205,126,.72) !important;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(255,235,174,.36),rgba(255,235,174,0) 35%),
+    linear-gradient(180deg,rgba(255,214,130,.84),rgba(190,59,34,.52) 47%,rgba(75,8,10,.70)) !important;
+  box-shadow:
+    0 0 38px rgba(255,198,94,.30),
+    0 20px 55px rgba(0,0,0,.62),
+    inset 0 1px 0 rgba(255,255,255,.45),
+    inset 0 -12px 28px rgba(0,0,0,.40) !important;
+  color:#fff5cf !important;
+  font-family:inherit !important;
+  font-size:clamp(22px,3vw,46px) !important;
+  font-weight:900 !important;
+  letter-spacing:.12em !important;
+  text-transform:uppercase !important;
+  text-shadow:0 3px 0 rgba(0,0,0,.50),0 0 18px rgba(255,212,116,.36) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  user-select:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+}
+body.start-boot-fix-28-9 #mainHardStartBtn28_9:hover,
+body.start-boot-fix-28-9 #mainHardStartBtn28_9:focus-visible{
+  filter:brightness(1.12) saturate(1.08) !important;
+  transform:translateY(-1px) !important;
+}
+body.start-boot-fix-28-9.character-select-open #mainHardStartBtn28_9,
+body.start-boot-fix-28-9.is-fighting #mainHardStartBtn28_9{
+  display:none !important;
+}
+@media (max-width: 760px){
+  body.start-boot-fix-28-9 #mainHardStartBtn28_9{
+    left:20.5% !important;
+    top:70.5% !important;
+    width:59% !important;
+    height:10.5% !important;
+    font-size:clamp(18px,7vw,34px) !important;
+  }
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -8849,7 +8910,7 @@ body.character-select-start-active-28-7 #csStartFightBtn.is-ready{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6 character-select-start-active-28-7 main-menu-start-force-28-8">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6 character-select-start-active-28-7 main-menu-start-force-28-8 start-boot-fix-28-9">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -8894,6 +8955,7 @@ body.character-select-start-active-28-7 #csStartFightBtn.is-ready{
       <div class="dc-real-hotzones" aria-label="Активные зоны Dark Cinematic меню">
         <i id="dcRealHoverFrame" class="dc-real-hover-frame" aria-hidden="true"></i>
         <button id="realStartZone" class="dc-real-zone" type="button" aria-label="Начать бой"></button>
+        <button id="mainHardStartBtn28_9" class="main-hard-start-28-9" type="button" aria-label="Начать бой">НАЧАТЬ БОЙ</button>
         <button id="realProfileZone" class="dc-real-zone" type="button" aria-label="Профиль"></button>
         <button id="realSeasonCardBtn" class="dc-real-zone" type="button" aria-label="Сезон"></button>
         <button id="realDailyCardBtn" class="dc-real-zone" type="button" aria-label="Ежедневная награда"></button>
@@ -9850,7 +9912,22 @@ body.character-select-start-active-28-7 #csStartFightBtn.is-ready{
   }
 
   function normalizeSelectedFighter28_5(id){
-    return (CHARACTER_SELECT_META[id] || (DEFAULT_CONTENT.fighters || []).some(f => f.id === id)) ? id : 'raven';
+    const value = String(id || 'raven').trim();
+    if (!value) return 'raven';
+
+    // 28.9 Critical boot fix:
+    // This helper is called while the initial fighter objects are created.
+    // CHARACTER_SELECT_META is declared later in the file, so touching it here
+    // before initialization causes a TDZ ReferenceError and kills all menu JS.
+    let hasCharacterMeta = false;
+    try {
+      hasCharacterMeta = !!CHARACTER_SELECT_META?.[value];
+    } catch (_) {
+      hasCharacterMeta = false;
+    }
+
+    const hasDefaultFighter = (DEFAULT_CONTENT.fighters || []).some(f => f && f.id === value);
+    return (hasCharacterMeta || hasDefaultFighter || value === 'ghlum') ? value : 'raven';
   }
 
 
@@ -20477,6 +20554,95 @@ function sessionId(){
   }
 
 
+  /* ==========================================================
+     28.9 CRITICAL START BOOT FIX
+     Root cause: normalizeSelectedFighter28_5 touched CHARACTER_SELECT_META
+     before initialization, so the JS boot crashed and all buttons became dead.
+     This bridge is intentionally simple and late-bound.
+     ========================================================== */
+  function clearStaleStartBlockers28_9(){
+    try { gameState = 'menu'; } catch(_) {}
+    try { setPaused(false, true); } catch(_) {}
+    try {
+      document.body.classList.remove(
+        'is-fighting',
+        'fight-entering',
+        'menu-leaving',
+        'result-entering',
+        'arena-select-open',
+        'arena-reveal-open'
+      );
+    } catch(_) {}
+    ['result','pauseOverlay','arenaSelect','arenaReveal16','cinematicIntro24'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('show');
+      el.setAttribute('aria-hidden','true');
+      if (id !== 'arenaSelect') el.style.display = 'none';
+    });
+  }
+
+  function openCharacterSelectHard28_9(source='main_start_hard_28_9'){
+    clearStaleStartBlockers28_9();
+    try { audio.ensure(); audio.ui(); } catch(_) {}
+    try {
+      contentState.fighterId = normalizeSelectedFighter28_5(contentState.fighterId || contentBundle.balance?.activeFighterId || 'raven');
+      contentState.enemyId = opponentForSelectedFighter(contentState.fighterId);
+      contentBundle.balance = contentBundle.balance || {};
+      contentBundle.balance.activeFighterId = contentState.fighterId;
+      contentBundle.balance.enemyFighterId = contentState.enemyId;
+      saveContentState();
+    } catch(_) {}
+
+    const cs = document.getElementById('characterSelect');
+    try {
+      if (typeof updateCharacterSelectUI === 'function') updateCharacterSelectUI();
+    } catch(_) {}
+
+    if (cs) {
+      cs.style.setProperty('display','flex','important');
+      cs.style.setProperty('visibility','visible','important');
+      cs.style.setProperty('pointer-events','auto','important');
+      cs.style.setProperty('z-index','2147482400','important');
+      cs.classList.add('show');
+      cs.setAttribute('aria-hidden','false');
+      document.body.classList.add('character-select-open');
+      try { trackEvent('character_select_open', { source, patch:'28.9_start_boot_fix' }); } catch(_) {}
+      return;
+    }
+
+    // Safety fallback: if the select markup was removed by a stale build,
+    // at least launch a fight instead of leaving a dead start button.
+    try { newMatch(); } catch(err) { console.error('28.9 direct start fallback failed', err); }
+  }
+
+  function bindStartBootFix28_9(){
+    const hard = document.getElementById('mainHardStartBtn28_9');
+    const bindEl = (el, source) => {
+      if (!el) return;
+      el.disabled = false;
+      el.removeAttribute('disabled');
+      el.removeAttribute('aria-disabled');
+      el.style.pointerEvents = 'auto';
+      el.style.zIndex = '2147482500';
+      ['pointerdown','click','touchend'].forEach(type => {
+        el.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+          openCharacterSelectHard28_9(source + '_' + type);
+        }, { capture:true, passive:false });
+      });
+    };
+
+    bindEl(hard, 'hard_visible_start_28_9');
+    bindEl(document.getElementById('realStartZone'), 'real_start_zone_28_9');
+    bindEl(document.getElementById('startBtn'), 'legacy_start_btn_28_9');
+
+    window.eralashStartFight = () => openCharacterSelectHard28_9('window_api_28_9');
+  }
+
+
   resize();
   bindControls();
   bindEconomyControls();
@@ -20488,6 +20654,7 @@ function sessionId(){
   bindCharacterSelectStartRoute28_6();
   bindCharacterSelectStartActive28_7();
   bindMainMenuStartForce28_8();
+  bindStartBootFix28_9();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);

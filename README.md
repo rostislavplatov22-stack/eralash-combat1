@@ -718,3 +718,7 @@ Fixed the critical runtime issue where selecting Ghlum in Character Select could
 ## 28.7 Character Select Active Start CTA Hotfix
 
 Fixed inactive Start Fight CTA by lifting Character Select/Arena Select above legacy inline overlay layers, forcing the CTA to be pointer-active, adding direct pointer/touch/click bindings and geometry fallback, while preserving Ghlum runtime selection.
+
+
+## 28.9 Character Select Start Boot Critical Fix
+Fixed JS boot crash caused by early CHARACTER_SELECT_META access, restored active main Start button, and added hard Start bridge into Character Select while preserving Ghlum runtime selection.
