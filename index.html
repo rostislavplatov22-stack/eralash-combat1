@@ -8792,6 +8792,55 @@ body.character-select-start-route-28-6 #characterSelect .cs-start.is-routing{
     inset 0 0 0 1px rgba(255,245,196,.42) !important;
 }
 
+
+
+/* ==========================================================
+   28.7 Character Select Active Start CTA Hotfix
+   Fixes inactive Start button caused by old inline z-index overlay layers.
+   ========================================================== */
+body.character-select-start-active-28-7 #characterSelect.show,
+body.character-select-start-active-28-7.character-select-open #characterSelect{
+  z-index: 2147483400 !important;
+  pointer-events: auto !important;
+}
+
+body.character-select-start-active-28-7 #characterSelect .cs-shell{
+  position: relative !important;
+  z-index: 2147483450 !important;
+  pointer-events: auto !important;
+}
+
+body.character-select-start-active-28-7 #characterSelect .cs-preview,
+body.character-select-start-active-28-7 #characterSelect .cs-actions{
+  position: relative !important;
+  z-index: 2147483500 !important;
+  pointer-events: auto !important;
+}
+
+body.character-select-start-active-28-7 #csStartFightBtn,
+body.character-select-start-active-28-7 #characterSelect .cs-start{
+  position: relative !important;
+  z-index: 2147483600 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  filter: brightness(1.08) saturate(1.08) !important;
+  outline: 1px solid rgba(255,239,177,.46) !important;
+}
+
+body.character-select-start-active-28-7 #csStartFightBtn::after{
+  pointer-events: none !important;
+}
+
+body.character-select-start-active-28-7 #csStartFightBtn.is-ready{
+  animation: csStartReady287 1.8s ease-in-out infinite;
+}
+
+@keyframes csStartReady287{
+  0%,100%{box-shadow:0 16px 40px rgba(217,183,106,.28),0 0 0 rgba(255,225,135,0)}
+  50%{box-shadow:0 18px 48px rgba(217,183,106,.36),0 0 28px rgba(255,225,135,.20)}
+}
+
 </style>
 
 <link rel="preload" as="image" href="assets/arena-approved-storm-sanctuary-25-3.webp?v=253">
@@ -8800,7 +8849,7 @@ body.character-select-start-route-28-6 #characterSelect .cs-start.is-routing{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6 character-select-start-active-28-7">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -9047,9 +9096,9 @@ body.character-select-start-route-28-6 #characterSelect .cs-start.is-routing{
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">GHLUM START ROUTING FIX · 28.6</div>
+          <div class="cs-kicker">START CTA ACTIVE FIX · 28.7</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
-          <p class="cs-subtitle">Исправлен Start Fight: кнопка запуска жёстко ведёт выбранного бойца в Arena Select и бой.</p>
+          <p class="cs-subtitle">Кнопка Start Fight поднята над всеми слоями, активна и ведёт выбранного бойца в Arena Select.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
       </div>
@@ -9150,7 +9199,7 @@ body.character-select-start-route-28-6 #characterSelect .cs-start.is-routing{
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">28.6 start fix: selected fighter is locked, routed and verified before arena start.</div>
+          <div class="cs-locked-note">28.7 active start fix: CTA is top-layer, clickable and locked to selected fighter.</div>
         </aside>
       </div>
     </div>
@@ -20119,6 +20168,168 @@ function sessionId(){
   }
 
 
+
+  /* ==========================================================
+     28.7 Character Select Active Start CTA Hotfix
+     Raises Character Select and Arena Select with inline !important
+     z-index, activates the Start button, and adds geometry-based
+     pointer fallback independent of event target.
+     ========================================================== */
+  const START_CTA_FIX_28_7 = '28.7';
+
+  function activateCharacterStartCTA28_7(){
+    const overlay = document.getElementById('characterSelect');
+    const shell = overlay?.querySelector('.cs-shell');
+    const btn = document.getElementById('csStartFightBtn');
+
+    if (overlay) {
+      overlay.style.setProperty('z-index', '2147483400', 'important');
+      overlay.style.setProperty('pointer-events', 'auto', 'important');
+      overlay.style.setProperty('visibility', 'visible', 'important');
+    }
+
+    if (shell) {
+      shell.style.setProperty('z-index', '2147483450', 'important');
+      shell.style.setProperty('pointer-events', 'auto', 'important');
+    }
+
+    if (btn) {
+      btn.disabled = false;
+      btn.removeAttribute('disabled');
+      btn.removeAttribute('aria-disabled');
+      btn.classList.add('is-ready');
+      btn.style.setProperty('pointer-events', 'auto', 'important');
+      btn.style.setProperty('cursor', 'pointer', 'important');
+      btn.style.setProperty('opacity', '1', 'important');
+      btn.style.setProperty('z-index', '2147483600', 'important');
+      btn.style.setProperty('position', 'relative', 'important');
+      btn.style.setProperty('visibility', 'visible', 'important');
+    }
+  }
+
+  const __forceVisibleOverlay16_3_28_7 = forceVisibleOverlay16_3;
+  forceVisibleOverlay16_3 = function(id, bodyClass, zIndex){
+    const forcedZ = id === 'characterSelect' ? 2147483400 : (id === 'arenaSelect' ? 2147483350 : zIndex);
+    const el = __forceVisibleOverlay16_3_28_7(id, bodyClass, forcedZ);
+    if (id === 'characterSelect') {
+      activateCharacterStartCTA28_7();
+      window.setTimeout(activateCharacterStartCTA28_7, 40);
+      window.setTimeout(activateCharacterStartCTA28_7, 220);
+    }
+    if (id === 'arenaSelect' && el) {
+      el.style.setProperty('z-index', '2147483350', 'important');
+      el.style.setProperty('pointer-events', 'auto', 'important');
+      el.style.setProperty('visibility', 'visible', 'important');
+    }
+    return el;
+  };
+
+  const __openCharacterSelect16_3_28_7 = openCharacterSelect16_3;
+  openCharacterSelect16_3 = function(source='start_gate_28_7'){
+    const r = __openCharacterSelect16_3_28_7(source);
+    activateCharacterStartCTA28_7();
+    window.setTimeout(activateCharacterStartCTA28_7, 60);
+    window.setTimeout(activateCharacterStartCTA28_7, 240);
+    return r;
+  };
+
+  const __openCharacterSelect28_7 = openCharacterSelect;
+  openCharacterSelect = function(source='menu_28_7'){
+    const r = __openCharacterSelect28_7(source);
+    activateCharacterStartCTA28_7();
+    window.setTimeout(activateCharacterStartCTA28_7, 60);
+    window.setTimeout(activateCharacterStartCTA28_7, 240);
+    return r;
+  };
+
+  const __openArenaSelect16_3_28_7 = openArenaSelect16_3;
+  openArenaSelect16_3 = function(source='character_start_28_7'){
+    const r = __openArenaSelect16_3_28_7(source);
+    const arena = document.getElementById('arenaSelect');
+    if (arena) {
+      arena.style.setProperty('z-index','2147483350','important');
+      arena.style.setProperty('pointer-events','auto','important');
+      arena.style.setProperty('visibility','visible','important');
+    }
+    return r;
+  };
+
+  function isCharacterSelectVisible28_7(){
+    const overlay = document.getElementById('characterSelect');
+    return !!overlay && (
+      overlay.classList.contains('show') ||
+      document.body.classList.contains('character-select-open') ||
+      overlay.getAttribute('aria-hidden') === 'false'
+    );
+  }
+
+  function pointInExpandedRect28_7(event, el, pad=22){
+    if (!event || !el || typeof event.clientX !== 'number') return false;
+    const r = el.getBoundingClientRect();
+    return event.clientX >= r.left - pad &&
+           event.clientX <= r.right + pad &&
+           event.clientY >= r.top - pad &&
+           event.clientY <= r.bottom + pad;
+  }
+
+  function startSelectedCharacterMatch28_7(source='cs_active_start_28_7'){
+    activateCharacterStartCTA28_7();
+    try {
+      if (typeof lockSelectedFighterForStart28_6 === 'function') {
+        lockSelectedFighterForStart28_6(source + '_lock');
+      }
+    } catch(err) {
+      console.warn('28.7 pre-start fighter lock failed', err);
+    }
+
+    try {
+      if (typeof startSelectedCharacterMatch28_6 === 'function') {
+        startSelectedCharacterMatch28_6(source);
+      } else if (typeof startSelectedCharacterMatch === 'function') {
+        startSelectedCharacterMatch();
+      } else {
+        newMatch();
+      }
+    } catch(err) {
+      console.warn('28.7 start route failed; forcing direct fight', err);
+      try { newMatch(); } catch(_) {}
+    }
+  }
+
+  function bindCharacterSelectStartActive28_7(){
+    activateCharacterStartCTA28_7();
+
+    const btn = document.getElementById('csStartFightBtn');
+    if (btn) {
+      ['pointerdown','pointerup','touchend','click'].forEach(type => {
+        btn.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+          startSelectedCharacterMatch28_7('cs_button_' + type + '_28_7');
+        }, { capture:true });
+      });
+    }
+
+    ['pointerdown','pointerup','touchend','click'].forEach(type => {
+      document.addEventListener(type, (event) => {
+        if (!isCharacterSelectVisible28_7()) return;
+        const btn = document.getElementById('csStartFightBtn');
+        const actions = document.querySelector('#characterSelect .cs-actions');
+        const targetIsStart = !!event.target?.closest?.('#csStartFightBtn, #characterSelect .cs-start');
+        const hitStart = pointInExpandedRect28_7(event, btn, 28) || pointInExpandedRect28_7(event, actions, 6);
+        if (!targetIsStart && !hitStart) return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+        startSelectedCharacterMatch28_7('cs_geometry_' + type + '_28_7');
+      }, true);
+    });
+
+    window.eralashStartSelectedFighter28_7 = () => startSelectedCharacterMatch28_7('window_api_28_7');
+  }
+
+
   resize();
   bindControls();
   bindEconomyControls();
@@ -20128,6 +20339,7 @@ function sessionId(){
   bindArenaFlowLayerFix16_3();
   bindStartButtonRoutingHotfix26_6();
   bindCharacterSelectStartRoute28_6();
+  bindCharacterSelectStartActive28_7();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);

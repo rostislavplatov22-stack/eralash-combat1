@@ -697,3 +697,8 @@ Clean rebuild of Character Select: removed broken reference overlays and fake po
 ## 28.5 Character Select Ghlum Runtime Lock
 
 Fixed the critical runtime issue where selecting Ghlum in Character Select could still launch Raven in combat if `/api/content` returned an older fighter list. The client now merges shipped local fighters with backend content, locks selected fighter before arena start, and preserves Ghlum-specific combat tuning during round reset.
+
+
+## 28.7 Character Select Active Start CTA Hotfix
+
+Fixed inactive Start Fight CTA by lifting Character Select/Arena Select above legacy inline overlay layers, forcing the CTA to be pointer-active, adding direct pointer/touch/click bindings and geometry fallback, while preserving Ghlum runtime selection.
