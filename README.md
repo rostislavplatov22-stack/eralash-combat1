@@ -1,3 +1,8 @@
+
+## 28.1 — Clean Fighter Select & Ghlum Click Hotfix
+
+Fixed the overloaded Ghlum character select integration by replacing the noisy roster overlay with a clean three-fighter selectable dock, disabling invisible click-stealing hero cards, restoring clear Raven / Iron Warden / Ghlum selection, and preserving Start Fight, AI difficulty, Back, 28.0 Ghlum combat, and 27.0 combat flow.
+
 # EraLash Combat — Prestige Character Select & Cinematic Hero Presentation 27.2
 
 27.2 rebuilds Character Select into a prestige hero-selection screen inspired by the supplied premium reference: big Raven/Iron Warden hero presentation, cinematic VS ceremony, luxury command panel and portrait rail.
