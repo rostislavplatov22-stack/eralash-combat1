@@ -688,3 +688,8 @@ Clean rebuild of Character Select: removed broken reference overlays and fake po
 - Ghlum получил более дорогой toxic selected-state и poison card polish.
 - Сохранены реальные три карточки Raven / Iron Warden / Ghlum и их click-зоны.
 
+
+
+## 28.5 Character Select Ghlum Runtime Lock
+
+Fixed the critical runtime issue where selecting Ghlum in Character Select could still launch Raven in combat if `/api/content` returned an older fighter list. The client now merges shipped local fighters with backend content, locks selected fighter before arena start, and preserves Ghlum-specific combat tuning during round reset.

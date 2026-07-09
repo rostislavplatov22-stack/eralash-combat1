@@ -8733,7 +8733,7 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -8980,9 +8980,9 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
     <div class="cs-shell" role="dialog" aria-modal="true" aria-labelledby="csTitle">
       <div class="cs-top">
         <div>
-          <div class="cs-kicker">VIEWPORT FIT SELECT · 28.4</div>
+          <div class="cs-kicker">GHLUM RUNTIME FIX · 28.5</div>
           <h1 id="csTitle" class="cs-title">Choose Your <span>Fighter</span></h1>
-          <p class="cs-subtitle">Чистый премиальный выбор бойца: три читаемые карты, улучшенная посадка в экран, Ghlum poison polish и полностью видимый Start Fight.</p>
+          <p class="cs-subtitle">Исправлен реальный запуск выбранного бойца: Ghlum сохраняется в combat runtime, даже если backend content устарел.</p>
         </div>
         <button id="csCloseBtn" class="cs-close" type="button" aria-label="Закрыть выбор персонажа">×</button>
       </div>
@@ -9083,7 +9083,7 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
             <button id="csBackBtn" class="cs-back" type="button">Назад</button>
             <button id="csStartFightBtn" class="cs-start" type="button">Start Fight</button>
           </div>
-          <div class="cs-locked-note">28.4 viewport fit: clean 3-fighter roster, visible command controls, Ghlum poison polish.</div>
+          <div class="cs-locked-note">28.5 runtime fix: selected fighter is locked into combat before arena start.</div>
         </aside>
       </div>
     </div>
@@ -9710,6 +9710,34 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
   let contentState = loadContentState();
   let contentBundle = DEFAULT_CONTENT;
 
+  function mergeDefaultFighters28_5(fighters){
+    const merged = new Map();
+    (DEFAULT_CONTENT.fighters || []).forEach(f => {
+      if (f && f.id) merged.set(String(f.id), { ...f });
+    });
+    (Array.isArray(fighters) ? fighters : []).forEach(f => {
+      if (!f || !f.id) return;
+      const id = String(f.id);
+      merged.set(id, { ...(merged.get(id) || {}), ...f });
+    });
+    return Array.from(merged.values());
+  }
+
+  function mergeContentBundle28_5(data){
+    const incoming = data || {};
+    return {
+      fighters: mergeDefaultFighters28_5(incoming.fighters),
+      arenas: Array.isArray(incoming.arenas) && incoming.arenas.length ? incoming.arenas : DEFAULT_CONTENT.arenas,
+      abilities: Array.isArray(incoming.abilities) ? incoming.abilities : [],
+      balance: { ...DEFAULT_CONTENT.balance, ...(incoming.balance || {}) }
+    };
+  }
+
+  function normalizeSelectedFighter28_5(id){
+    return (CHARACTER_SELECT_META[id] || (DEFAULT_CONTENT.fighters || []).some(f => f.id === id)) ? id : 'raven';
+  }
+
+
   const input = {
     left:false,right:false,jump:false,block:false,dodge:false,
     light:false,heavy:false,special:false,ultimate:false,
@@ -9724,7 +9752,7 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
   const REAL_PHYSICS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const AI_COMBOS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const ULTIMATE_FINISHER_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
-  const CHARACTER_SELECT_PATCH = '28.2 CLEAN FUNCTIONAL FIGHTER SELECT';
+  const CHARACTER_SELECT_PATCH = '28.5 GHLUM RUNTIME FIGHTER LOCK';
   const ARENA_SELECT_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
 
   const AI_PROFILES = {
@@ -10087,11 +10115,18 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
   }
 
   function contentFighter(kind){
-    const list = contentBundle.fighters?.length ? contentBundle.fighters : DEFAULT_CONTENT.fighters;
-    const id = kind === 'player'
+    // 28.5: never let an older /api/content payload remove newly shipped local fighters.
+    // If Supabase does not yet know Ghlum, the runtime must still resolve him from DEFAULT_CONTENT.
+    const serverList = contentBundle.fighters?.length ? contentBundle.fighters : [];
+    const list = mergeDefaultFighters28_5(serverList);
+    const requestedId = kind === 'player'
       ? (contentState.fighterId || contentBundle.balance?.activeFighterId || 'raven')
       : (contentState.enemyId || contentBundle.balance?.enemyFighterId || 'iron_warden');
-    return list.find(f => f.id === id) || list.find(f => f.id === (kind === 'player' ? 'raven' : 'iron_warden')) || list[0] || DEFAULT_CONTENT.fighters[kind === 'player' ? 0 : 1];
+    const id = normalizeSelectedFighter28_5(requestedId);
+    return list.find(f => f.id === id)
+      || DEFAULT_CONTENT.fighters.find(f => f.id === id)
+      || list.find(f => f.id === (kind === 'player' ? 'raven' : 'iron_warden'))
+      || DEFAULT_CONTENT.fighters[kind === 'player' ? 0 : 1];
   }
 
   function contentArena(){
@@ -10960,7 +10995,12 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
 
   function startSelectedArenaMatch(){
     contentBundle.balance = contentBundle.balance || {};
+    const fighterId = normalizeSelectedFighter28_5(contentState.fighterId || contentBundle.balance?.activeFighterId || 'raven');
+    contentState.fighterId = fighterId;
+    contentState.enemyId = opponentForSelectedFighter(fighterId);
     contentState.arenaId = currentArena15();
+    contentBundle.balance.activeFighterId = fighterId;
+    contentBundle.balance.enemyFighterId = contentState.enemyId;
     contentBundle.balance.activeArenaId = contentState.arenaId;
     saveContentState();
     trackEvent('fight_start', {
@@ -11061,12 +11101,12 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
   }
 
   function setSelectedFighter14(id){
-    if (!CHARACTER_SELECT_META[id]) return;
+    const fighterId = normalizeSelectedFighter28_5(id);
+    if (!CHARACTER_SELECT_META[fighterId]) return;
     contentBundle.balance = contentBundle.balance || {};
-    contentState.fighterId = id;
-    contentState.enemyId = opponentForSelectedFighter(id);
-    contentState.fighterId = contentState.fighterId || 'raven';
-    contentBundle.balance.activeFighterId = contentState.fighterId;
+    contentState.fighterId = fighterId;
+    contentState.enemyId = opponentForSelectedFighter(fighterId);
+    contentBundle.balance.activeFighterId = fighterId;
     contentBundle.balance.enemyFighterId = contentState.enemyId;
     saveContentState();
     updateCharacterSelectUI();
@@ -11114,9 +11154,11 @@ body.character-select-fit-28-4 .cs-preview:has(#csCommandTitle){
   function startSelectedCharacterMatch(){
     contentBundle.balance = contentBundle.balance || {};
     const diff = currentDifficulty14();
+    const fighterId = normalizeSelectedFighter28_5(contentState.fighterId || contentBundle.balance?.activeFighterId || 'raven');
+    contentState.fighterId = fighterId;
+    contentState.enemyId = opponentForSelectedFighter(fighterId);
     contentBundle.balance.aiDifficulty = difficultyToValue(diff);
-    contentState.enemyId = opponentForSelectedFighter(contentState.fighterId || 'raven');
-    contentBundle.balance.activeFighterId = contentState.fighterId;
+    contentBundle.balance.activeFighterId = fighterId;
     contentBundle.balance.enemyFighterId = contentState.enemyId;
     saveContentState();
     trackEvent('fight_start', {
@@ -16261,12 +16303,7 @@ function sessionId(){
       const res = await fetch('/api/content', { headers: economyHeaders(false) });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || 'content error');
-      contentBundle = {
-        fighters: data.fighters || DEFAULT_CONTENT.fighters,
-        arenas: data.arenas || DEFAULT_CONTENT.arenas,
-        abilities: data.abilities || [],
-        balance: data.balance || DEFAULT_CONTENT.balance
-      };
+      contentBundle = mergeContentBundle28_5(data);
       if (!contentState.fighterId) contentState.fighterId = contentBundle.balance.activeFighterId || 'raven';
       if (!contentState.enemyId) contentState.enemyId = contentBundle.balance.enemyFighterId || 'iron_warden';
       if (!contentState.arenaId) contentState.arenaId = contentBundle.balance.activeArenaId || 'black_citadel';
@@ -16635,7 +16672,7 @@ function sessionId(){
     updateTelegramBadge();
     syncProfileFromBackend();
     registerReferralFromLaunch();
-    fetch('/api/content').then(r=>r.json()).then(data=>{ if(data.ok){ contentBundle={ fighters:data.fighters||DEFAULT_CONTENT.fighters, arenas:data.arenas||DEFAULT_CONTENT.arenas, abilities:data.abilities||[], balance:data.balance||DEFAULT_CONTENT.balance }; }}).catch(()=>{});
+    fetch('/api/content').then(r=>r.json()).then(data=>{ if(data.ok){ contentBundle=mergeContentBundle28_5(data); updateCharacterSelectUI(); syncHudFighterNames(); }}).catch(()=>{});
     const params = new URLSearchParams(location.search);
     setTimeout(() => {
       if (params.get('admin') === '1') loadAdmin();
@@ -16898,26 +16935,33 @@ function sessionId(){
     player = makeFighter('player');
     enemy = makeFighter('enemy');
 
-    // Fighter Rig 8.0 combat values are deliberately visible.
-    player.collisionW = 118;
-    player.collisionH = 296;
-    enemy.collisionW = 150;
-    enemy.collisionH = 328;
-    player.mass = 1.02;
-    enemy.mass = 1.48;
+    // 28.5: keep combat values character-aware. Older fixes overwrote the
+    // selected fighter with Raven/Warden tuning after makeFighter(), so Ghlum
+    // looked selected in UI but behaved/rendered like an old fighter in combat.
+    const pIsGhlum28_5 = fighterIsGhlum(player);
+    const pIsWarden28_5 = fighterIsWarden(player);
+    const eIsGhlum28_5 = fighterIsGhlum(enemy);
+    const eIsWarden28_5 = fighterIsWarden(enemy);
 
-    player.stats.speed = 560;
-    player.stats.accel = 5400;
-    player.stats.airAccel = 1460;
-    player.stats.jump = 900;
+    player.collisionW = pIsGhlum28_5 ? 74 : pIsWarden28_5 ? 120 : 88;
+    player.collisionH = pIsGhlum28_5 ? 178 : pIsWarden28_5 ? 275 : 245;
+    enemy.collisionW = eIsGhlum28_5 ? 74 : eIsWarden28_5 ? 120 : 88;
+    enemy.collisionH = eIsGhlum28_5 ? 178 : eIsWarden28_5 ? 275 : 245;
+    player.mass = pIsGhlum28_5 ? .86 : pIsWarden28_5 ? 1.42 : 1.04;
+    enemy.mass = eIsGhlum28_5 ? .86 : eIsWarden28_5 ? 1.42 : 1.04;
 
-    enemy.stats.speed = 385;
-    enemy.stats.accel = 3250;
-    enemy.stats.airAccel = 1030;
-    enemy.stats.jump = 720;
-    enemy.ai.aggression = .50;
-    enemy.ai.blockChance = .42;
-    enemy.ai.mistake = .28;
+    player.stats.speed = pIsGhlum28_5 ? 720 : pIsWarden28_5 ? 520 : 560;
+    player.stats.accel = pIsGhlum28_5 ? 6350 : pIsWarden28_5 ? 3700 : 5400;
+    player.stats.airAccel = pIsGhlum28_5 ? 1650 : pIsWarden28_5 ? 1050 : 1460;
+    player.stats.jump = pIsGhlum28_5 ? 980 : pIsWarden28_5 ? 730 : 900;
+
+    enemy.stats.speed = eIsGhlum28_5 ? 690 : eIsWarden28_5 ? 385 : 545;
+    enemy.stats.accel = eIsGhlum28_5 ? 6100 : eIsWarden28_5 ? 3250 : 5200;
+    enemy.stats.airAccel = eIsGhlum28_5 ? 1540 : eIsWarden28_5 ? 1030 : 1420;
+    enemy.stats.jump = eIsGhlum28_5 ? 960 : eIsWarden28_5 ? 720 : 890;
+    enemy.ai.aggression = eIsGhlum28_5 ? .68 : eIsWarden28_5 ? .50 : .58;
+    enemy.ai.blockChance = eIsGhlum28_5 ? .25 : eIsWarden28_5 ? .42 : .34;
+    enemy.ai.mistake = eIsGhlum28_5 ? .22 : eIsWarden28_5 ? .28 : .24;
 
     const b = stageBounds();
     const gap = Math.min((b.right-b.left)*.46, Math.max(470, w*.31));
