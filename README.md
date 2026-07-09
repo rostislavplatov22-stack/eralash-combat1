@@ -659,3 +659,8 @@ Replaced the previous cheap DOM/card character select with the approved cinemati
 - Switched Character Select to a clean full-reference PNG surface.
 - Kept only invisible click zones for Raven, Iron Warden, difficulty, Start Fight, Back and Close.
 - Preserved 27.0 combat, 26.10 readability, 26.9 facing, 26.8 grounding and 26.6 Start routing.
+
+
+## 28.0 — New Fighter: Ghlum — Cave Devourer
+
+Added third playable fighter Ghlum with new assets, roster integration, poison rushdown identity, low-profile combat tuning and preserved 27.5 clean Character Select flow.

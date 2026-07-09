@@ -6839,7 +6839,7 @@ body.character-select-reference-clean-27-5 .cs-shell{
   border:0 !important;
   border-radius:0 !important;
   overflow:hidden !important;
-  background:#000 url("assets/character-select-approved-reference-clean-27-5.png?v=275") center center / contain no-repeat !important;
+  background:#000 url("assets/character-select-ghlum-added-28-0.png?v=280") center center / contain no-repeat !important;
   box-shadow:none !important;
   outline:0 !important;
 }
@@ -6935,7 +6935,7 @@ body.character-select-reference-clean-27-5 .cs-close{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3 character-select-approved-27-4 character-select-reference-clean-27-5">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 character-select-luxury-27-1 character-select-prestige-27-2 character-select-prestige-27-3 character-select-approved-27-4 character-select-reference-clean-27-5 new-fighter-ghlum-28">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -7222,8 +7222,8 @@ body.character-select-reference-clean-27-5 .cs-close{
           <div class="cs-portrait-rail" aria-hidden="true">
             <button class="cs-crest active" type="button"><span>☠</span></button>
             <button class="cs-rail-portrait active" type="button"><img src="assets/fighter-shadow-raven.png" alt=""><b></b></button>
-            <button class="cs-rail-portrait" type="button"><img src="assets/fighter-iron-warden.png" alt=""><b></b></button>
-            <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
+            <button class="cs-rail-portrait" type="button" data-cs-fighter="iron_warden"><img src="assets/fighter-iron-warden.png" alt=""><b></b></button>
+            <button class="cs-rail-portrait" type="button" data-cs-fighter="ghlum"><img src="assets/fighter-portrait-ghlum-28.webp" alt="Ghlum"><b></b></button>
             <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
             <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
             <button class="cs-rail-portrait locked" type="button"><span>?</span><i>LOCK</i></button>
@@ -7515,7 +7515,8 @@ body.character-select-reference-clean-27-5 .cs-close{
 
   const premiumFighterArt = {
     player: new Image(),
-    enemy: new Image()
+    enemy: new Image(),
+    ghlum: new Image()
   };
   premiumFighterArt.player.decoding = 'async';
   premiumFighterArt.player.loading = 'eager';
@@ -7523,6 +7524,9 @@ body.character-select-reference-clean-27-5 .cs-close{
   premiumFighterArt.enemy.decoding = 'async';
   premiumFighterArt.enemy.loading = 'eager';
   premiumFighterArt.enemy.src = 'assets/fighter-iron-warden.png?v=2610';
+  premiumFighterArt.ghlum.decoding = 'async';
+  premiumFighterArt.ghlum.loading = 'eager';
+  premiumFighterArt.ghlum.src = 'assets/fighter-ghlum-28.webp?v=280';
 
   // Premium Fighters 6.0:
   // the old procedural stick/robot bodies are only a fallback now.
@@ -7686,10 +7690,25 @@ body.character-select-reference-clean-27-5 .cs-close{
       idleBob: 2.2,
       idleSway: .72,
       idlePulse: .12
+    },
+    ghlum: {
+      scale: .82,
+      physicsScale: .78,
+      yLift: 4,
+      shadowScaleX: .88,
+      shadowScaleY: .30,
+      shadowOpacity: .34,
+      contactOpacity: .54,
+      glowOpacity: .22,
+      rimBoost: .18,
+      idleBob: 4.2,
+      idleSway: 1.55,
+      idlePulse: .16
     }
   };
 
   function fighterPresence26_8(f){
+    if (fighterIsGhlum(f)) return FIGHTER_PRESENCE_26_8.ghlum;
     return fighterIsWarden(f) ? FIGHTER_PRESENCE_26_8.enemy : FIGHTER_PRESENCE_26_8.player;
   }
 
@@ -7699,18 +7718,18 @@ body.character-select-reference-clean-27-5 .cs-close{
 
   function fighterVisualHeight(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.h;
-    const base = fighterIsWarden(f) ? 420 * fighterPresence26_8(f).physicsScale : 390 * fighterPresence26_8(f).physicsScale;
+    const base = fighterIsGhlum(f) ? 335 * fighterPresence26_8(f).physicsScale : (fighterIsWarden(f) ? 420 * fighterPresence26_8(f).physicsScale : 390 * fighterPresence26_8(f).physicsScale);
     return base * premiumFighterScaleFactor() * (window.matchMedia && window.matchMedia('(pointer:coarse)').matches ? .92 : 1);
   }
 
   function fighterVisualWidth(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.w;
-    return fighterVisualHeight(f) * (fighterIsWarden(f) ? .50 : .44);
+    return fighterVisualHeight(f) * (fighterIsGhlum(f) ? .56 : (fighterIsWarden(f) ? .50 : .44));
   }
 
   function fighterBodyRadius(f){
     if (!USE_PREMIUM_FIGHTER_ART) return f.w * .45;
-    return fighterVisualWidth(f) * (fighterIsWarden(f) ? .44 : .40);
+    return fighterVisualWidth(f) * (fighterIsGhlum(f) ? .36 : (fighterIsWarden(f) ? .44 : .40));
   }
 
   function fighterPreferredDistance(a,b){
@@ -7859,7 +7878,8 @@ body.character-select-reference-clean-27-5 .cs-close{
   const DEFAULT_CONTENT = {
     fighters: [
       { id:'raven', name:'Raven', archetype:'Balanced Duelist', role:'Fast Combo Assassin', power:78, speed:86, defense:72, hp:100, energy:35, jump:960, width:78, height:172, colorA:'#14171e', colorB:'#c92832', accent:'#d9b76a', specialName:'Crimson Rift', ultimateName:'RIFT EXECUTION', bio:'Fast pressure fighter with clean chains and high mobility.' },
-      { id:'iron_warden', name:'Iron Warden', archetype:'Heavy Punisher', role:'Armored Heavy Tank', power:88, speed:62, defense:84, hp:112, energy:30, jump:850, width:90, height:188, colorA:'#17191c', colorB:'#3eb6ff', accent:'#d9f2ff', specialName:'Steel Breaker', ultimateName:'TITAN JUDGEMENT', bio:'Heavy armor fighter with bigger punishment windows and stronger defense.' }
+      { id:'iron_warden', name:'Iron Warden', archetype:'Heavy Punisher', role:'Armored Heavy Tank', power:88, speed:62, defense:84, hp:112, energy:30, jump:850, width:90, height:188, colorA:'#17191c', colorB:'#3eb6ff', accent:'#d9f2ff', specialName:'Steel Breaker', ultimateName:'TITAN JUDGEMENT', bio:'Heavy armor fighter with bigger punishment windows and stronger defense.' },
+      { id:'ghlum', name:'Ghlum', archetype:'Cave Devourer', role:'Poison Rushdown Predator', power:70, speed:96, defense:48, hp:85, energy:55, jump:980, width:68, height:150, colorA:'#11170f', colorB:'#98ff6e', accent:'#d9b76a', specialName:'Venom Leap', ultimateName:'ABYSS FEAST', bio:'Low-profile cave predator with claw pressure, poison mist and feral rushdown.' }
     ],
     arenas: [
       { id:'black_citadel', title:'Black Citadel', description:'Gothic courtyard, moon gate, wet obsidian stone and ember braziers.', accent:'#d9b76a', backgroundType:'black-citadel', difficulty:'Balanced', bonus:'Neutral footwork' },
@@ -7892,7 +7912,7 @@ body.character-select-reference-clean-27-5 .cs-close{
   const REAL_PHYSICS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const AI_COMBOS_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
   const ULTIMATE_FINISHER_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
-  const CHARACTER_SELECT_PATCH = '27.4 APPROVED PRESTIGE CHARACTER SELECT';
+  const CHARACTER_SELECT_PATCH = '28.0 NEW FIGHTER GHLUM';
   const ARENA_SELECT_PATCH = '25.3 APPROVED ARENA ART HOTFIX';
 
   const AI_PROFILES = {
@@ -8296,10 +8316,11 @@ body.character-select-reference-clean-27-5 .cs-close{
     const hp = Number(cfg.hp || 100);
     const fighterId = String(cfg.id || '').toLowerCase();
     const isWarden = fighterId.includes('warden');
+    const isGhlum = fighterId.includes('ghlum');
     const heavy = isWarden;
-    const baseSpeed = Number(cfg.speed || (isWarden ? 62 : 86));
-    const baseDefense = Number(cfg.defense || (isWarden ? 84 : 72));
-    const basePower = Number(cfg.power || (isWarden ? 88 : 78));
+    const baseSpeed = Number(cfg.speed || (isGhlum ? 96 : isWarden ? 62 : 86));
+    const baseDefense = Number(cfg.defense || (isGhlum ? 48 : isWarden ? 84 : 72));
+    const basePower = Number(cfg.power || (isGhlum ? 70 : isWarden ? 88 : 78));
 
     return {
       id: kind,
@@ -8313,17 +8334,17 @@ body.character-select-reference-clean-27-5 .cs-close{
 
       // Combat Physics 7.2:
       // visual art can be huge, but collision is a stable combat capsule.
-      w: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 142 : 108) : Number(cfg.width || (isWarden ? 90 : 78)),
-      h: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 330 : 300) : Number(cfg.height || (isWarden ? 188 : 172)),
-      collisionW: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 120 : 88) : Number(cfg.width || (isWarden ? 90 : 78)),
-      collisionH: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 275 : 245) : Number(cfg.height || (isWarden ? 188 : 172)),
-      mass: USE_PREMIUM_FIGHTER_ART ? (isWarden ? 1.42 : 1.04) : 1,
-      bodyWeight20: isWarden ? 1.46 : 1.02,
-      weightClass20: isWarden ? 'TANK' : 'ASSASSIN',
-      traction20: isWarden ? .78 : .84,
-      pushResist20: isWarden ? 1.38 : 1.00,
-      stanceWidth20: isWarden ? 1.18 : .96,
-      rimPower20: isWarden ? .34 : .42,
+      w: USE_PREMIUM_FIGHTER_ART ? (isGhlum ? 92 : isWarden ? 142 : 108) : Number(cfg.width || (isGhlum ? 68 : isWarden ? 90 : 78)),
+      h: USE_PREMIUM_FIGHTER_ART ? (isGhlum ? 245 : isWarden ? 330 : 300) : Number(cfg.height || (isGhlum ? 150 : isWarden ? 188 : 172)),
+      collisionW: USE_PREMIUM_FIGHTER_ART ? (isGhlum ? 74 : isWarden ? 120 : 88) : Number(cfg.width || (isGhlum ? 68 : isWarden ? 90 : 78)),
+      collisionH: USE_PREMIUM_FIGHTER_ART ? (isGhlum ? 178 : isWarden ? 275 : 245) : Number(cfg.height || (isGhlum ? 150 : isWarden ? 188 : 172)),
+      mass: USE_PREMIUM_FIGHTER_ART ? (isGhlum ? .86 : isWarden ? 1.42 : 1.04) : 1,
+      bodyWeight20: isGhlum ? .88 : (isWarden ? 1.46 : 1.02),
+      weightClass20: isGhlum ? 'PREDATOR' : (isWarden ? 'TANK' : 'ASSASSIN'),
+      traction20: isGhlum ? .92 : (isWarden ? .78 : .84),
+      pushResist20: isGhlum ? .82 : (isWarden ? 1.38 : 1.00),
+      stanceWidth20: isGhlum ? .78 : (isWarden ? 1.18 : .96),
+      rimPower20: isGhlum ? .55 : (isWarden ? .34 : .42),
       breathSeed20: Math.random() * Math.PI * 2,
       bodyLean20: 0,
       impactRecoil20: 0,
@@ -8339,7 +8360,7 @@ body.character-select-reference-clean-27-5 .cs-close{
       maxHp: hp,
       energy: Number(cfg.energy || (isWarden ? 30 : 35)),
       ultimateName: cfg.ultimateName || (isWarden ? 'TITAN JUDGEMENT' : 'RIFT EXECUTION'),
-      finisherName: isWarden ? 'TITAN JUDGEMENT' : 'RIFT EXECUTION',
+      finisherName: isGhlum ? 'ABYSS FEAST' : (isWarden ? 'TITAN JUDGEMENT' : 'RIFT EXECUTION'),
       ultimateCd: 0,
       stamina: 100,
 
@@ -8362,6 +8383,9 @@ body.character-select-reference-clean-27-5 .cs-close{
       afterImage: 0,
       armor: heavy ? .12 : 0,
       contactPressure: 0,
+      poisonT: 0,
+      poisonTickT: 0,
+      toxicFlash28: 0,
       walkIntent: 0,
       landingFx: false,
 
@@ -8403,15 +8427,15 @@ body.character-select-reference-clean-27-5 .cs-close{
       stats: {
         // Physics 11.0: footwork is tuned around acceleration, traction and real stop distance.
         // Raven is faster and more responsive; Warden is heavier and more stable.
-        speed: Math.round((isWarden ? 395 : 515) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.08 : 1.9)),
-        accel: Math.round((isWarden ? 2500 : 3900) + baseSpeed * (isWarden ? 8.9 : 11.6)),
-        airAccel: Math.round((isWarden ? 560 : 840) + baseSpeed * 2.55),
-        brake: isWarden ? .62 : .76,
-        turnBrake: isWarden ? .40 : .57,
-        traction20: isWarden ? .80 : .88,
-        stopPower20: isWarden ? 1.22 : 1.05,
-        jump: Number(cfg.jump || (isWarden ? 720 : 910)),
-        gravityScale: isWarden ? 1.18 : 1.02,
+        speed: Math.round((isGhlum ? 560 : isWarden ? 395 : 515) + baseSpeed * (USE_PREMIUM_FIGHTER_ART ? 2.08 : 1.9)),
+        accel: Math.round((isGhlum ? 4450 : isWarden ? 2500 : 3900) + baseSpeed * (isGhlum ? 12.6 : isWarden ? 8.9 : 11.6)),
+        airAccel: Math.round((isGhlum ? 980 : isWarden ? 560 : 840) + baseSpeed * 2.55),
+        brake: isGhlum ? .82 : (isWarden ? .62 : .76),
+        turnBrake: isGhlum ? .62 : (isWarden ? .40 : .57),
+        traction20: isGhlum ? .94 : (isWarden ? .80 : .88),
+        stopPower20: isGhlum ? 1.00 : (isWarden ? 1.22 : 1.05),
+        jump: Number(cfg.jump || (isGhlum ? 920 : isWarden ? 720 : 910)),
+        gravityScale: isGhlum ? 1.08 : (isWarden ? 1.18 : 1.02),
         hp,
         power: basePower,
         defense: baseDefense
@@ -8631,6 +8655,18 @@ body.character-select-reference-clean-27-5 .cs-close{
       skill:'TITAN JUDGEMENT',
       text:'Тяжёлый персонаж с большим уроном, бронёй, сильным блоком и мощным knockback.',
       stats:{ power:88, speed:62, defense:84 }
+    },
+    ghlum: {
+      id:'ghlum',
+      name:'Ghlum',
+      role:'Cave Devourer',
+      style:'Poison Rushdown Predator',
+      image:'assets/fighter-ghlum-28.webp',
+      portrait:'assets/fighter-portrait-ghlum-28.webp',
+      introArt:'assets/fighter-ghlum-28.webp',
+      skill:'ABYSS FEAST',
+      text:'Низкопрофильный пещерный хищник: быстрые когти, ядовитый Venom Leap и давление на ближней дистанции.',
+      stats:{ power:70, speed:96, defense:48 }
     }
   };
 
@@ -8656,7 +8692,9 @@ body.character-select-reference-clean-27-5 .cs-close{
   }
 
   function opponentForSelectedFighter(id){
-    return id === 'iron_warden' ? 'raven' : 'iron_warden';
+    if (id === 'iron_warden') return 'raven';
+    if (id === 'ghlum') return 'iron_warden';
+    return 'iron_warden';
   }
 
   function fighterSelectMeta(id){
@@ -9848,7 +9886,7 @@ body.character-select-reference-clean-27-5 .cs-close{
       const minRange = f.attack.name === 'ultimate' ? 410 : f.attack.name === 'special' ? 342 : f.attack.name === 'heavy' ? 308 : 246;
       const range = Math.max(minRange, f.attack.range * premiumFighterScaleFactor() * reachBoost);
       const boxH = Math.max(150, f.attack.height * premiumFighterScaleFactor() * 1.10);
-      const y = f.y - vh * (f.attack.name === 'ultimate' ? .80 : f.attack.name === 'special' ? .75 : .72);
+      const y = f.y - vh * (fighterIsGhlum(f) ? (f.attack.name === 'ultimate' ? .66 : f.attack.name === 'special' ? .62 : .58) : (f.attack.name === 'ultimate' ? .80 : f.attack.name === 'special' ? .75 : .72));
       const base = fighterBodyRadius(f) * .36;
       return {
         x: dir > 0 ? f.x + base : f.x - base - range,
@@ -9914,6 +9952,13 @@ body.character-select-reference-clean-27-5 .cs-close{
     dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
 
     defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    if (!blocked && fighterIsGhlum(attacker) && (atk.name === 'special' || atk.name === 'ultimate' || atk.name === 'heavy')) {
+      defender.poisonT = Math.max(defender.poisonT || 0, atk.name === 'ultimate' ? 3.2 : 1.8);
+      defender.poisonTickT = Math.min(defender.poisonTickT || .34, .26);
+      defender.toxicFlash28 = .85;
+      floatingText('POISON', defender.x, defender.y - defender.h*.76, '#98ff6e');
+      particles.push({kind:'shockwave', x:defender.x, y:defender.y-(defender.collisionH || defender.h)*.52, vx:0, vy:0, life:.42, max:.42, size:82, color:'#98ff6e'});
+    }
     if (blocked) defender.energy = clamp(defender.energy + 4, 0, 100);
     else defender.energy = clamp(defender.energy + (atk.name === 'ultimate' ? 14 : atk.name === 'special' ? 11 : atk.name === 'heavy' ? 8 : 5), 0, 100);
     const ultimateFinisher = !blocked && atk.name === 'ultimate' && (defender.hp <= 0 || hpBefore <= defender.maxHp * .30 || defender.hp <= defender.maxHp * .18);
@@ -10700,6 +10745,19 @@ body.character-select-reference-clean-27-5 .cs-close{
     f.guardBreakCd = Math.max(0, (f.guardBreakCd || 0) - dt);
     f.guardBrokenT = Math.max(0, (f.guardBrokenT || 0) - dt);
     f.blockStress19 = Math.max(0, (f.blockStress19 || 0) - dt * 18);
+    f.toxicFlash28 = Math.max(0, (f.toxicFlash28 || 0) - dt * 1.6);
+    if ((f.poisonT || 0) > 0 && gameState === 'fight' && f.hp > 0) {
+      f.poisonT = Math.max(0, (f.poisonT || 0) - dt);
+      f.poisonTickT = Math.max(0, (f.poisonTickT || 0) - dt);
+      if (f.poisonTickT <= 0) {
+        f.poisonTickT = .52;
+        f.hp = clamp(f.hp - 1, 0, f.maxHp);
+        f.toxicFlash28 = .65;
+        floatingText('-1 TOXIN', f.x, f.y - (f.collisionH || f.h)*.72, '#98ff6e');
+        updateHUD();
+        if (f.hp <= 0) finishRound(f.id === 'player' ? 'enemy' : 'player');
+      }
+    }
     applyCombatPhysics20(f, opponent, dt);
     f.comboSeqT = Math.max(0, (f.comboSeqT || 0) - dt);
     f.comboNameT = Math.max(0, (f.comboNameT || 0) - dt);
@@ -11917,6 +11975,16 @@ body.character-select-reference-clean-27-5 .cs-close{
     return id.includes('warden') || String(f?.name || '').toLowerCase().includes('iron');
   }
 
+  function fighterIsGhlum(f){
+    const id = String(f?.contentId || f?.name || '').toLowerCase();
+    return id.includes('ghlum') || id.includes('cave devourer');
+  }
+
+  function premiumArtForFighter(f){
+    if (fighterIsGhlum(f)) return premiumFighterArt.ghlum;
+    return fighterIsWarden(f) ? premiumFighterArt.enemy : premiumFighterArt.player;
+  }
+
   function spriteAnimForFighter(f){
     const bank = spriteFighterSheets[spriteBankKeyForFighter(f)] || (f.id === 'player' ? spriteFighterSheets.player : spriteFighterSheets.enemy);
     if (!bank) return null;
@@ -12022,6 +12090,7 @@ body.character-select-reference-clean-27-5 .cs-close{
 
   function attackPoseSet26_3(f){
     if (!f || f.state !== 'attack' || !f.attack) return null;
+    if (fighterIsGhlum(f)) return null;
     const side = f.id === 'player' ? 'player' : 'enemy';
     const type = f.attack.name || f.lastAttackType || 'light';
     return (attackPoseFrames26_3[side] && attackPoseFrames26_3[side][type]) || null;
@@ -12336,7 +12405,7 @@ body.character-select-reference-clean-27-5 .cs-close{
   function drawPremiumFighterArt(f){
     if (drawSpriteSheetFighter(f)) return true;
     if (!USE_PREMIUM_FIGHTER_ART) return false;
-    const img = fighterIsWarden(f) ? premiumFighterArt.enemy : premiumFighterArt.player;
+    const img = premiumArtForFighter(f);
     if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return false;
 
     const time = performance.now();
@@ -12598,7 +12667,7 @@ body.character-select-reference-clean-27-5 .cs-close{
     ctx.fillStyle = plateGrad;
     ctx.strokeStyle = hexA(accent,'66');
     roundRect(ctx, x-plateW*.5, y+14, plateW, 25, 12, true, true);
-    ctx.fillStyle = isEnemy ? '#bdeeff' : '#ffd06e';
+    ctx.fillStyle = fighterIsGhlum(f) ? '#caff9a' : (isEnemy ? '#bdeeff' : '#ffd06e');
     ctx.font = '950 13px Inter, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -12607,7 +12676,7 @@ body.character-select-reference-clean-27-5 .cs-close{
     ctx.fillText((f.name || (isEnemy ? 'IRON WARDEN' : 'SHADOW RAVEN')).slice(0,16).toUpperCase(), x, y+27);
     if (!coarse) {
       ctx.globalAlpha = .72;
-      ctx.fillStyle = heavyBody20 ? '#8edcff' : '#ff8c8c';
+      ctx.fillStyle = fighterIsGhlum(f) ? '#98ff6e' : (heavyBody20 ? '#8edcff' : '#ff8c8c');
       ctx.font = '900 8px Inter, Arial';
       ctx.fillText((f.weightClass20 || (heavyBody20 ? 'TANK' : 'ASSASSIN')).toUpperCase(), x, y+43);
     }
@@ -15214,6 +15283,13 @@ function sessionId(){
     const armorReduce = (!blocked && defender.armor && atk.name !== 'ultimate') ? defender.armor : 0;
     dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
     defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    if (!blocked && fighterIsGhlum(attacker) && (atk.name === 'special' || atk.name === 'ultimate' || atk.name === 'heavy')) {
+      defender.poisonT = Math.max(defender.poisonT || 0, atk.name === 'ultimate' ? 3.2 : 1.8);
+      defender.poisonTickT = Math.min(defender.poisonTickT || .34, .26);
+      defender.toxicFlash28 = .85;
+      floatingText('POISON', defender.x, defender.y - defender.h*.76, '#98ff6e');
+      particles.push({kind:'shockwave', x:defender.x, y:defender.y-(defender.collisionH || defender.h)*.52, vx:0, vy:0, life:.42, max:.42, size:82, color:'#98ff6e'});
+    }
     defender.invuln = blocked ? .08 : (atk.name === 'ultimate' ? .24 : .14);
 
     const massScale = 1 / Math.max(.86, defender.mass || 1);
@@ -16224,6 +16300,7 @@ function sessionId(){
 
   function attackPoseSet26_3(f){
     if (!f || f.state !== 'attack' || !f.attack) return null;
+    if (fighterIsGhlum(f)) return null;
     const side = f.id === 'player' ? 'player' : 'enemy';
     const type = f.attack.name || f.lastAttackType || 'light';
     return (attackPoseFrames26_3[side] && attackPoseFrames26_3[side][type]) || null;
@@ -17332,6 +17409,13 @@ function sessionId(){
     const armorReduce = (!blocked && defender.armor && atk.name !== 'ultimate') ? defender.armor : 0;
     dmg = Math.max(1, Math.round(dmg * (1 - armorReduce)));
     defender.hp = clamp(defender.hp - dmg, 0, defender.maxHp);
+    if (!blocked && fighterIsGhlum(attacker) && (atk.name === 'special' || atk.name === 'ultimate' || atk.name === 'heavy')) {
+      defender.poisonT = Math.max(defender.poisonT || 0, atk.name === 'ultimate' ? 3.2 : 1.8);
+      defender.poisonTickT = Math.min(defender.poisonTickT || .34, .26);
+      defender.toxicFlash28 = .85;
+      floatingText('POISON', defender.x, defender.y - defender.h*.76, '#98ff6e');
+      particles.push({kind:'shockwave', x:defender.x, y:defender.y-(defender.collisionH || defender.h)*.52, vx:0, vy:0, life:.42, max:.42, size:82, color:'#98ff6e'});
+    }
     defender.invuln = blocked ? .10 : (atk.name === 'ultimate' ? .20 : .12);
 
     const massScale = 1 / Math.max(.92, defender.mass || 1);
