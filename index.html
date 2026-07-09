@@ -8849,7 +8849,7 @@ body.character-select-start-active-28-7 #csStartFightBtn.is-ready{
 <link rel="preload" as="image" href="assets/arena-approved-crimson-garden-25-3.webp?v=253">
 
 </head>
-<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6 character-select-start-active-28-7">
+<body class="dc-ref-ready dc-reference-v3 real-art-v4 combat-feel-10 character-select-14 arena-flow-16 arena-flow-17 combat-impact-18 arena-set-22 arena-set-22-1 arena-set-22-2 fighter-presentation-22 arena-luxury-23 cinematic-art-24 fighter-identity-24 arena-expansion-25 arena-real-art-25-1 arena-approved-25-2 fighter-motion-26 new-fighter-ghlum-28 character-select-real-28-3 character-select-fit-28-4 character-select-ghlum-runtime-28-5 character-select-start-route-28-6 character-select-start-active-28-7 main-menu-start-force-28-8">
 <div id="app">
   <canvas id="game"></canvas>
 
@@ -20330,6 +20330,153 @@ function sessionId(){
   }
 
 
+
+
+  /* ==========================================================
+     28.8 — Main Menu Start Force Hotfix
+     The main menu can look visible while stale combat state/old
+     overlays still block the painted START button. This rescue runs
+     on WINDOW capture before document-level legacy click handlers.
+     ========================================================== */
+  const MAIN_MENU_START_FORCE_28_8 = true;
+
+  function isMainMenuVisible28_8(){
+    const menu = document.getElementById('menu') || ui?.menu;
+    if (!menu) return false;
+    const s = window.getComputedStyle(menu);
+    return s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0';
+  }
+
+  function pointInMainStartZone28_8(event){
+    const p = event?.changedTouches?.[0] || event;
+    if (!p || typeof p.clientX !== 'number' || typeof p.clientY !== 'number') return false;
+
+    const lobby = document.querySelector('#menu .dc-v3-lobby') || document.getElementById('menu') || ui?.menu;
+    if (lobby) {
+      const r = lobby.getBoundingClientRect();
+      if (r.width > 100 && r.height > 100) {
+        const x = ((p.clientX - r.left) / r.width) * 100;
+        const y = ((p.clientY - r.top) / r.height) * 100;
+        // Covers the large painted "НАЧАТЬ БОЙ" plate and browser-scale drift.
+        if (x >= 25 && x <= 70 && y >= 67 && y <= 88) return true;
+      }
+    }
+
+    // Final viewport fallback for the centered desktop menu screenshot.
+    const vw = Math.max(1, window.innerWidth || document.documentElement.clientWidth || 1);
+    const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 1);
+    const vx = (p.clientX / vw) * 100;
+    const vy = (p.clientY / vh) * 100;
+    return vx >= 34 && vx <= 66 && vy >= 67 && vy <= 88;
+  }
+
+  function clearStaleStartBlockers28_8(){
+    // The menu is visible, so stale fight/result state must not block opening select.
+    try { gameState = 'menu'; } catch(_) {}
+    try { setPaused(false, true); } catch(_) {}
+    try {
+      document.body.classList.remove(
+        'is-fighting',
+        'fight-entering',
+        'menu-leaving',
+        'result-entering',
+        'arena-select-open',
+        'arena-reveal-open'
+      );
+    } catch(_) {}
+
+    ['result','pauseOverlay','arenaSelect','arenaReveal16'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('show');
+      el.setAttribute('aria-hidden','true');
+      if (id !== 'arenaSelect') el.style.display = 'none';
+    });
+  }
+
+  function forceOpenCharacterSelectFromMain28_8(source='main_start_force_28_8'){
+    clearStaleStartBlockers28_8();
+    try { audio.ensure(); audio.ui(); } catch(_) {}
+    try {
+      if (typeof lockSelectedFighterForStart28_6 === 'function') {
+        lockSelectedFighterForStart28_6(source + '_preselect');
+      }
+    } catch(_) {}
+
+    try {
+      if (typeof openCharacterSelect16_3 === 'function') {
+        openCharacterSelect16_3(source);
+      } else if (typeof openCharacterSelect === 'function') {
+        openCharacterSelect(source);
+      } else {
+        newMatch();
+      }
+    } catch(err) {
+      console.warn('28.8 main start open failed; forcing direct character overlay', err);
+    }
+
+    // Verification: force the overlay visible even if an older function silently bails.
+    window.setTimeout(() => {
+      const cs = document.getElementById('characterSelect');
+      const isOpen = document.body.classList.contains('character-select-open') || cs?.classList.contains('show');
+      if (!isOpen && cs) {
+        try { updateCharacterSelectUI(); } catch(_) {}
+        cs.style.display = 'flex';
+        cs.classList.add('show');
+        cs.setAttribute('aria-hidden','false');
+        cs.style.zIndex = '999997';
+        cs.style.pointerEvents = 'auto';
+        document.body.classList.add('character-select-open');
+      }
+    }, 80);
+  }
+
+  function bindMainMenuStartForce28_8(){
+    const handler = (event) => {
+      if (!isMainMenuVisible28_8()) return;
+      if (document.body.classList.contains('character-select-open')) return;
+      if (document.body.classList.contains('arena-select-open')) return;
+      const target = event.target;
+      const directTarget = !!target?.closest?.('#realStartZone, #startBtn');
+      const inZone = pointInMainStartZone28_8(event);
+      if (!directTarget && !inZone) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+      forceOpenCharacterSelectFromMain28_8('main_menu_' + event.type + '_28_8');
+    };
+
+    // WINDOW capture runs before the old document capture handlers that may stop propagation.
+    ['pointerdown','touchend','click'].forEach(type => {
+      window.addEventListener(type, handler, { capture:true, passive:false });
+    });
+
+    // Keep real DOM zones alive when the menu is painted.
+    const makeActive = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.disabled = false;
+      el.removeAttribute('disabled');
+      el.removeAttribute('aria-disabled');
+      el.style.pointerEvents = 'auto';
+      el.style.zIndex = '999996';
+      ['pointerdown','touchend','click'].forEach(type => {
+        el.addEventListener(type, (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+          forceOpenCharacterSelectFromMain28_8(id + '_' + type + '_28_8');
+        }, { capture:true, passive:false });
+      });
+    };
+    makeActive('realStartZone');
+    makeActive('startBtn');
+
+    window.eralashStartFight = () => forceOpenCharacterSelectFromMain28_8('window_api_28_8');
+  }
+
+
   resize();
   bindControls();
   bindEconomyControls();
@@ -20340,6 +20487,7 @@ function sessionId(){
   bindStartButtonRoutingHotfix26_6();
   bindCharacterSelectStartRoute28_6();
   bindCharacterSelectStartActive28_7();
+  bindMainMenuStartForce28_8();
   initTelegram();
   setTimeout(()=>trackEvent('app_open', { insideTelegram:telegramContext.insideTelegram }), 650);
   window.addEventListener('resize', resize);
