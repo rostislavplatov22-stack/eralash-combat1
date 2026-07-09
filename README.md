@@ -674,3 +674,8 @@ Added third playable fighter Ghlum with new assets, roster integration, poison r
 ## 28.2 Clean Functional Fighter Select Hotfix
 
 Fixed the overloaded Ghlum character select by replacing fake portrait overlays with a clean three-fighter roster, real click zones, dynamic matchup panel, and preserved 28.0 Ghlum combat.
+
+
+## 28.3 Real Fighter Select Rebuild
+
+Clean rebuild of Character Select: removed broken reference overlays and fake portrait rail, restored a real three-fighter playable roster with Raven, Iron Warden and Ghlum, direct click zones, dynamic command panel, and preserved Ghlum combat flow.
