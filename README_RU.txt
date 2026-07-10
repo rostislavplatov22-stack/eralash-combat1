@@ -1,24 +1,25 @@
-ERALASH COMBAT — PREMIUM DARK FANTASY FIGHT 31.0
+ERALASH COMBAT — HARD COMBAT REPLACEMENT 31.1
 
-Это полный redesign боевого экрана по утверждённому референсу:
-- новый cinematic HUD с портретами;
-- зелёные life bars и золотые energy bars;
-- большой gothic timer;
-- круглые premium combat buttons;
-- red/blue side lighting и глубокая виньетка;
-- крупный Ghlum с отдельными idle/block/attack/special/jump/KO animations;
-- жёсткое отключение Raven renderer fallback для Ghlum;
-- старый HUD и прямоугольные кнопки скрываются только во время боя.
+ЭТО НЕ СТАРЫЙ РУЧНОЙ ПАТЧ.
+После загрузки файлов исправление применяется автоматически:
+- во время Vercel build через vercel.json;
+- либо GitHub Actions изменит настоящий игровой index.html и сделает auto-commit.
 
-КАК УСТАНОВИТЬ
-1. Распакуй ВСЁ содержимое архива в КОРЕНЬ проекта, где находится index.html.
-2. Разреши объединение папки assets.
-3. Запусти APPLY_FIX.bat.
-4. Дождись сообщения: PREMIUM DARK FANTASY FIGHT 31.0 УСПЕШНО ВНЕДРЁН.
-5. Загрузить на Vercel/Netlify нужно ВЕСЬ проект, включая assets/ghlum31.
-6. На опубликованном сайте нажми Ctrl+Shift+R.
+ЧТО ИСПРАВЛЕНО
+1. Ghlum жёстко перехватывается до любого Raven sprite bank/fallback.
+2. Ghlum получает отдельные idle, walk, block, hit, attack, special, jump и KO листы.
+3. Старый HUD перекрывается и отключается, даже если часть интерфейса рисовалась внутри canvas.
+4. Добавлен новый premium HUD с портретами, gothic timer, life/energy bars и round pips.
+5. Добавлены крупные круглые боевые кнопки, как на утверждённом референсе.
+6. ROUND/FIGHT заменён на чистый cinematic banner без огромной дешёвой коробки.
+7. Бойцы разведены по сторонам и увеличены.
 
-Резервная копия:
-index.before-premium-fight-31.0.html
+КАК ЗАГРУЗИТЬ
+1. Распакуй архив.
+2. Загрузи ВСЕ файлы и папки из архива в корень репозитория с заменой старых.
+3. Особенно важно загрузить скрытую папку .github, vercel.json, apply-hard-combat-31-1.mjs и assets/ghlum311.
+4. Сделай commit с текстом из COMMIT_MESSAGE.txt.
+5. Подожди новый Vercel deployment. Ничего вручную запускать не требуется.
+6. После Ready открой НОВЫЙ deployment и нажми Ctrl+Shift+R.
 
-Важно: файл reference/PREMIUM_FIGHT_REFERENCE_31.png — только визуальный эталон. Он не используется как фальшивый фон игры.
+Локально при необходимости можно запустить APPLY_FIX.bat.

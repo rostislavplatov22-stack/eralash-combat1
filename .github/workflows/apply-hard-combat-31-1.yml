@@ -1,0 +1,25 @@
+name: Apply Hard Combat 31.1
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: ${{ contains(github.event.head_commit.message, '[auto-apply 31.1]') == false }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node apply-hard-combat-31-1.mjs .
+      - name: Commit generated index
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name "eralash-combat-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git reset -- '**/index.before-hard-combat-31.1.html' || true
+          git commit -m "[auto-apply 31.1] hard combat replacement"
+          git push

@@ -1,1 +1,1 @@
-Redesign combat screen with premium dark fantasy HUD and dedicated Ghlum animations
+Hard replace legacy combat HUD and render Ghlum with dedicated full-motion sprites
