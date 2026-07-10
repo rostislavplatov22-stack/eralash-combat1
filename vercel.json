@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "",
-  "buildCommand": "node apply-combat-director-32.mjs .",
+  "buildCommand": "node apply-true-motion-33.mjs .",
   "outputDirectory": "."
 }

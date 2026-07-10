@@ -1,1 +1,1 @@
-Add cinematic camera, premium hit feedback and clean combat effects
+Restore real fighter animation state machine with startup active recovery and hit reactions
