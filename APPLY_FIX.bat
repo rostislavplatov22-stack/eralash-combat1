@@ -1,26 +1,28 @@
 @echo off
 chcp 65001 >nul
+setlocal
 cd /d "%~dp0"
 echo.
 echo ============================================================
-echo  ERALASH COMBAT - GHLUM RUNTIME LOCK 29.0
+echo   ERALASH COMBAT - GHLUM COMBAT ART FIX 29.1
 echo ============================================================
 echo.
+set "PROJECT=%~1"
+if "%PROJECT%"=="" set "PROJECT=.."
 where node >nul 2>nul
 if errorlevel 1 (
-  echo ОШИБКА: Node.js не найден.
-  echo Установите Node.js или поместите эту папку в корень проекта,
-  echo где уже используется Node.js.
+  echo [ERROR] Node.js не найден.
+  echo Установи Node.js или запусти команду вручную на компьютере с Node.js.
   pause
   exit /b 1
 )
-node apply-ghlum-fix.mjs "%~dp0"
+node "%~dp0apply-ghlum-combat-art-fix.mjs" "%PROJECT%"
 if errorlevel 1 (
   echo.
-  echo Исправление не применено. Прочитайте ошибку выше.
+  echo Исправление не применено. Проверь текст ошибки выше.
   pause
   exit /b 1
 )
 echo.
-echo ГОТОВО. index.html исправлен, резервная копия создана.
+echo Готово. Загрузи проект на Vercel/Netlify и нажми Ctrl+Shift+R.
 pause
