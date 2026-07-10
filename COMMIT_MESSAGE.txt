@@ -1,1 +1,1 @@
-Final combat scale intro and effects polish for premium Ghlum fight
+Restore arena renderer and keep safe premium combat UI
