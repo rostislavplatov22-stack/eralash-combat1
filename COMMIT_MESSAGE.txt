@@ -1,1 +1,1 @@
-Add full Ghlum sprite animations and remove Raven motion fallback
+Redesign combat screen with premium dark fantasy HUD and dedicated Ghlum animations

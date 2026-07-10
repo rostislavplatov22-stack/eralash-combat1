@@ -1,35 +1,24 @@
-ERALASH COMBAT — GHLUM FULL MOTION 30.0
+ERALASH COMBAT — PREMIUM DARK FANTASY FIGHT 31.0
 
-ЭТО УЖЕ НЕ FIX КАРТИНКИ
-В сборку добавлен отдельный боевой sprite bank для Ghlum.
-Raven больше не используется как анимация или визуальный fallback Ghlum.
+Это полный redesign боевого экрана по утверждённому референсу:
+- новый cinematic HUD с портретами;
+- зелёные life bars и золотые energy bars;
+- большой gothic timer;
+- круглые premium combat buttons;
+- red/blue side lighting и глубокая виньетка;
+- крупный Ghlum с отдельными idle/block/attack/special/jump/KO animations;
+- жёсткое отключение Raven renderer fallback для Ghlum;
+- старый HUD и прямоугольные кнопки скрываются только во время боя.
 
-ВНЕДРЁННЫЕ АНИМАЦИИ
-- Idle: 6 кадров.
-- Block / Hit reaction: 6 кадров.
-- Light / Heavy claw attack: 6 кадров.
-- Toxic special attack: 6 кадров.
-- Jump: 6 кадров.
-- Knockdown / KO: 6 кадров.
+КАК УСТАНОВИТЬ
+1. Распакуй ВСЁ содержимое архива в КОРЕНЬ проекта, где находится index.html.
+2. Разреши объединение папки assets.
+3. Запусти APPLY_FIX.bat.
+4. Дождись сообщения: PREMIUM DARK FANTASY FIGHT 31.0 УСПЕШНО ВНЕДРЁН.
+5. Загрузить на Vercel/Netlify нужно ВЕСЬ проект, включая assets/ghlum31.
+6. На опубликованном сайте нажми Ctrl+Shift+R.
 
-ЧТО ДЕЛАЕТ УСТАНОВЩИК
-- Копирует прозрачные игровые PNG в assets/ghlum30.
-- Создаёт отдельный ghlumSpriteSheets30.
-- Привязывает состояния боя к нужным анимациям.
-- Включает sprite rendering для Ghlum даже при старом глобальном fallback.
-- Сохраняет Raven и Iron Warden без изменений.
-- Создаёт резервную копию index.html.
+Резервная копия:
+index.before-premium-fight-31.0.html
 
-КАК ПРИМЕНИТЬ
-1. Распакуй папку архива в корень проекта рядом с index.html.
-2. Запусти APPLY_FIX.bat.
-3. Дождись сообщения GHLUM FULL MOTION 30.0 УСПЕШНО ВНЕДРЁН.
-4. Загрузи весь проект на Vercel или Netlify.
-5. Нажми Ctrl+Shift+R.
-6. Если старая версия осталась: F12 > Application > Storage > Clear site data.
-
-РЕЗЕРВНАЯ КОПИЯ
-index.before-ghlum-full-motion-30.0.html
-
-ПАПКА НОВЫХ АССЕТОВ
-assets/ghlum30
+Важно: файл reference/PREMIUM_FIGHT_REFERENCE_31.png — только визуальный эталон. Он не используется как фальшивый фон игры.
