@@ -4,7 +4,7 @@ setlocal
 cd /d "%~dp0"
 echo.
 echo ============================================================
-echo   ERALASH COMBAT - GHLUM COMBAT ART FIX 29.1
+echo   ERALASH COMBAT - GHLUM FULL MOTION 30.0
 echo ============================================================
 echo.
 set "PROJECT=%~1"
@@ -12,17 +12,17 @@ if "%PROJECT%"=="" set "PROJECT=.."
 where node >nul 2>nul
 if errorlevel 1 (
   echo [ERROR] Node.js не найден.
-  echo Установи Node.js или запусти команду вручную на компьютере с Node.js.
+  echo Установи Node.js и повтори запуск.
   pause
   exit /b 1
 )
-node "%~dp0apply-ghlum-combat-art-fix.mjs" "%PROJECT%"
+node "%~dp0apply-ghlum-full-motion-30.mjs" "%PROJECT%"
 if errorlevel 1 (
   echo.
-  echo Исправление не применено. Проверь текст ошибки выше.
+  echo Исправление не применено. Проверь ошибку выше.
   pause
   exit /b 1
 )
 echo.
-echo Готово. Загрузи проект на Vercel/Netlify и нажми Ctrl+Shift+R.
+echo Готово. Загрузи весь проект и нажми Ctrl+Shift+R.
 pause

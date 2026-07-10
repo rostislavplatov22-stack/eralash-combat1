@@ -1,28 +1,35 @@
-ERALASH COMBAT — GHLUM COMBAT ART FIX 29.1
+ERALASH COMBAT — GHLUM FULL MOTION 30.0
 
-ЧТО ПОКАЗАЛО ВИДЕО
-- Выбор Ghlum работает.
-- VS-интро показывает Ghlum.
-- HUD и подпись бойца показывают GHLUM.
-- Но непосредственно на арене рендерится изображение Raven.
+ЭТО УЖЕ НЕ FIX КАРТИНКИ
+В сборку добавлен отдельный боевой sprite bank для Ghlum.
+Raven больше не используется как анимация или визуальный fallback Ghlum.
 
-ЗНАЧИТ ОШИБКА НЕ В START FIGHT
-Состояние боя уже содержит Ghlum. Ошибка находится в определении визуального типа бойца: старое поле Raven могло иметь приоритет над правильным именем Ghlum.
+ВНЕДРЁННЫЕ АНИМАЦИИ
+- Idle: 6 кадров.
+- Block / Hit reaction: 6 кадров.
+- Light / Heavy claw attack: 6 кадров.
+- Toxic special attack: 6 кадров.
+- Jump: 6 кадров.
+- Knockdown / KO: 6 кадров.
 
-ЧТО ИСПРАВЛЯЕТ 29.1
-- Проверяет все поля идентичности бойца, а не только первое найденное.
-- Для player использует сохранённый runtime selection как дополнительную гарантию.
-- Перед выбором боевого изображения принудительно восстанавливает contentId=ghlum.
-- Запрещает Ghlum использовать боевой арт и attack-pose Raven.
-- Добавляет cache-bust для fighter-ghlum-28.webp.
+ЧТО ДЕЛАЕТ УСТАНОВЩИК
+- Копирует прозрачные игровые PNG в assets/ghlum30.
+- Создаёт отдельный ghlumSpriteSheets30.
+- Привязывает состояния боя к нужным анимациям.
+- Включает sprite rendering для Ghlum даже при старом глобальном fallback.
+- Сохраняет Raven и Iron Warden без изменений.
 - Создаёт резервную копию index.html.
 
 КАК ПРИМЕНИТЬ
-1. Распакуй эту папку в корень проекта рядом с index.html.
+1. Распакуй папку архива в корень проекта рядом с index.html.
 2. Запусти APPLY_FIX.bat.
-3. Загрузи весь проект на Vercel/Netlify заново.
-4. Открой сайт и нажми Ctrl+Shift+R.
-5. При необходимости очисти Application > Storage > Clear site data.
+3. Дождись сообщения GHLUM FULL MOTION 30.0 УСПЕШНО ВНЕДРЁН.
+4. Загрузи весь проект на Vercel или Netlify.
+5. Нажми Ctrl+Shift+R.
+6. Если старая версия осталась: F12 > Application > Storage > Clear site data.
 
 РЕЗЕРВНАЯ КОПИЯ
-index.before-ghlum-combat-art-fix-29.1.html
+index.before-ghlum-full-motion-30.0.html
+
+ПАПКА НОВЫХ АССЕТОВ
+assets/ghlum30

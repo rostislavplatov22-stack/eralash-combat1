@@ -1,1 +1,1 @@
-Fix Ghlum combat art identity and prevent Raven renderer fallback
+Add full Ghlum sprite animations and remove Raven motion fallback
