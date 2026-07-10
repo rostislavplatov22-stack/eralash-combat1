@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "",
-  "buildCommand": "node apply-hard-combat-31-3.mjs .",
+  "buildCommand": "node apply-hard-combat-31-4.mjs .",
   "outputDirectory": "."
 }

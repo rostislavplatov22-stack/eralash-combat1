@@ -1,1 +1,1 @@
-Recover arena canvas and replace only Raven player art with Ghlum sprites
+Final combat scale intro and effects polish for premium Ghlum fight
