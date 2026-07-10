@@ -1,0 +1,1 @@
+Fixed Ghlum Canonical Runtime Lock 29.0 by unifying fighter selection state across Character Select, Arena Select, Arena Reveal, newMatch and round resets, capturing fighter-card input before stale handlers, and verifying the created combat fighter matches the selected Ghlum ID.
