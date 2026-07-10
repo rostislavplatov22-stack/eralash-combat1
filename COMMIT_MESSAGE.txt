@@ -1,1 +1,1 @@
-Force Ghlum canvas renderer and remove legacy ROUND VS FIGHT overlays
+Recover arena canvas and replace only Raven player art with Ghlum sprites

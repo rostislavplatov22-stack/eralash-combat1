@@ -7,5 +7,5 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-node apply-hard-combat-31-2.mjs "%CD%"
+node apply-hard-combat-31-3.mjs "%CD%"
 pause
