@@ -1,25 +1,23 @@
-ERALASH COMBAT — HARD COMBAT REPLACEMENT 31.1
+ERALASH COMBAT — GHLUM RENDERER TAKEOVER 31.2
 
-ЭТО НЕ СТАРЫЙ РУЧНОЙ ПАТЧ.
-После загрузки файлов исправление применяется автоматически:
-- во время Vercel build через vercel.json;
-- либо GitHub Actions изменит настоящий игровой index.html и сделает auto-commit.
+Исправляет именно то, что видно на последнем видео:
+- HUD пишет GHLUM, но canvas рисует Raven;
+- старые ROUND / VS / FIGHT слои накладываются поверх нового интерфейса.
 
-ЧТО ИСПРАВЛЕНО
-1. Ghlum жёстко перехватывается до любого Raven sprite bank/fallback.
-2. Ghlum получает отдельные idle, walk, block, hit, attack, special, jump и KO листы.
-3. Старый HUD перекрывается и отключается, даже если часть интерфейса рисовалась внутри canvas.
-4. Добавлен новый premium HUD с портретами, gothic timer, life/energy bars и round pips.
-5. Добавлены крупные круглые боевые кнопки, как на утверждённом референсе.
-6. ROUND/FIGHT заменён на чистый cinematic banner без огромной дешёвой коробки.
-7. Бойцы разведены по сторонам и увеличены.
+ЧТО ДЕЛАЕТ 31.2
+1. Во время боя постоянно фиксирует identity игрока как ghlum.
+2. После загрузки игры повторно перехватывает все известные fighter render functions.
+3. Дополнительно перехватывает canvas drawImage и заменяет изображения Raven на нужный кадр Ghlum.
+4. Подключает idle, walk, block, hit, attack, special, jump и KO.
+5. Подавляет старые canvas-тексты ROUND / FIGHT / VS.
+6. Скрывает старые центральные VS/intro DOM-панели.
+7. Показывает чистое короткое ROUND → FIGHT интро.
 
-КАК ЗАГРУЗИТЬ
+УСТАНОВКА
 1. Распакуй архив.
-2. Загрузи ВСЕ файлы и папки из архива в корень репозитория с заменой старых.
-3. Особенно важно загрузить скрытую папку .github, vercel.json, apply-hard-combat-31-1.mjs и assets/ghlum311.
-4. Сделай commit с текстом из COMMIT_MESSAGE.txt.
-5. Подожди новый Vercel deployment. Ничего вручную запускать не требуется.
-6. После Ready открой НОВЫЙ deployment и нажми Ctrl+Shift+R.
-
-Локально при необходимости можно запустить APPLY_FIX.bat.
+2. Загрузи ВСЕ файлы в корень репозитория с заменой.
+3. Обязательно загрузи скрытую папку .github, assets/ghlum312, vercel.json,
+   apply-hard-combat-31-2.mjs и hard-combat-31-2-runtime.js.
+4. Сделай commit.
+5. Дождись нового deployment и открой именно его.
+6. Нажми Ctrl+Shift+R.

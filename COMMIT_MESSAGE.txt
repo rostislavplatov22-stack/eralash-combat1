@@ -1,1 +1,1 @@
-Hard replace legacy combat HUD and render Ghlum with dedicated full-motion sprites
+Force Ghlum canvas renderer and remove legacy ROUND VS FIGHT overlays
