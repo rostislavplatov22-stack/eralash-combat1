@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -e
 cd "$(dirname "$0")"
-node apply-hard-combat-31-5.mjs "$(pwd)"
+node apply-combat-director-32.mjs "$(pwd)"
